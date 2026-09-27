@@ -1,16 +1,17 @@
-# Parámetros medidos con pruebas de carga reales (ver docs/ para el detalle de cada medición)
-capacity_rps: 18            # C: peticiones/seg antes de que el pod se degrade
-startup_time_seconds: 13    # T: tiempo real hasta que un pod nuevo queda Ready
-sigma_rps: 2                # margen de error del tráfico proyectado
+# Parameters measured with real load tests
+
+capacity_rps: 18  # requests per second before the pod starts degrading
+startup_time_seconds: 13  # Tactual time until a new pod becomes Ready
+sigma_rps: 2  # projected traffic error margin
 
 risk_thresholds:
-  scale_up: 0.70                    # riesgo desde el cual se pide escalar
-  scale_down: 0.30                  # riesgo por debajo del cual se puede bajar
-  scale_down_sustained_seconds: 60  # tiempo que el riesgo debe mantenerse bajo antes de bajar
+  scale_up: 0.70  # risk level from which scaling up is requested
+  scale_down: 0.30  # risk level below which scaling down is allowed
+  scale_down_sustained_seconds: 60  # time the risk must remain below the threshold before scaling down
 
 sampling:
-  interval_seconds: 5           # cada cuánto el recolector consulta Prometheus
-  projection_window_seconds: 30 # ventana usada para calcular la pendiente del tráfico
+  interval_seconds: 5  # how often the collector queries Prometheus
+  projection_window_seconds: 30  # window used to calculate the traffic slope
 
 kubernetes:
   hpa_name: catalog-service
