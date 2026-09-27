@@ -1,0 +1,24 @@
+# Parámetros medidos con pruebas de carga reales (ver docs/ para el detalle de cada medición)
+capacity_rps: 18            # C: peticiones/seg antes de que el pod se degrade
+startup_time_seconds: 13    # T: tiempo real hasta que un pod nuevo queda Ready
+sigma_rps: 2                # margen de error del tráfico proyectado
+
+risk_thresholds:
+  scale_up: 0.70                    # riesgo desde el cual se pide escalar
+  scale_down: 0.30                  # riesgo por debajo del cual se puede bajar
+  scale_down_sustained_seconds: 60  # tiempo que el riesgo debe mantenerse bajo antes de bajar
+
+sampling:
+  interval_seconds: 5           # cada cuánto el recolector consulta Prometheus
+  projection_window_seconds: 30 # ventana usada para calcular la pendiente del tráfico
+
+kubernetes:
+  hpa_name: catalog-service
+  namespace: default
+  min_replicas_normal: 1
+  min_replicas_scaled: 2
+
+prometheus:
+  url: "http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
+  query_rps: 'sum(rate(http_request_duration_seconds_count{route="/"}[30s]))'
+  query_p95: 'histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{route="/"}[30s])) by (le))'
