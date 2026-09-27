@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package catalog;
+
+service CatalogService {
+  rpc GetBook (BookId) returns (Book);
+  rpc ListBooks (Empty) returns (BookList);
+}
+
+message Empty {}
+
+message BookId {
+  string id = 1;
+}
+
+message Book {
+  string id = 1;
+  string name = 2;
+  string author = 3;
+  string description = 4;
+  string price = 5;
+  int32 countInStock = 6;
+  string image = 7;
+}
+
+message BookList {
+  repeated Book books = 1;
+}
