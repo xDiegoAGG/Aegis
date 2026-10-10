@@ -1,5 +1,3 @@
-"""Calcula sigma (margen de error del trafico) a partir de la varianza real
-de req/s medida por Prometheus, en un tramo donde el servicio estaba sano."""
 import json
 import statistics
 import urllib.parse
@@ -24,14 +22,18 @@ def query_range(query, start, end, step):
         return json.load(response)
 
 
+# Sigma (traffic error margin) = standard deviation of req/s over a window where the service was healthy.
 def main():
     data = query_range(QUERY, START, END, STEP)["data"]["result"]
-    valores = [float(v) for _, v in data[0]["values"]] if data else []
-    print("valores:", valores)
-    if len(valores) < 2:
-        print("No hay suficientes muestras para calcular stdev (se necesitan al menos 2).")
+    values = []
+    if data:
+        for _, v in data[0]["values"]:
+            values.append(float(v))
+    print("values:", values)
+    if len(values) < 2:
+        print("Not enough samples to calculate stdev (at least 2 are needed).")
         return
-    sigma = statistics.stdev(valores)
+    sigma = statistics.stdev(values)
     print("sigma =", round(sigma, 2), "req/s")
 
 

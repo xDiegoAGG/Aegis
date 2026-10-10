@@ -10,7 +10,7 @@ dynamodb = boto3.resource("dynamodb",
 
 TABLE_NAME = "tb_books"
 
-# Crear la tabla si no existe
+# Create the table if it does not exist
 existing_tables = []
 for dynamodb_table in dynamodb.tables.all():
     existing_tables.append(dynamodb_table.name)
@@ -23,14 +23,14 @@ if TABLE_NAME not in existing_tables:
         BillingMode="PAY_PER_REQUEST",
     )
     table.wait_until_exists()
-    print(f"Tabla '{TABLE_NAME}' creada.")
+    print(f"Table '{TABLE_NAME}' created.")
 else:
     table = dynamodb.Table(TABLE_NAME)
-    print(f"Tabla '{TABLE_NAME}' ya existía.")
+    print(f"Table '{TABLE_NAME}' already existed.")
 
-# Libros original de la app mybookstore
+# Original books from the mybookstore app (catalog data, kept as in the original store)
 
-libros_originales = [
+original_books = [
     {
         "id": "1", "name": "Cumbres Borrascosas", "author": "Emily Brontë",
         "description": "Esta edición de Cumbres Borrascosas forma parte de la colección Jardín Secreto de Editorial Alma, caracterizada por libros de tapa dura con un diseño estético y detallado. La obra de Emily Brontë narra la intensa y oscura historia de amor, venganza y obsesión entre Catherine Earnshaw y Heatcliff en los páramos de Yorkshire.",
@@ -63,24 +63,24 @@ libros_originales = [
     },
 ]
 
-for libro in libros_originales:
-    table.put_item(Item=libro)
-print(f"Sembrados {len(libros_originales)} libros originales.")
+for book in original_books:
+    table.put_item(Item=book)
+print(f"Seeded {len(original_books)} original books.")
 
-# Libros adicionales para que el Scan tenga peso real bajo carga
+# Extra books so the Scan has real weight under load
 
-autores = ["Gabriel García Márquez", "Isabel Allende", "Jorge Luis Borges", "Julio Cortázar", "Mario Vargas Llosa"]
+authors = ["Gabriel García Márquez", "Isabel Allende", "Jorge Luis Borges", "Julio Cortázar", "Mario Vargas Llosa"]
 for i in range(7, 51):
     table.put_item(
         Item={
             "id": str(i),
-            "name": f"Libro de prueba #{i}",
-            "author": random.choice(autores),
-            "description": "Descripción generada para pruebas de carga de Aegis.",
+            "name": f"Test book #{i}",
+            "author": random.choice(authors),
+            "description": "Description generated for Aegis load tests.",
             "price": random.randint(10000, 80000),
             "countInStock": random.randint(0, 100),
             "image": "https://via.placeholder.com/150",
         }
     )
-    
-print("Tabla de libros poblada completamente, estamos melos")
+
+print("Books table fully seeded.")
