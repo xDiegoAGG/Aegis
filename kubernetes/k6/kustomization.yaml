@@ -4,4 +4,4 @@ configMapGenerator:
       - test.js=test.js
 
 resources:
-  - k6-job.yaml
+  - job.yaml
