@@ -1,0 +1,135 @@
+import csv
+import datetime
+import sys
+
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+
+DEFAULT_TITLE = "Risk calculated by Aegis during the 5 → 30 req/s ramp"
+SCALE_UP = 0.70
+SCALE_DOWN = 0.30
+P95_CAP_S = 5
+EVENT_COLORS = ["tab:purple", "tab:red", "tab:orange", "tab:green"]
+NUMERIC = ["rps", "slope", "projected_rps", "capacity_rps", "risk", "p95_s", "replicas", "replicas_ready"]
+
+
+def parse_time(text):
+    return datetime.datetime.strptime(text, "%H:%M:%S")
+
+
+def parse_value(text):
+    try:
+        value = float(text)
+    except ValueError:
+        return None
+    if value != value:  # drop NaN
+        return None
+    return value
+
+
+def load_csv(path):
+    rows = {"time": [], "aegis_target": []}
+    for key in NUMERIC:
+        rows[key] = []
+    with open(path, newline="") as f:
+        for row in csv.DictReader(f):
+            rows["time"].append(parse_time(row["time_utc"]))
+            for key in NUMERIC:
+                rows[key].append(parse_value(row[key]))
+            # Optional column: older CSVs (before the decision engine) do not have it
+            rows["aegis_target"].append(parse_value(row.get("aegis_target", "")))
+    return rows
+
+
+def main():
+    if len(sys.argv) < 3:
+        print("Usage: python3 scripts/plot_risk.py input.csv output.png [--title \"text\"] [HH:MM:SS=label ...]")
+        sys.exit(1)
+
+    csv_path, png_path = sys.argv[1], sys.argv[2]
+    extra_args = sys.argv[3:]
+    title = DEFAULT_TITLE
+    if "--title" in extra_args:
+        index = extra_args.index("--title")
+        title = extra_args[index + 1]
+        extra_args = extra_args[:index] + extra_args[index + 2:]
+    events = []
+    for arg in extra_args:
+        time_text, _, label = arg.partition("=")
+        events.append((parse_time(time_text), label or time_text))
+
+    data = load_csv(csv_path)
+    times = data["time"]
+
+    risk_pct = []
+    for risk in data["risk"]:
+        if risk is None:
+            risk_pct.append(None)
+        else:
+            risk_pct.append(risk * 100)
+
+    has_aegis_target = False
+    for target in data["aegis_target"]:
+        if target is not None:
+            has_aegis_target = True
+            break
+
+    fig, (ax_rps, ax_p95, ax_risk, ax_rep) = plt.subplots(4, 1, figsize=(12, 11), sharex=True)
+    fig.suptitle(title, fontsize=14)
+
+    ax_rps.plot(times, data["rps"], color="tab:blue", linewidth=2, label="Current req/s (r)")
+    ax_rps.plot(times, data["projected_rps"], color="tab:blue", linestyle="--", alpha=0.6,
+                label="req/s projected to T = 13 s (r + m·T)")
+    ax_rps.step(times, data["capacity_rps"], where="post", color="gray", linestyle="--",
+                label="Capacity (C × N)")
+    ax_rps.set_ylabel("Requests / s")
+    ax_rps.legend(loc="upper left", fontsize=9)
+
+    ax_p95.plot(times, data["p95_s"], color="tab:red", linewidth=2, label="P95 latency")
+    ax_p95.axhline(P95_CAP_S, color="gray", linestyle=":", label="Histogram cap (5 s)")
+    ax_p95.set_ylabel("P95 (s)")
+    ax_p95.set_ylim(0, P95_CAP_S + 0.5)
+    ax_p95.legend(loc="upper left", fontsize=9)
+
+    ax_risk.plot(times, risk_pct, color="tab:purple", linewidth=2, label="Risk")
+    ax_risk.axhline(SCALE_UP * 100, color="tab:red", linestyle="--", label="Scale-up threshold (70%)")
+    ax_risk.axhline(SCALE_DOWN * 100, color="tab:green", linestyle="--", label="Scale-down threshold (30%)")
+    ax_risk.set_ylabel("Risk (%)")
+    ax_risk.set_ylim(-5, 105)
+    ax_risk.legend(loc="upper left", fontsize=9)
+
+    ax_rep.step(times, data["replicas"], where="post", color="tab:gray", linewidth=2, label="Desired replicas")
+    ax_rep.step(times, data["replicas_ready"], where="post", color="tab:green", linewidth=2, label="Ready replicas")
+    if has_aegis_target:
+        ax_rep.step(times, data["aegis_target"], where="post", color="tab:purple", linewidth=2,
+                    linestyle="--", label="Aegis target (simulated)")
+    ax_rep.set_ylabel("Replicas")
+    ax_rep.set_ylim(-0.2, 3.2)
+    ax_rep.set_yticks([0, 1, 2, 3])
+    ax_rep.set_xlabel("Time (UTC)")
+    ax_rep.legend(loc="upper left", fontsize=9)
+
+    axes = (ax_rps, ax_p95, ax_risk, ax_rep)
+    for index, (event_time, label) in enumerate(events):
+        color = EVENT_COLORS[index % len(EVENT_COLORS)]
+        for ax in axes:
+            ax.axvline(event_time, color=color, linestyle="--", linewidth=1.5)
+        # Three alternating heights so labels of close events do not overlap
+        ax_rps.annotate(label, xy=(event_time, 1.02 + 0.09 * (index % 3)), xycoords=("data", "axes fraction"),
+                        color=color, fontsize=9, ha="center", va="bottom")
+
+    for ax in axes:
+        ax.grid(alpha=0.3)
+    ax_rep.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M:%S"))
+
+    fig.tight_layout()
+    fig.subplots_adjust(top=0.90)
+    fig.savefig(png_path, dpi=150)
+    print("Chart saved to", png_path)
+
+
+if __name__ == "__main__":
+    main()
