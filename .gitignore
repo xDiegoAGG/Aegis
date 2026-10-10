@@ -41,5 +41,6 @@ htmlcov/
 .vscode/
 .DS_Store
 
-# Project plan
-plan.md*.docx
+# Project plan and local documents
+plan.md
+*.docx
