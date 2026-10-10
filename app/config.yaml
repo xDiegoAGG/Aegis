@@ -1,7 +1,7 @@
 # Parameters measured with real load tests
 
 capacity_rps: 18  # requests per second before the pod starts degrading
-startup_time_seconds: 13  # Tactual time until a new pod becomes Ready
+startup_time_seconds: 13  # T: actual time until a new pod becomes Ready
 sigma_rps: 2  # projected traffic error margin
 
 risk_thresholds:
@@ -16,10 +16,12 @@ sampling:
 kubernetes:
   hpa_name: catalog-service
   namespace: default
-  min_replicas_normal: 1
-  min_replicas_scaled: 2
+  min_replicas: 1  # Aegis never goes below this
+  max_replicas: 3  # must match maxReplicas in kubernetes/catalog-service-hpa.yaml
 
 prometheus:
   url: "http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
   query_rps: 'sum(rate(http_request_duration_seconds_count{route="/"}[30s]))'
   query_p95: 'histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{route="/"}[30s])) by (le))'
+  query_replicas_ready: 'sum(kube_deployment_status_replicas_ready{deployment="catalog-service"})'
+  timeout_seconds: 3  # must be lower than sampling.interval_seconds
