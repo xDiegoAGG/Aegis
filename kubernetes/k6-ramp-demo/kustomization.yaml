@@ -1,0 +1,7 @@
+configMapGenerator:
+  - name: k6-ramp-demo-script
+    files:
+      - test.js=test.js
+
+resources:
+  - job.yaml
