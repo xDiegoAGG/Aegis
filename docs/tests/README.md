@@ -1,0 +1,35 @@
+# Aegis tests
+
+Log of every test run in the project. Each test has its own document with what was done, when, the results and its chart. Raw data (CSV) and charts (PNG) live in [`data/`](data/).
+
+All times are in **UTC** (local time = UTC − 5).
+
+| # | Test | Date | Purpose | Key result |
+|---|---|---|---|---|
+| 01 | [Capacity of one pod](01-capacity-calibration.md) | 2026-09-27 | Measure $C$ | P95 jumps from ~0.3 s to 5 s around 18–20 req/s → **C = 18** |
+| 02 | [Steps below capacity](02-step-load-calibration.md) | 2026-09-27 | Confirm $C$ and measure $\sigma$ | 5, 10 and 14 req/s with no degradation |
+| 03 | [Startup time](03-startup-time-calibration.md) | 2026-09-27 | Measure $T$ | 13, 15, 12 and 11 s → **T = 13** |
+| 04 | [Baseline HPA, without Aegis](04-hpa-baseline.md) | 2026-09-28 | "Before" comparison | The HPA scales **95 s after** latency breaks |
+| 05 | [Collector](05-collector.md) | 2026-09-28 | Test `collector.py` | Follows the steps and survives Prometheus being down |
+| 06 | [Risk calculator, synthetic scenarios](06-risk-synthetic.md) | 2026-09-28 | Test `risk.py` without real traffic | Every case gives the expected result |
+| 07 | [Risk calculator, live](07-risk-live.md) | 2026-09-28 | Test `risk.py` with real traffic | Risk crosses 70% **65 s before** latency breaks |
+| 08 | [Decision engine, synthetic scenarios](08-decision-synthetic.md) | 2026-09-28 | Test `decision.py` without real traffic | Right orders in all 8 scenarios, no flapping |
+| 09 | [Decision engine, replayed on real data](09-decision-replay.md) | 2026-09-28 | See what Aegis would have decided in test 07 | Scale-up **65 s before** latency breaks; scale-down 60 s after traffic ends |
+
+## How each artifact is produced
+
+Everything needs the Prometheus tunnel open:
+
+```
+kubectl -n monitoring port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090
+```
+
+| Script | What it does |
+|---|---|
+| `scripts/export_run.py START END output` | Exports req/s, P95 and replicas of a run to `output.csv` |
+| `scripts/plot_run.py input.csv output.png [--title ...] [HH:MM:SS=event ...]` | 3-panel chart (traffic, latency, replicas) |
+| `scripts/plot_startup.py START END output.png` | Chart of the startup time of each new pod |
+| `scripts/replay_risk.py START END output` | Feeds a run's data through the risk calculator and the decision engine (simulated) and saves `output.csv` |
+| `scripts/plot_risk.py input.csv output.png [--title ...] [HH:MM:SS=event ...]` | 4-panel chart (traffic, latency, risk, replicas; plus the simulated Aegis target if present) |
+
+Prometheus keeps 10 days of data, so a run can be exported and plotted later, as long as it is less than 10 days old.
