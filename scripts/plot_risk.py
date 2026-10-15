@@ -15,7 +15,6 @@ P95_CAP_S = 5
 EVENT_COLORS = ["tab:purple", "tab:red", "tab:orange", "tab:green"]
 NUMERIC = ["rps", "slope", "projected_rps", "capacity_rps", "risk", "p95_s", "replicas", "replicas_ready"]
 
-
 def parse_time(text):
     return datetime.datetime.strptime(text, "%H:%M:%S")
 
@@ -46,12 +45,18 @@ def load_csv(path):
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: python3 scripts/plot_risk.py input.csv output.png [--title \"text\"] [HH:MM:SS=label ...]")
+        print("Usage: python3 scripts/plot_risk.py input.csv output.png [--title \"text\"] [--hide-target]"
+              " [HH:MM:SS=label ...]")
         sys.exit(1)
 
     csv_path, png_path = sys.argv[1], sys.argv[2]
     extra_args = sys.argv[3:]
     title = DEFAULT_TITLE
+    # --hide-target: for live runs, where the desired replicas already are Aegis's real decisions
+    hide_target = False
+    if "--hide-target" in extra_args:
+        hide_target = True
+        extra_args.remove("--hide-target")
     if "--title" in extra_args:
         index = extra_args.index("--title")
         title = extra_args[index + 1]
@@ -72,10 +77,11 @@ def main():
             risk_pct.append(risk * 100)
 
     has_aegis_target = False
-    for target in data["aegis_target"]:
-        if target is not None:
-            has_aegis_target = True
-            break
+    if not hide_target:
+        for target in data["aegis_target"]:
+            if target is not None:
+                has_aegis_target = True
+                break
 
     fig, (ax_rps, ax_p95, ax_risk, ax_rep) = plt.subplots(4, 1, figsize=(12, 11), sharex=True)
     fig.suptitle(title, fontsize=14)

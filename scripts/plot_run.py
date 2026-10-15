@@ -89,7 +89,8 @@ def main():
         color = EVENT_COLORS[index % len(EVENT_COLORS)]
         for ax in (ax_rps, ax_p95, ax_rep):
             ax.axvline(event_time, color=color, linestyle="--", linewidth=1.5)
-        ax_rps.annotate(label, xy=(event_time, 1.02), xycoords=("data", "axes fraction"),
+        # Two alternating heights so labels of close events do not overlap
+        ax_rps.annotate(label, xy=(event_time, 1.02 + 0.08 * (index % 2)), xycoords=("data", "axes fraction"),
                         color=color, fontsize=9, ha="center", va="bottom", rotation=0)
 
     for ax in (ax_rps, ax_p95, ax_rep):
