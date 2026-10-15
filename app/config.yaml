@@ -17,7 +17,7 @@ kubernetes:
   hpa_name: catalog-service
   namespace: default
   min_replicas: 1  # Aegis never goes below this
-  max_replicas: 3  # must match maxReplicas in kubernetes/catalog-service-hpa.yaml
+  max_replicas: 3  # must match maxReplicas in kubernetes/catalog-service-hpa-aegis.yaml
 
 prometheus:
   url: "http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
