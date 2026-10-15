@@ -15,6 +15,9 @@ All times are in **UTC** (local time = UTC − 5).
 | 07 | [Risk calculator, live](07-risk-live.md) | 2026-09-28 | Test `risk.py` with real traffic | Risk crosses 70% **65 s before** latency breaks |
 | 08 | [Decision engine, synthetic scenarios](08-decision-synthetic.md) | 2026-09-28 | Test `decision.py` without real traffic | Right orders in all 8 scenarios, no flapping |
 | 09 | [Decision engine, replayed on real data](09-decision-replay.md) | 2026-09-28 | See what Aegis would have decided in test 07 | Scale-up **65 s before** latency breaks; scale-down 60 s after traffic ends |
+| 10 | [Actuator, manual test](10-actuator-manual.md) | 2026-10-13 | Test `actuator.py` against the real HPA | `minReplicas` 1 → 3 creates pods at once; the HPA delayed scale-down ~5 min, fixed with the Aegis HPA (~1 s) |
+| 11 | [Aegis live](11-aegis-live.md) | 2026-10-14 | "After" comparison: same ramp as 04, Aegis scaling | Scale-up **26 s before** latency breaks, 0% errors (vs 6.15%); latency still breaks because keep-alive connections stay on the old pod |
+| 12 | [Baseline HPA, one connection per request](12-hpa-baseline-no-reuse.md) | 2026-10-14 | Repeat 04 with the load-balancing fix | Traffic is split evenly, but 1 pod handles ~28 req/s without breaking: **C must be measured again** |
 
 ## How each artifact is produced
 
@@ -29,6 +32,7 @@ kubectl -n monitoring port-forward svc/prometheus-kube-prometheus-prometheus 909
 | `scripts/export_run.py START END output` | Exports req/s, P95 and replicas of a run to `output.csv` |
 | `scripts/plot_run.py input.csv output.png [--title ...] [HH:MM:SS=event ...]` | 3-panel chart (traffic, latency, replicas) |
 | `scripts/plot_startup.py START END output.png` | Chart of the startup time of each new pod |
+| `scripts/plot_pods.py START END output [--title ...]` | Requests per second and Ready state of each pod, to `output.csv` and `output.png` |
 | `scripts/replay_risk.py START END output` | Feeds a run's data through the risk calculator and the decision engine (simulated) and saves `output.csv` |
 | `scripts/plot_risk.py input.csv output.png [--title ...] [HH:MM:SS=event ...]` | 4-panel chart (traffic, latency, risk, replicas; plus the simulated Aegis target if present) |
 

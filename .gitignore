@@ -44,3 +44,4 @@ htmlcov/
 # Project plan and local documents
 plan.md
 *.docx
+.kiro/
