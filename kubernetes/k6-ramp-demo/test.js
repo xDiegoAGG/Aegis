@@ -3,6 +3,9 @@ import http from 'k6/http';
 // Demo ramp: 5 req/s -> 30 req/s over 2 min, held for 1 min, then down.
 // 30 req/s exceeds the capacity of 1 pod (C = 18 req/s), so it forces a scale-up.
 export const options = {
+  // One new connection per request. A Kubernetes Service picks a pod per connection,
+  // so with keep-alive the traffic stayed on the old pod after a scale-up (test 11).
+  noConnectionReuse: true,
   scenarios: {
     ramp_demo: {
       executor: 'ramping-arrival-rate',
