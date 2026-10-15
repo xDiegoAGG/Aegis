@@ -49,8 +49,8 @@ class RiskCalculator:
         self.startup_time_seconds = startup_time_seconds
         self.sigma_rps = sigma_rps
         self.window_seconds = window_seconds
-        self._window = deque()          # valid (timestamp, rps) pairs inside the window
-        self._last_replicas = None
+        self.window = deque()          # valid (timestamp, rps) pairs inside the window
+        self.last_replicas = None
 
     @classmethod
     def from_config(cls, config):
@@ -64,22 +64,22 @@ class RiskCalculator:
     # Adds a sample and returns the current risk, or None if there is no traffic data yet.
     def update(self, sample) -> Optional[RiskResult]:
         if sample.rps is not None:
-            self._window.append((sample.timestamp, sample.rps))
+            self.window.append((sample.timestamp, sample.rps))
         if sample.replicas_ready is not None:
-            self._last_replicas = sample.replicas_ready
+            self.last_replicas = sample.replicas_ready
 
         # Drop samples that fell out of the window
-        while self._window and self._window[0][0] < sample.timestamp - self.window_seconds:
-            self._window.popleft()
+        while self.window and self.window[0][0] < sample.timestamp - self.window_seconds:
+            self.window.popleft()
 
-        if not self._window:
+        if not self.window:
             return None
 
-        timestamp, rps = self._window[-1]
-        slope = self._slope()
+        timestamp, rps = self.window[-1]
+        slope = self.slope()
         projected_rps = rps + slope * self.startup_time_seconds
 
-        replicas = max(MIN_REPLICAS_FOR_CAPACITY, self._last_replicas or 0)
+        replicas = max(MIN_REPLICAS_FOR_CAPACITY, self.last_replicas or 0)
         capacity = self.capacity_rps * replicas
         risk = risk_probability(projected_rps, capacity, self.sigma_rps)
 
@@ -95,12 +95,12 @@ class RiskCalculator:
             sigma_rps=self.sigma_rps,
         )
 
-    def _slope(self):
-        if len(self._window) < 2:
+    def slope(self):
+        if len(self.window) < 2:
             return 0.0
         times = []
         values = []
-        for timestamp, rps in self._window:
+        for timestamp, rps in self.window:
             times.append(timestamp)
             values.append(rps)
         return statistics.linear_regression(times, values).slope

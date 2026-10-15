@@ -44,9 +44,9 @@ class PrometheusCollector:
     # is still returned: a network error never brings Aegis down.
     def collect(self):
         timestamp = time.time()
-        rps = self._query_scalar(self.query_rps, timestamp)
-        p95_s = self._query_scalar(self.query_p95, timestamp)
-        replicas = self._query_scalar(self.query_replicas_ready, timestamp)
+        rps = self.query_scalar(self.query_rps, timestamp)
+        p95_s = self.query_scalar(self.query_p95, timestamp)
+        replicas = self.query_scalar(self.query_replicas_ready, timestamp)
 
         replicas_ready = None
         if replicas is not None:
@@ -60,7 +60,7 @@ class PrometheusCollector:
         )
 
     # Runs an instant query and returns its single value, or None if there is no data.
-    def _query_scalar(self, query, timestamp):
+    def query_scalar(self, query, timestamp):
         params = urllib.parse.urlencode({"query": query, "time": timestamp})
         try:
             with urllib.request.urlopen(self.query_url + "?" + params, timeout=self.timeout_seconds) as response:

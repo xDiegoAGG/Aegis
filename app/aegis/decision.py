@@ -29,12 +29,12 @@ class DecisionEngine:
         self.scale_down_sustained_seconds = scale_down_sustained_seconds
         self.min_replicas = min_replicas
         self.max_replicas = max_replicas
-        self._low_risk_since = None    # when risk (with one replica less) went below the threshold
+        self.low_risk_since = None    # when risk (with one replica less) went below the threshold
 
         if initial_target is None:
             self.target = min_replicas
         else:
-            self.target = self._clamp(initial_target)
+            self.target = self.clamp(initial_target)
 
     @classmethod
     def from_config(cls, config, initial_target=None):
@@ -57,15 +57,15 @@ class DecisionEngine:
 
         if result is None:
             # Without data we do not know: hold, and do not count this time towards scaling down.
-            self._low_risk_since = None
+            self.low_risk_since = None
             return Decision(now, HOLD, previous, previous, "no traffic data")
 
         # Scale up (evaluated with the replicas already requested)
         risk_at_target = result.risk_at(self.target)
         if risk_at_target >= self.scale_up_threshold:
-            self._low_risk_since = None
+            self.low_risk_since = None
             if self.target >= self.max_replicas:
-                return self._hold(now, "risk with " + str(self.target) + " replica(s) " + pct(risk_at_target)
+                return self.hold(now, "risk with " + str(self.target) + " replica(s) " + pct(risk_at_target)
                                   + " but already at max_replicas")
             self.target += 1
             return Decision(now, SCALE_UP, previous, self.target,
@@ -76,29 +76,29 @@ class DecisionEngine:
         if self.target > self.min_replicas:
             risk_one_less = result.risk_at(self.target - 1)
             if risk_one_less < self.scale_down_threshold:
-                if self._low_risk_since is None:
-                    self._low_risk_since = now
-                low_for = now - self._low_risk_since
+                if self.low_risk_since is None:
+                    self.low_risk_since = now
+                low_for = now - self.low_risk_since
                 if low_for >= self.scale_down_sustained_seconds:
                     self.target -= 1
-                    self._low_risk_since = None   # the next step down needs another full period
+                    self.low_risk_since = None   # the next step down needs another full period
                     return Decision(now, SCALE_DOWN, previous, self.target,
                                     "risk with " + str(self.target) + " replica(s) " + pct(risk_one_less)
                                     + " < " + pct(self.scale_down_threshold) + " for "
                                     + str(int(low_for)) + " s")
-                return self._hold(now, "risk with one replica less " + pct(risk_one_less) + ", low for "
+                return self.hold(now, "risk with one replica less " + pct(risk_one_less) + ", low for "
                                   + str(int(low_for)) + "/" + str(self.scale_down_sustained_seconds) + " s")
-            self._low_risk_since = None
-            return self._hold(now, "risk with one replica less " + pct(risk_one_less)
+            self.low_risk_since = None
+            return self.hold(now, "risk with one replica less " + pct(risk_one_less)
                               + " >= " + pct(self.scale_down_threshold))
 
-        self._low_risk_since = None
-        return self._hold(now, "risk " + pct(risk_at_target) + ", already at min_replicas")
+        self.low_risk_since = None
+        return self.hold(now, "risk " + pct(risk_at_target) + ", already at min_replicas")
 
-    def _hold(self, now, reason):
+    def hold(self, now, reason):
         return Decision(now, HOLD, self.target, self.target, reason)
 
-    def _clamp(self, replicas):
+    def clamp(self, replicas):
         return max(self.min_replicas, min(self.max_replicas, replicas))
 
 
