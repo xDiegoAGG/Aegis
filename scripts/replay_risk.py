@@ -21,7 +21,7 @@ PROMETHEUS_URL = "http://localhost:9090/api/v1/query_range"
 # Latency for the chart: short window (10s) to see the jump when it actually happens
 QUERY_P95_10S = 'histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{route="/"}[10s])) by (le))'
 QUERY_REPLICAS = 'sum(kube_deployment_status_replicas{deployment="catalog-service"})'
-COLUMNS = ["time_utc", "rps", "slope", "projected_rps", "capacity_rps", "risk",
+COLUMNS = ["time_utc", "rps", "slope", "projected_rps", "capacity_rps", "risk", "sigma_rps",
            "p95_s", "replicas", "replicas_ready", "action", "aegis_target"]
 
 
@@ -59,8 +59,10 @@ def main():
     args = sys.argv[1:]
     capacity = take_option(args, "--capacity")
     startup = take_option(args, "--startup")
+    sigma = take_option(args, "--sigma")
     if len(args) != 3:
-        print("Usage: python3 scripts/replay_risk.py START END output_path [--capacity C] [--startup T]")
+        print("Usage: python3 scripts/replay_risk.py START END output_path [--capacity C] [--startup T] [--sigma S]")
+        print("Without --sigma, sigma is calculated from the projection errors, as in Aegis.")
         print("Without --capacity and --startup, C and T come from the cluster calibration (aegis.calibrate).")
         print("Runs before the calibration existed used C = 18 and T = 13.")
         sys.exit(1)
@@ -77,6 +79,10 @@ def main():
         config["capacity_rps"] = float(capacity)
     if startup is not None:
         config["startup_time_seconds"] = float(startup)
+    if sigma is not None:
+        # Fixed sigma, as before it was calculated live (runs before test 15 used 2)
+        config["sigma"]["initial_rps"] = float(sigma)
+        config["sigma"]["min_errors"] = 10 ** 9
     prometheus = config["prometheus"]
     step = str(config["sampling"]["interval_seconds"]) + "s"
 
@@ -110,9 +116,10 @@ def main():
             time_utc = datetime.datetime.fromtimestamp(t, datetime.timezone.utc).strftime("%H:%M:%S")
 
             if result is None:
-                risk_fields = ["", "", "", "", ""]
+                risk_fields = ["", "", "", "", "", ""]
             else:
-                risk_fields = [result.rps, result.slope, result.projected_rps, result.capacity_rps, result.risk]
+                risk_fields = [result.rps, result.slope, result.projected_rps, result.capacity_rps, result.risk,
+                               result.sigma_rps]
             writer.writerow([time_utc] + risk_fields + [
                 p95.get(t, ""), replicas.get(t, ""), ready.get(t, ""),
                 decision.action, decision.target,

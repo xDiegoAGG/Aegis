@@ -14,6 +14,7 @@ SCALE_DOWN = 0.30
 P95_CAP_S = 5
 EVENT_COLORS = ["tab:purple", "tab:red", "tab:orange", "tab:green"]
 NUMERIC = ["rps", "slope", "projected_rps", "capacity_rps", "risk", "p95_s", "replicas", "replicas_ready"]
+OPTIONAL = ["aegis_target", "sigma_rps"]   # older CSVs do not have these columns
 
 def parse_time(text):
     return datetime.datetime.strptime(text, "%H:%M:%S")
@@ -30,17 +31,24 @@ def parse_value(text):
 
 
 def load_csv(path):
-    rows = {"time": [], "aegis_target": []}
-    for key in NUMERIC:
+    rows = {"time": []}
+    for key in NUMERIC + OPTIONAL:
         rows[key] = []
     with open(path, newline="") as f:
         for row in csv.DictReader(f):
             rows["time"].append(parse_time(row["time_utc"]))
             for key in NUMERIC:
                 rows[key].append(parse_value(row[key]))
-            # Optional column: older CSVs (before the decision engine) do not have it
-            rows["aegis_target"].append(parse_value(row.get("aegis_target", "")))
+            for key in OPTIONAL:
+                rows[key].append(parse_value(row.get(key, "")))
     return rows
+
+
+def has_values(values):
+    for value in values:
+        if value is not None:
+            return True
+    return False
 
 
 def main():
@@ -78,10 +86,7 @@ def main():
 
     has_aegis_target = False
     if not hide_target:
-        for target in data["aegis_target"]:
-            if target is not None:
-                has_aegis_target = True
-                break
+        has_aegis_target = has_values(data["aegis_target"])
 
     fig, (ax_rps, ax_p95, ax_risk, ax_rep) = plt.subplots(4, 1, figsize=(12, 11), sharex=True)
     fig.suptitle(title, fontsize=14)
@@ -89,6 +94,19 @@ def main():
     ax_rps.plot(times, data["rps"], color="tab:blue", linewidth=2, label="Current req/s (r)")
     ax_rps.plot(times, data["projected_rps"], color="tab:blue", linestyle="--", alpha=0.6,
                 label="Projected req/s (r + m·T)")
+    if has_values(data["sigma_rps"]):
+        # Band of ±sigma around the projection: how wrong the projection has been lately
+        band_times = []
+        low = []
+        high = []
+        for index, sigma in enumerate(data["sigma_rps"]):
+            projected = data["projected_rps"][index]
+            if sigma is None or projected is None:
+                continue
+            band_times.append(times[index])
+            low.append(projected - sigma)
+            high.append(projected + sigma)
+        ax_rps.fill_between(band_times, low, high, color="tab:blue", alpha=0.15, label="Projection ± σ (live)")
     ax_rps.step(times, data["capacity_rps"], where="post", color="gray", linestyle="--",
                 label="Capacity (C × N)")
     ax_rps.set_ylabel("Requests / s")
