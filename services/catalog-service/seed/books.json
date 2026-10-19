@@ -1,0 +1,56 @@
+[
+  {
+    "id": "1",
+    "name": "Cumbres Borrascosas",
+    "author": "Emily Brontë",
+    "description": "Esta edición de Cumbres Borrascosas forma parte de la colección Jardín Secreto de Editorial Alma, caracterizada por libros de tapa dura con un diseño estético y detallado. La obra de Emily Brontë narra la intensa y oscura historia de amor, venganza y obsesión entre Catherine Earnshaw y Heatcliff en los páramos de Yorkshire.",
+    "price": 183754,
+    "countInStock": 3,
+    "image": "/images/img-cumbres-borrascosas.jpeg"
+  },
+  {
+    "id": "2",
+    "name": "Como agua para chocolate",
+    "author": "Laura Esquivel",
+    "description": "Tita y Pedro se aman. Pero ella está condenada a permanecer soltera, cuidando a su madre hasta que ésta muera. Y Pedro, para estar cerca de Tita, se casa con la hermana de ella, Rosaura. Las recetas de cocina que Tita elabora, además de construir narrativamente la novela, puntean el paso de las estaciones de su vida.",
+    "price": 63200,
+    "countInStock": 12,
+    "image": "/images/img-como-agua-para-chocolate.jpeg"
+  },
+  {
+    "id": "3",
+    "name": "Orgullo y Prejuicio",
+    "author": "Jane Austen",
+    "description": "Orgullo y prejuicio narra cómo Elizabeth Bennet y Fitzwilliam Darcy se enfrentan a sus prejuicios movidos por el amor que, contra pronóstico, surge entre ellos.",
+    "price": 280363,
+    "countInStock": 1,
+    "image": "/images/img-orgullo-y-prejuicio.jpeg"
+  },
+  {
+    "id": "4",
+    "name": "Jane Eyre",
+    "author": "Charlotte Brontë",
+    "description": "Jane Eyre es una novela clásica de la literatura inglesa, considerada una de las primeras obras en explorar la psicología profunda de una protagonista femenina y un referente del feminismo temprano.",
+    "price": 134250,
+    "countInStock": 10,
+    "image": "/images/img-Jane-Eyre.jpeg"
+  },
+  {
+    "id": "5",
+    "name": "En agosto nos vemos",
+    "author": "Gabriel García Márquez",
+    "description": "Novela póstuma de Gabriel García Márquez, centrada en Ana Magdalena Bach, quien cada 16 de agosto viaja a una isla del Caribe para visitar la tumba de su madre.",
+    "price": 57600,
+    "countInStock": 8,
+    "image": "/images/img-en-agosto-nos-vemos.jpeg"
+  },
+  {
+    "id": "6",
+    "name": "El gran Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "description": "Ambientada en los locos años veinte, narra la historia del misterioso millonario Jay Gatsby y su obsesión por reconquistar a su antiguo amor, Daisy Buchanan.",
+    "price": 57157,
+    "countInStock": 5,
+    "image": "/images/img-el-gran-gatsby.jpeg"
+  }
+]

@@ -1,0 +1,28 @@
+# Creates tb_books in DynamoDB Local and fills it with 50 books.
+# Uses the catalog-service image, so it needs no extra image and no port-forward.
+# Safe to re-run: delete the finished Job first (scripts/setup.sh does it).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seed-books
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: seed
+          image: catalog-service:local
+          imagePullPolicy: IfNotPresent
+          command: ["node", "seed/seed.js"]
+          env:
+            - name: AWS_REGION
+              value: "us-east-1"
+            - name: BOOKS_TABLE
+              value: "tb_books"
+            - name: DYNAMODB_ENDPOINT
+              value: "http://dynamodb-local:8000"
+            - name: AWS_ACCESS_KEY_ID
+              value: "local"
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "local"
