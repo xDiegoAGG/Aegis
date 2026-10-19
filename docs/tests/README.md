@@ -18,6 +18,7 @@ All times are in **UTC** (local time = UTC − 5).
 | 10 | [Actuator, manual test](10-actuator-manual.md) | 2026-10-13 | Test `actuator.py` against the real HPA | `minReplicas` 1 → 3 creates pods at once; the HPA delayed scale-down ~5 min, fixed with the Aegis HPA (~1 s) |
 | 11 | [Aegis live](11-aegis-live.md) | 2026-10-14 | "After" comparison: same ramp as 04, Aegis scaling | Scale-up **26 s before** latency breaks, 0% errors (vs 6.15%); latency still breaks because keep-alive connections stay on the old pod |
 | 12 | [Baseline HPA, one connection per request](12-hpa-baseline-no-reuse.md) | 2026-10-14 | Repeat 04 with the load-balancing fix | Traffic is split evenly, but 1 pod handles ~28 req/s without breaking: **C must be measured again** |
+| 13 | [Reproducible environment](13-environment-setup.md) | 2026-10-15 | Test `scripts/setup.sh` and `check_env.py` | One command restores everything after the machine was off; the table survives a minikube restart |
 
 ## How each artifact is produced
 
