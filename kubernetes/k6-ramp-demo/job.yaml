@@ -11,11 +11,20 @@ spec:
         - name: k6
           image: grafana/k6:2.3.0
           imagePullPolicy: IfNotPresent
-          args: ["run", "/scripts/test.js"]
+          # Every request is also written to /results/requests.csv.gz (client-side latency, which
+          # sees requests waiting outside a saturated pod; the service's own P95 does not, test 14).
+          # The container then waits 10 min so scripts/fetch_k6_results.py can copy the file.
+          command: ["sh", "-c"]
+          args:
+            - k6 run --out csv=/results/requests.csv.gz /scripts/test.js; echo K6_FINISHED; sleep 600
           volumeMounts:
             - name: script
               mountPath: /scripts
+            - name: results
+              mountPath: /results
       volumes:
         - name: script
           configMap:
             name: k6-ramp-demo-script
+        - name: results
+          emptyDir: {}

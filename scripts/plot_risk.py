@@ -12,6 +12,7 @@ DEFAULT_TITLE = "Risk calculated by Aegis during the 5 → 30 req/s ramp"
 SCALE_UP = 0.70
 SCALE_DOWN = 0.30
 P95_CAP_S = 5
+L_SECONDS = 1.0   # degradation.p95_threshold_seconds in app/config.yaml
 EVENT_COLORS = ["tab:purple", "tab:red", "tab:orange", "tab:green"]
 NUMERIC = ["rps", "slope", "projected_rps", "capacity_rps", "risk", "p95_s", "replicas", "replicas_ready"]
 OPTIONAL = ["aegis_target", "sigma_rps"]   # older CSVs do not have these columns
@@ -44,6 +45,15 @@ def load_csv(path):
     return rows
 
 
+def load_client_csv(path):
+    rows = {"time": [], "client_p95_s": []}
+    with open(path, newline="") as f:
+        for row in csv.DictReader(f):
+            rows["time"].append(parse_time(row["time_utc"]))
+            rows["client_p95_s"].append(parse_value(row["client_p95_s"]))
+    return rows
+
+
 def has_values(values):
     for value in values:
         if value is not None:
@@ -65,6 +75,12 @@ def main():
     if "--hide-target" in extra_args:
         hide_target = True
         extra_args.remove("--hide-target")
+    # --client file.csv: client-side P95 from scripts/fetch_k6_results.py, drawn on the latency panel
+    client = None
+    if "--client" in extra_args:
+        index = extra_args.index("--client")
+        client = load_client_csv(extra_args[index + 1])
+        extra_args = extra_args[:index] + extra_args[index + 2:]
     if "--title" in extra_args:
         index = extra_args.index("--title")
         title = extra_args[index + 1]
@@ -112,10 +128,21 @@ def main():
     ax_rps.set_ylabel("Requests / s")
     ax_rps.legend(loc="upper left", fontsize=9)
 
-    ax_p95.plot(times, data["p95_s"], color="tab:red", linewidth=2, label="P95 latency")
+    ax_p95.plot(times, data["p95_s"], color="tab:red", linewidth=2, label="P95 latency (service)")
+    if client is not None:
+        # Measured by k6: includes the time requests waited outside a saturated pod
+        ax_p95.plot(client["time"], client["client_p95_s"], color="black", linewidth=1.5,
+                    label="P95 latency (client, k6)")
     ax_p95.axhline(P95_CAP_S, color="gray", linestyle=":", label="Histogram cap (5 s)")
+    ax_p95.axhline(L_SECONDS, color="tab:orange", linestyle="--", label="L = 1 s")
     ax_p95.set_ylabel("P95 (s)")
-    ax_p95.set_ylim(0, P95_CAP_S + 0.5)
+    top = P95_CAP_S + 0.5
+    if client is not None:
+        # The client P95 can go up to the k6 timeout (10 s)
+        for value in client["client_p95_s"]:
+            if value is not None and value + 0.5 > top:
+                top = value + 0.5
+    ax_p95.set_ylim(0, top)
     ax_p95.legend(loc="upper left", fontsize=9)
 
     ax_risk.plot(times, risk_pct, color="tab:purple", linewidth=2, label="Risk")
