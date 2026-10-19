@@ -1,3 +1,4 @@
+# DynamoDB Local with its data on disk (emptyDir): it survives minikube stop/start, not deleting the pod.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -18,9 +19,7 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
-          # Data on disk (emptyDir) instead of -inMemory: it survives container restarts and
-          # minikube stop/start. It is lost only if the pod is deleted; then re-run the seed Job.
-          args: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "/data"]
+          args: ["-Xmx256m", "-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "/data"]
           volumeMounts:
             - name: data
               mountPath: /data

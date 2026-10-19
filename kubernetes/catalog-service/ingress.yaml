@@ -1,0 +1,17 @@
+# Every request enters through Traefik: http://traefik.traefik.svc.cluster.local/api/books
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: catalog-service
+spec:
+  ingressClassName: traefik
+  rules:
+    - http:
+        paths:
+          - path: /api/books
+            pathType: Prefix
+            backend:
+              service:
+                name: catalog-service
+                port:
+                  number: 3003

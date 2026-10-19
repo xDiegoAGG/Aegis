@@ -1,3 +1,4 @@
+# The usual HPA, without Aegis: scale on CPU at 70%, Kubernetes defaults for everything else.
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:

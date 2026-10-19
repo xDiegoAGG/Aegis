@@ -1,8 +1,8 @@
+# Prometheus reads /metrics of every catalog-service pod every 5 s.
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: catalog-service
-  namespace: default
   labels:
     release: prometheus
 spec:

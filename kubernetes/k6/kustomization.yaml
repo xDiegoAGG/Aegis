@@ -1,7 +1,0 @@
-configMapGenerator:
-  - name: k6-script
-    files:
-      - test.js=test.js
-
-resources:
-  - job.yaml

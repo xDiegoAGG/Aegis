@@ -1,6 +1,4 @@
-# Creates tb_books in DynamoDB Local and fills it with 50 books.
-# Uses the catalog-service image, so it needs no extra image and no port-forward.
-# Safe to re-run: delete the finished Job first (scripts/setup.sh does it).
+# Creates tb_books and fills it with 50 books, using the catalog-service image. Safe to re-run.
 apiVersion: batch/v1
 kind: Job
 metadata:

@@ -9,7 +9,7 @@ WORKDIR /app/services/catalog-service
 RUN npm install --omit=dev --legacy-peer-deps
 
 COPY services/catalog-service/src /app/services/catalog-service/src
-# Table seed, run as a Kubernetes Job (kubernetes/seed-books-job.yaml)
+# Table seed, run as a Kubernetes Job (kubernetes/dynamodb/seed-books-job.yaml)
 COPY services/catalog-service/seed /app/services/catalog-service/seed
 
 ENV NODE_ENV=production

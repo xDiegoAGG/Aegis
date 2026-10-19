@@ -1,0 +1,63 @@
+# Fluctuating traffic: a wave to 40 req/s, 2 min low, a wave to 55 req/s, 2 min low (test 2, demo 2).
+# Every request is saved to /results/requests.csv.gz; the pod then waits 10 min so it can be copied.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: load-fluctuating
+data:
+  test.js: |
+    import http from 'k6/http';
+    export const options = {
+      noConnectionReuse: true,
+      scenarios: {
+        load: {
+          executor: 'ramping-arrival-rate',
+          startRate: 5,
+          timeUnit: '1s',
+          preAllocatedVUs: 100,
+          maxVUs: 600,
+          stages: [
+            { target: 5, duration: '30s' },
+            { target: 40, duration: '60s' },
+            { target: 40, duration: '45s' },
+            { target: 8, duration: '15s' },
+            { target: 8, duration: '105s' },
+            { target: 55, duration: '45s' },
+            { target: 55, duration: '45s' },
+            { target: 8, duration: '15s' },
+            { target: 8, duration: '120s' },
+          ],
+        },
+      },
+    };
+    export default function () {
+      http.get('http://traefik.traefik.svc.cluster.local/api/books', { timeout: '10s' });
+    }
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: load-fluctuating
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: k6
+          image: grafana/k6:2.3.0
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c"]
+          args:
+            - k6 run --out csv=/results/requests.csv.gz /scripts/test.js; echo K6_FINISHED; sleep 600
+          volumeMounts:
+            - name: script
+              mountPath: /scripts
+            - name: results
+              mountPath: /results
+      volumes:
+        - name: script
+          configMap:
+            name: load-fluctuating
+        - name: results
+          emptyDir: {}
