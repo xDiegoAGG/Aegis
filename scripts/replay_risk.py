@@ -8,9 +8,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "app"))
 
+import logging  # noqa: E402
+
+from aegis.calibration import load_cluster_calibration  # noqa: E402
 from aegis.collector import Sample  # noqa: E402
 from aegis.config import load_config  # noqa: E402
 from aegis.decision import DecisionEngine  # noqa: E402
+from aegis.kube import load_kubernetes_credentials  # noqa: E402
 from aegis.risk import RiskCalculator  # noqa: E402
 
 PROMETHEUS_URL = "http://localhost:9090/api/v1/query_range"
@@ -41,14 +45,38 @@ def clean(value):
     return value
 
 
+# Removes "--name value" from args and returns the value, or None if it is not there
+def take_option(args, name):
+    if name not in args:
+        return None
+    index = args.index(name)
+    value = args[index + 1]
+    del args[index:index + 2]
+    return value
+
+
 def main():
-    if len(sys.argv) != 4:
-        print("Usage: python3 scripts/replay_risk.py START END output_path")
+    args = sys.argv[1:]
+    capacity = take_option(args, "--capacity")
+    startup = take_option(args, "--startup")
+    if len(args) != 3:
+        print("Usage: python3 scripts/replay_risk.py START END output_path [--capacity C] [--startup T]")
+        print("Without --capacity and --startup, C and T come from the cluster calibration (aegis.calibrate).")
+        print("Runs before the calibration existed used C = 18 and T = 13.")
         sys.exit(1)
 
-    start, end, out = sys.argv[1], sys.argv[2], sys.argv[3]
+    start, end, out = args[0], args[1], args[2]
     csv_path = out + ".csv"
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     config = load_config()
+    if capacity is None or startup is None:
+        load_kubernetes_credentials()
+        if not load_cluster_calibration(config):
+            sys.exit(1)
+    if capacity is not None:
+        config["capacity_rps"] = float(capacity)
+    if startup is not None:
+        config["startup_time_seconds"] = float(startup)
     prometheus = config["prometheus"]
     step = str(config["sampling"]["interval_seconds"]) + "s"
 

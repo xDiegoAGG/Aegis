@@ -88,7 +88,7 @@ def main():
 
     ax_rps.plot(times, data["rps"], color="tab:blue", linewidth=2, label="Current req/s (r)")
     ax_rps.plot(times, data["projected_rps"], color="tab:blue", linestyle="--", alpha=0.6,
-                label="req/s projected to T = 13 s (r + m·T)")
+                label="Projected req/s (r + m·T)")
     ax_rps.step(times, data["capacity_rps"], where="post", color="gray", linestyle="--",
                 label="Capacity (C × N)")
     ax_rps.set_ylabel("Requests / s")
