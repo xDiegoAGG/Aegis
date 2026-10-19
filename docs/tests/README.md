@@ -20,6 +20,7 @@ All times are in **UTC** (local time = UTC − 5).
 | 12 | [Baseline HPA, one connection per request](12-hpa-baseline-no-reuse.md) | 2026-10-14 | Repeat 04 with the load-balancing fix | Traffic is split evenly, but 1 pod handles ~28 req/s without breaking: **C must be measured again** |
 | 13 | [Reproducible environment](13-environment-setup.md) | 2026-10-15 | Test `scripts/setup.sh` and `check_env.py` | One command restores everything after the machine was off; the table survives a minikube restart |
 | 14 | [Automatic calibration of C and T](14-automatic-calibration.md) | 2026-10-19 | Test `aegis.calibrate` | **C = 32**, **T = 14** with no manual steps; the service's own P95 does not see saturation |
+| 15 | [Sigma calculated live](15-sigma-live.md) | 2026-10-19 | Replace the fixed σ = 2 | Live σ stays at 1–3 req/s; same decisions in ramps, and it would have scaled in time in test 14 where σ = 2 never did |
 
 ## How each artifact is produced
 
@@ -36,7 +37,7 @@ kubectl -n monitoring port-forward svc/prometheus-kube-prometheus-prometheus 909
 | `scripts/plot_startup.py START END output.png` | Chart of the startup time of each new pod |
 | `scripts/plot_pods.py START END output [--title ...]` | Requests per second and Ready state of each pod, to `output.csv` and `output.png` |
 | `scripts/plot_calibration.py calibration.json output.png` | Chart of a calibration saved with `python3 -m aegis.calibrate --output calibration.json` |
-| `scripts/replay_risk.py START END output [--capacity C] [--startup T]` | Feeds a run's data through the risk calculator and the decision engine (simulated) and saves `output.csv`. C and T come from the cluster calibration unless given (runs before test 14 used C = 18, T = 13) |
+| `scripts/replay_risk.py START END output [--capacity C] [--startup T] [--sigma S]` | Feeds a run's data through the risk calculator and the decision engine (simulated) and saves `output.csv`. C and T come from the cluster calibration unless given (runs before test 14 used C = 18, T = 13); σ is calculated live unless `--sigma` fixes it (runs before test 15 used 2) |
 | `scripts/plot_risk.py input.csv output.png [--title ...] [HH:MM:SS=event ...]` | 4-panel chart (traffic, latency, risk, replicas; plus the simulated Aegis target if present) |
 
 Prometheus keeps 10 days of data, so a run can be exported and plotted later, as long as it is less than 10 days old.
