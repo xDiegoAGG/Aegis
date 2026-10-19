@@ -38,3 +38,20 @@ https://www.catchpoint.com/learn/the-internet-resilience-report-2025
 
 [12] CAST AI & Harness, "Kubernetes Overprovisioning and Cloud Cost Waste Benchmark Report," 2025.
 
+
+[13] L. Kleinrock, *Queueing Systems, Volume 1: Theory*, Wiley, 1975.
+
+[14] M. Harchol-Balter, *Performance Modeling and Design of Computer Systems: Queueing Theory in Action*, Cambridge University Press, 2013.
+
+[15] J. D. C. Little, "A Proof for the Queuing Formula: L = λW," *Operations Research*, vol. 9, no. 3, pp. 383–387, 1961.
+
+[16] R. J. Hyndman and G. Athanasopoulos, *Forecasting: Principles and Practice*, 3rd ed., OTexts, 2021.
+https://otexts.com/fpp3/
+
+[17] N. Roy, A. Dubey, and A. Gokhale, "Efficient Autoscaling in the Cloud Using Predictive Models for Workload Forecasting," IEEE International Conference on Cloud Computing (CLOUD), 2011.
+
+[18] T. Lorido-Botran, J. Miguel-Alonso, and J. A. Lozano, "A Review of Auto-scaling Techniques for Elastic Applications in Cloud Environments," *Journal of Grid Computing*, vol. 12, no. 4, 2014.
+
+[19] H. Markowitz, *Portfolio Selection: Efficient Diversification of Investments*, Wiley, 1959.
+
+[20] E. A. Silver, D. F. Pyke, and R. Peterson, *Inventory Management and Production Planning and Scheduling*, 3rd ed., Wiley, 1998.
