@@ -7,8 +7,10 @@ from typing import Optional
 
 from scipy.stats import norm
 
+from aegis.calibration import load_cluster_calibration
 from aegis.collector import PrometheusCollector, format_value
 from aegis.config import load_config
+from aegis.kube import load_kubernetes_credentials
 
 logger = logging.getLogger(__name__)
 
@@ -108,6 +110,9 @@ class RiskCalculator:
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     config = load_config()
+    load_kubernetes_credentials()
+    if not load_cluster_calibration(config):
+        return
     collector = PrometheusCollector.from_config(config)
     calculator = RiskCalculator.from_config(config)
     interval = config["sampling"]["interval_seconds"]

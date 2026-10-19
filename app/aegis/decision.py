@@ -2,8 +2,10 @@ import logging
 import time
 from dataclasses import dataclass
 
+from aegis.calibration import load_cluster_calibration
 from aegis.collector import PrometheusCollector, format_value
 from aegis.config import load_config
+from aegis.kube import load_kubernetes_credentials
 from aegis.risk import RiskCalculator
 
 logger = logging.getLogger(__name__)
@@ -109,6 +111,9 @@ def pct(value):
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     config = load_config()
+    load_kubernetes_credentials()
+    if not load_cluster_calibration(config):
+        return
     collector = PrometheusCollector.from_config(config)
     calculator = RiskCalculator.from_config(config)
     engine = DecisionEngine.from_config(config)

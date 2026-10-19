@@ -1,8 +1,11 @@
-# Parameters measured with real load tests
+# What "degraded" means for this service. Decided by people, not measured.
+degradation:
+  p95_threshold_seconds: 1.0  # L: a P95 above this is slow
+  sustained_seconds: 15  # T_d: the P95 must stay above L this long to count as degraded
 
-capacity_rps: 18  # requests per second before the pod starts degrading
-startup_time_seconds: 13  # T: actual time until a new pod becomes Ready
-sigma_rps: 2  # projected traffic error margin
+# C (capacity of one pod) and T (time until a requested pod is Ready) are not set here:
+# `python3 -m aegis.calibrate` measures them and saves them in the cluster (ConfigMap below).
+sigma_rps: 2  # projection error margin; fixed until it is calculated live (plan, phase 2.3)
 
 risk_thresholds:
   scale_up: 0.70  # risk level from which scaling up is requested
@@ -13,8 +16,23 @@ sampling:
   interval_seconds: 5  # how often the collector queries Prometheus
   projection_window_seconds: 30  # window used to calculate the traffic slope
 
+calibration:
+  configmap_name: aegis-calibration  # where the result is saved (same namespace as the service)
+  load_job_name: aegis-calibration-load  # k6 Job created during the calibration
+  k6_image: grafana/k6:2.3.0
+  target_url: http://catalog-service:3003/api/books
+  start_rps: 4  # first step
+  step_rps: 2  # each step adds this much
+  step_seconds: 30  # length of each step
+  max_rps: 80  # last step; if nothing breaks before, the calibration fails
+  max_error_ratio: 0.01  # more than 1% non-2xx answers also counts as degraded
+  repetitions: 2  # capacity runs; C is the lowest
+  cooldown_seconds: 60  # rest between runs
+  startup_replicas: 3  # replicas used to measure T (up to maxReplicas)
+
 kubernetes:
   hpa_name: catalog-service
+  deployment_name: catalog-service
   namespace: default
   min_replicas: 1  # Aegis never goes below this
   max_replicas: 3  # must match maxReplicas in kubernetes/catalog-service-hpa-aegis.yaml

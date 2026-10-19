@@ -3,25 +3,16 @@ import logging
 import time
 
 from kubernetes import client
-from kubernetes import config as kube_config
 from kubernetes.client.rest import ApiException
 
+from aegis.calibration import load_cluster_calibration
 from aegis.collector import PrometheusCollector, format_value
 from aegis.config import load_config
 from aegis.decision import HOLD, DecisionEngine, pct
+from aegis.kube import load_kubernetes_credentials
 from aegis.risk import RiskCalculator
 
 logger = logging.getLogger(__name__)
-
-
-# Inside the cluster Aegis uses its ServiceAccount; from the local machine, ~/.kube/config.
-def load_kubernetes_credentials():
-    try:
-        kube_config.load_incluster_config()
-        return "in-cluster"
-    except kube_config.ConfigException:
-        kube_config.load_kube_config()
-        return "kubeconfig"
 
 
 # Applies the target replicas by changing minReplicas of the HPA.
@@ -154,6 +145,8 @@ def main():
     logger.info("Kubernetes credentials from %s, HPA %s/%s", source, actuator.namespace, actuator.hpa_name)
 
     if args.set is None:
+        if not load_cluster_calibration(config):
+            return
         run_loop(config, actuator)
         return
 
