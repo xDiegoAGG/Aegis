@@ -6,6 +6,38 @@ Aegis estimates the probability of latency degradation within a short prediction
 
 ---
 
+## Getting started (minikube)
+
+Requirements: `minikube`, `kubectl`, `helm` and `python3` (with the packages in `app/requirements.txt`).
+
+```bash
+scripts/setup.sh
+```
+
+This starts minikube if needed and installs or repairs everything: `metrics-server`, Prometheus (`kube-prometheus-stack`), DynamoDB Local, the `tb_books` table (seeded by a Kubernetes Job), `catalog-service` and its HPA. It is safe to run many times and ends by checking the environment.
+
+| Option | What it does |
+|---|---|
+| `--hpa aegis` | HPA for running with Aegis: CPU at 95%, no scale-down window (default) |
+| `--hpa baseline` | Plain HPA (CPU 70%), to run tests without Aegis |
+| `--build` | Rebuild the `catalog-service` image after changing its code |
+
+To only check the environment, without changing anything:
+
+```bash
+python3 scripts/check_env.py
+```
+
+To run Aegis from your machine, keep a Prometheus tunnel open and start the loop from `app/`:
+
+```bash
+kubectl -n monitoring port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090
+cd app
+AEGIS_PROMETHEUS_URL=http://localhost:9090 python3 -m aegis.actuator
+```
+
+---
+
 ## Documentation
 
 * **Business Case & ROI:** [docs/business_case.md](docs/business_case.md)
