@@ -1,0 +1,17 @@
+{
+  "job": "k6-ramp-demo",
+  "start_utc": "06:19:50",
+  "end_utc": "06:23:55",
+  "requests": 6436,
+  "failed": 2499,
+  "failed_ratio": 0.3883,
+  "p95_s": 10.001,
+  "p99_s": 10.035,
+  "max_s": 10.243,
+  "seconds_p95_above_L": 140,
+  "seconds_degraded_sustained": 130,
+  "first_degraded_utc": "06:21:20",
+  "dropped_iterations": "838",
+  "L_s": 1.0,
+  "T_d_s": 15
+}
