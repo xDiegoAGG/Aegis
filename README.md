@@ -28,13 +28,21 @@ To only check the environment, without changing anything:
 python3 scripts/check_env.py
 ```
 
-To run Aegis from your machine, keep a Prometheus tunnel open and start the loop from `app/`:
+To run Aegis from your machine, keep a Prometheus tunnel open:
 
 ```bash
 kubectl -n monitoring port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090
+```
+
+Then, from `app/`, calibrate once per environment and start the loop:
+
+```bash
 cd app
+AEGIS_PROMETHEUS_URL=http://localhost:9090 python3 -m aegis.calibrate   # ~20 min, Aegis must not be running
 AEGIS_PROMETHEUS_URL=http://localhost:9090 python3 -m aegis.actuator
 ```
+
+The calibration measures C (requests per second one pod handles before it degrades) and T (time from asking for a pod until it is Ready) and saves them in the ConfigMap `aegis-calibration`. Aegis does not start without it, and warns when the environment changed since it was measured (image, CPU or memory limit, node type). What counts as degraded is set in `app/config.yaml` (`degradation`: P95 above 1 s for 15 s).
 
 ---
 
