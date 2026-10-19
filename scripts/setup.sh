@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
-# Brings up (or repairs) the whole Aegis test environment. Safe to run many times:
-# every step checks or applies the desired state, nothing is deleted except finished Jobs.
-#
+# Brings up or repairs the whole environment and checks it. Safe to run many times.
 # Usage: scripts/setup.sh [--hpa aegis|baseline] [--build]
-#   --hpa aegis      HPA used with Aegis (CPU 95%, no scale-down window). Default.
-#   --hpa baseline   plain HPA (CPU 70%), to run tests without Aegis.
-#   --build          rebuild the catalog-service image even if it exists (after code changes).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 PROMETHEUS_CHART_VERSION="91.7.0"
+TRAEFIK_CHART_VERSION="41.7.1"
 IMAGE="catalog-service:local"
 HPA="aegis"
 BUILD="no"
@@ -31,58 +27,49 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-case "$HPA" in
-  aegis) HPA_FILE="kubernetes/catalog-service-hpa-aegis.yaml" ;;
-  baseline) HPA_FILE="kubernetes/catalog-service-hpa.yaml" ;;
-  *)
-    echo "--hpa must be aegis or baseline"
-    exit 1
-    ;;
-esac
+if [ "$HPA" != "aegis" ] && [ "$HPA" != "baseline" ]; then
+  echo "--hpa must be aegis or baseline"
+  exit 1
+fi
 
 step() {
   echo
   echo "==> $*"
 }
 
-require() {
-  if ! command -v "$1" >/dev/null 2>&1; then
-    echo "Missing tool: $1"
+for tool in kubectl helm python3; do
+  if ! command -v "$tool" >/dev/null 2>&1; then
+    echo "Missing tool: $tool"
     exit 1
   fi
-}
+done
 
-require kubectl
-require helm
-require python3
-
-# --- Cluster ---------------------------------------------------------------
-# minikube-only steps. On another cluster (EKS) they are skipped and the image
-# must already be in a registry the cluster can pull from.
+# minikube only: create or start it, enable metrics-server and build the image inside it.
+# On a new machine (no kubectl context yet) it creates the cluster: MINIKUBE_CPUS and MINIKUBE_MEMORY change its size.
 ON_MINIKUBE="no"
+CONTEXT="$(kubectl config current-context 2>/dev/null || true)"
 if command -v minikube >/dev/null 2>&1 && minikube status >/dev/null 2>&1; then
   ON_MINIKUBE="yes"
-elif command -v minikube >/dev/null 2>&1 && [ "$(kubectl config current-context 2>/dev/null || true)" = "minikube" ]; then
+elif command -v minikube >/dev/null 2>&1 && { [ -z "$CONTEXT" ] || [ "$CONTEXT" = "minikube" ]; }; then
   step "Starting minikube"
-  minikube start
+  minikube start --driver=docker --kubernetes-version=v1.37.0 --cpus="${MINIKUBE_CPUS:-2}" --memory="${MINIKUBE_MEMORY:-4g}"
   ON_MINIKUBE="yes"
 fi
-
 if [ "$ON_MINIKUBE" = "yes" ]; then
   kubectl config use-context minikube >/dev/null
-  step "Enabling metrics-server (the HPA needs it to read CPU)"
+  step "metrics-server"
   minikube addons enable metrics-server >/dev/null
-
   if [ "$BUILD" = "yes" ] || ! minikube image ls | grep -q "docker.io/library/$IMAGE"; then
     step "Building $IMAGE inside minikube"
     minikube image build -t "$IMAGE" -f services/catalog-service/Dockerfile .
     BUILD="yes"
   fi
-else
-  echo "Current context: $(kubectl config current-context). Not minikube: skipping minikube steps."
+  if ! minikube image ls | grep -q "grafana/k6:2.3.0"; then
+    step "Downloading the k6 image (so the first load does not wait for it)"
+    minikube image pull grafana/k6:2.3.0 || true
+  fi
 fi
 
-# --- Prometheus ------------------------------------------------------------
 step "Prometheus (kube-prometheus-stack $PROMETHEUS_CHART_VERSION)"
 if ! helm repo list 2>/dev/null | grep -q "^prometheus-community"; then
   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -90,57 +77,43 @@ fi
 if ! helm search repo prometheus-community/kube-prometheus-stack --version "$PROMETHEUS_CHART_VERSION" | grep -q kube-prometheus-stack; then
   helm repo update prometheus-community
 fi
-INSTALLED_CHART="$(helm list -n monitoring -f '^prometheus$' -o json | python3 -c "
-import json, sys
-releases = json.load(sys.stdin)
-if releases:
-    print(releases[0]['chart'])
-")"
-if [ "$INSTALLED_CHART" = "kube-prometheus-stack-$PROMETHEUS_CHART_VERSION" ]; then
-  echo "Already installed"
-else
-  helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
-    --version "$PROMETHEUS_CHART_VERSION" --namespace monitoring --create-namespace \
-    --wait --timeout 10m
+helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
+  --version "$PROMETHEUS_CHART_VERSION" --namespace monitoring --create-namespace \
+  -f kubernetes/helm/prometheus-values.yaml --wait --timeout 10m
+
+step "Traefik (chart $TRAEFIK_CHART_VERSION)"
+if ! helm repo list 2>/dev/null | grep -q "^traefik"; then
+  helm repo add traefik https://traefik.github.io/charts
 fi
+if ! helm search repo traefik/traefik --version "$TRAEFIK_CHART_VERSION" | grep -q "traefik/traefik"; then
+  helm repo update traefik
+fi
+helm upgrade --install traefik traefik/traefik \
+  --version "$TRAEFIK_CHART_VERSION" --namespace traefik --create-namespace \
+  -f kubernetes/helm/traefik-values.yaml --wait --timeout 5m
 
-# --- DynamoDB Local and table ----------------------------------------------
-step "DynamoDB Local"
-kubectl apply -f kubernetes/dynamodb-local.yaml
-kubectl rollout status deploy/dynamodb-local --timeout=180s
-
-step "Seeding tb_books"
+step "DynamoDB Local and the books table"
 kubectl delete job seed-books --ignore-not-found >/dev/null
-kubectl apply -f kubernetes/seed-books-job.yaml
-kubectl wait --for=condition=complete job/seed-books --timeout=180s
+kubectl apply -f kubernetes/dynamodb/dynamodb-local.yaml
+kubectl rollout status deploy/dynamodb-local --timeout=600s
+kubectl apply -f kubernetes/dynamodb/seed-books-job.yaml
+kubectl wait --for=condition=complete job/seed-books --timeout=300s
 kubectl logs job/seed-books
 
-# --- catalog-service -------------------------------------------------------
 step "catalog-service"
-kubectl apply -f kubernetes/catalog-service.yaml
-kubectl apply -f kubernetes/catalog-service-servicemonitor.yaml
+kubectl apply -f kubernetes/catalog-service/
 if [ "$BUILD" = "yes" ]; then
-  # Same tag, new image: restart so the pods use it
   kubectl rollout restart deploy/catalog-service
 fi
-kubectl rollout status deploy/catalog-service --timeout=180s
+kubectl rollout status deploy/catalog-service --timeout=600s
 
 step "HPA ($HPA)"
-kubectl apply -f "$HPA_FILE"
+kubectl apply -f "kubernetes/hpa/$HPA.yaml"
 
-# --- Leftovers from earlier runs -------------------------------------------
-step "Deleting finished k6 Jobs (a finished Job blocks running the test again)"
-for job in k6-ramp-demo k6-load-test; do
-  ACTIVE="$(kubectl get job "$job" -o jsonpath='{.status.active}' 2>/dev/null || true)"
-  if kubectl get job "$job" >/dev/null 2>&1 && [ -z "$ACTIVE" ]; then
-    kubectl delete job "$job"
-  fi
+step "Removing finished load Jobs"
+for job in load-linear load-fluctuating aegis-calibration-load; do
+  kubectl delete job "$job" --ignore-not-found
 done
 
-# --- Check -----------------------------------------------------------------
 step "Checking the environment"
-python3 scripts/check_env.py --wait 120
-
-echo
-echo "To run Aegis from this machine, open the Prometheus tunnel in another terminal:"
-echo "  kubectl -n monitoring port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090"
+python3 scripts/check_env.py --wait 300
