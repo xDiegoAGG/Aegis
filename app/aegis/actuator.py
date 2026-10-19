@@ -111,15 +111,18 @@ def run_loop(config, actuator):
 
             rps_text = "-"
             risk_text = "-"
+            sigma_text = "-"
             if result is not None:
                 rps_text = format_value(result.rps)
                 risk_text = pct(result.risk)
+                sigma_text = format_value(result.sigma_rps)
 
             logger.log(
                 level,
-                "rps=%s risk=%s %s target %s -> %s, applied=%s (%s)",
+                "rps=%s risk=%s sigma=%s %s target %s -> %s, applied=%s (%s)",
                 rps_text,
                 risk_text,
+                sigma_text,
                 decision.action.upper(),
                 decision.previous_target,
                 decision.target,

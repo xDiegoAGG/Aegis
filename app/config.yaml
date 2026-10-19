@@ -5,7 +5,14 @@ degradation:
 
 # C (capacity of one pod) and T (time until a requested pod is Ready) are not set here:
 # `python3 -m aegis.calibrate` measures them and saves them in the cluster (ConfigMap below).
-sigma_rps: 2  # projection error margin; fixed until it is calculated live (plan, phase 2.3)
+
+# sigma (how much traffic comes in above the projection) is calculated live: every projection
+# is compared with the real traffic T seconds later. Only errors where traffic was higher count.
+sigma:
+  initial_rps: 2  # used until there are min_errors errors (the first ~min_errors x 5 s)
+  min_rps: 1.0  # floor, so very steady traffic does not make Aegis overconfident
+  window_seconds: 300  # errors older than this are forgotten
+  min_errors: 6
 
 risk_thresholds:
   scale_up: 0.70  # risk level from which scaling up is requested
