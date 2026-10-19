@@ -14,10 +14,23 @@ spec:
     spec:
       containers:
         - name: dynamodb-local
-          image: amazon/dynamodb-local:latest
+          image: amazon/dynamodb-local:3.3.2
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
-          args: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"]
+          # Data on disk (emptyDir) instead of -inMemory: it survives container restarts and
+          # minikube stop/start. It is lost only if the pod is deleted; then re-run the seed Job.
+          args: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "/data"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            periodSeconds: 3
+      volumes:
+        - name: data
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

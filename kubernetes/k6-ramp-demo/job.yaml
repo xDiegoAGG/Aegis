@@ -9,8 +9,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: k6
-          image: grafana/k6:latest
-          # Use the image already in the node; with :latest Kubernetes would pull it every time
+          image: grafana/k6:2.3.0
           imagePullPolicy: IfNotPresent
           args: ["run", "/scripts/test.js"]
           volumeMounts:
