@@ -30,13 +30,13 @@ Prometheus ──► demand r ──► projection p = r + m·(T + lag) ──�
 | `kubernetes/load/` | The two k6 traffic profiles: `linear.yaml` and `fluctuating.yaml` |
 | `kubernetes/helm/` | Values for Prometheus and Traefik |
 | `scripts/setup.sh`, `scripts/check_env.py` | Bring up and check the whole environment |
-| `scripts/experiments/` | Run the tests (`run.py`), draw them (`report.py`), reset between runs (`reset.py`) |
+| `scripts/experiments/` | Run the tests (`run.py`), draw them (`report.py`), reset between runs (`reset.py`); `requirements.txt` for a new machine |
 | `docs/tests/` | The tests, their charts and data ([summary](docs/tests/README.md)) |
 | `docs/demo.md` | Step-by-step live demo ([español](docs/demo.es.md)) |
 
 ## Getting started (minikube)
 
-Requirements: `minikube`, `kubectl`, `helm` and `python3` with the packages in `app/requirements.txt`.
+Requirements: Docker, `minikube`, `kubectl`, `helm` and `python3` (3.11+) with the packages in `scripts/experiments/requirements.txt`. Step by step for a new machine: [docs/demo.md](docs/demo.md#1-a-new-machine-from-zero-about-45-minutes-do-it-before-the-class).
 
 ```bash
 scripts/setup.sh                 # minikube, metrics-server, Prometheus, Traefik, DynamoDB Local, catalog-service, HPA
@@ -51,7 +51,7 @@ No tunnel is needed: Aegis reaches Prometheus through the Kubernetes API server.
 
 ```bash
 cd scripts/experiments
-./run_all.sh                       # the three tests, 5 runs each (~2 h); runs already done are skipped
+./run_all.sh                       # the three tests, one run each (~25 min); runs already done are skipped
 python3 run.py test1-linear-ramp   # or one test only
 python3 report.py                  # charts and tables again from the saved data
 ```
