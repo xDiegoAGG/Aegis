@@ -45,14 +45,19 @@ for tool in kubectl helm python3; do
 done
 
 # minikube only: create or start it, enable metrics-server and build the image inside it.
-# On a new machine (no kubectl context yet) it creates the cluster: MINIKUBE_CPUS and MINIKUBE_MEMORY change its size.
+# A stopped cluster is started with the size it already has; on a new machine it is created, and MINIKUBE_CPUS and MINIKUBE_MEMORY change its size.
 ON_MINIKUBE="no"
 CONTEXT="$(kubectl config current-context 2>/dev/null || true)"
 if command -v minikube >/dev/null 2>&1 && minikube status >/dev/null 2>&1; then
   ON_MINIKUBE="yes"
 elif command -v minikube >/dev/null 2>&1 && { [ -z "$CONTEXT" ] || [ "$CONTEXT" = "minikube" ]; }; then
   step "Starting minikube"
-  minikube start --driver=docker --kubernetes-version=v1.37.0 --cpus="${MINIKUBE_CPUS:-2}" --memory="${MINIKUBE_MEMORY:-4g}"
+  HOST_STATE="$(minikube status --format '{{.Host}}' 2>/dev/null || true)"
+  if [ "$HOST_STATE" = "Stopped" ]; then
+    minikube start
+  else
+    minikube start --driver=docker --kubernetes-version=v1.37.0 --cpus="${MINIKUBE_CPUS:-2}" --memory="${MINIKUBE_MEMORY:-4g}"
+  fi
   ON_MINIKUBE="yes"
 fi
 if [ "$ON_MINIKUBE" = "yes" ]; then
