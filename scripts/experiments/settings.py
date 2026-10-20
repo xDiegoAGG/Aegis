@@ -12,7 +12,7 @@ TESTS = {
     "test2-fluctuating": ("fluctuating", "aegis", "Test 2 - Aegis, fluctuating traffic"),
     "test3-hpa-baseline": ("linear", "hpa", "Test 3 - HPA only, linear ramp"),
 }
-RUNS_PER_TEST = 5
+RUNS_PER_TEST = 1
 STEP = 5
 BEFORE_SECONDS = 30
 AFTER_SECONDS = {"aegis": 75, "hpa": 30}

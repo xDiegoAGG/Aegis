@@ -1,7 +1,7 @@
 import argparse
 import csv
 import json
-from charts import plot_all_runs, plot_comparison, plot_run
+from charts import plot_all_runs, plot_run
 from settings import TESTS, TESTS_DIR
 
 RESULT_KEYS = ["failed_percent", "client_p95_s", "degraded_seconds", "crosses_c_s", "first_scale_up_s",
@@ -91,13 +91,14 @@ def report(names):
         if not summaries:
             print(name, "has no runs yet")
             continue
-        for index, summary in enumerate(summaries):
-            plot_run(folder / ("run-" + str(summary["run"]) + ".png"), title, summary, runs[index])
-        plot_all_runs(folder / "all-runs.png", title, summaries, runs)
+        if len(summaries) == 1:
+            plot_run(folder / "chart.png", title, summaries[0], runs[0])
+        else:
+            for index, summary in enumerate(summaries):
+                plot_run(folder / ("run-" + str(summary["run"]) + ".png"), title, summary, runs[index])
+            plot_all_runs(folder / "all-runs.png", title, summaries, runs)
         write_results(folder, title, summaries)
         tests.append((title, summaries))
-    if len(tests) > 1:
-        plot_comparison(tests, stats)
     print("charts saved")
 
 

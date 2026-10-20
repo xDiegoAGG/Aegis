@@ -159,6 +159,6 @@ def plot_comparison(tests, stats):
         ax.axhline(0, color="black", linewidth=0.8)
         ax.set_title(label, fontsize=10)
         ax.grid(alpha=0.3, axis="y")
-    fig.suptitle("Mean of the 5 runs of each test (lines show min and max)", fontsize=12)
+    fig.suptitle("Mean of the runs of each test (lines show min and max)", fontsize=12)
     fig.tight_layout()
     fig.savefig(TESTS_DIR / "comparison.png", dpi=110)

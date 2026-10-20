@@ -1,4 +1,4 @@
-# Fluctuating traffic: a wave to 40 req/s, 2 min low, a wave to 55 req/s, 2 min low (test 2, demo 2).
+# Fluctuating traffic: a wave to 30 req/s, 2 min low, a wave to 50 req/s, 2 min low; both climb like the linear ramp (test 2, demo 2).
 # Every request is saved to /results/requests.csv.gz; the pod then waits 10 min so it can be copied.
 apiVersion: v1
 kind: ConfigMap
@@ -18,14 +18,14 @@ data:
           maxVUs: 600,
           stages: [
             { target: 5, duration: '30s' },
-            { target: 40, duration: '60s' },
-            { target: 40, duration: '45s' },
-            { target: 8, duration: '15s' },
-            { target: 8, duration: '105s' },
-            { target: 55, duration: '45s' },
-            { target: 55, duration: '45s' },
-            { target: 8, duration: '15s' },
-            { target: 8, duration: '120s' },
+            { target: 30, duration: '65s' },
+            { target: 30, duration: '45s' },
+            { target: 5, duration: '15s' },
+            { target: 5, duration: '105s' },
+            { target: 50, duration: '120s' },
+            { target: 50, duration: '45s' },
+            { target: 5, duration: '15s' },
+            { target: 5, duration: '120s' },
           ],
         },
       },
