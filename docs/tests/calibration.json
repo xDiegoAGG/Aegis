@@ -1,0 +1,193 @@
+{
+  "capacity_rps": 24,
+  "startup_time_seconds": 15,
+  "measured_at": "2026-10-19T17:49:51Z",
+  "measured_at_unix": 1792432191.079557,
+  "started_at": "2026-10-19T17:33:59Z",
+  "environment": {
+    "image": "catalog-service:local",
+    "cpu_limit": "200m",
+    "memory_limit": "256Mi",
+    "node_instance_type": "",
+    "node_cpu": "2"
+  },
+  "degradation": {
+    "p95_threshold_seconds": 1.0,
+    "sustained_seconds": 15
+  },
+  "load": {
+    "start_rps": 4,
+    "step_rps": 2,
+    "step_seconds": 30,
+    "target_url": "http://traefik.traefik.svc.cluster.local/api/books"
+  },
+  "capacity_runs": [
+    {
+      "started_at": "2026-10-19T17:34:02Z",
+      "capacity_rps": 28,
+      "reason": "served under 90% of the sent req/s at 30 req/s",
+      "degraded_at": "2026-10-19T17:40:46Z",
+      "degraded_step_rps": 30,
+      "ended_at": "2026-10-19T17:41:01Z",
+      "steps": [
+        {
+          "target_rps": 4,
+          "measured_rps": 3.95,
+          "p95_max_s": 0.41
+        },
+        {
+          "target_rps": 6,
+          "measured_rps": 5.95,
+          "p95_max_s": 0.2
+        },
+        {
+          "target_rps": 8,
+          "measured_rps": 8.0,
+          "p95_max_s": 0.167
+        },
+        {
+          "target_rps": 10,
+          "measured_rps": 10.0,
+          "p95_max_s": 0.24
+        },
+        {
+          "target_rps": 12,
+          "measured_rps": 11.95,
+          "p95_max_s": 0.637
+        },
+        {
+          "target_rps": 14,
+          "measured_rps": 13.99,
+          "p95_max_s": 1.633
+        },
+        {
+          "target_rps": 16,
+          "measured_rps": 16.0,
+          "p95_max_s": 0.302
+        },
+        {
+          "target_rps": 18,
+          "measured_rps": 18.0,
+          "p95_max_s": 0.236
+        },
+        {
+          "target_rps": 20,
+          "measured_rps": 20.0,
+          "p95_max_s": 0.127
+        },
+        {
+          "target_rps": 22,
+          "measured_rps": 22.05,
+          "p95_max_s": 0.78
+        },
+        {
+          "target_rps": 24,
+          "measured_rps": 24.0,
+          "p95_max_s": 0.329
+        },
+        {
+          "target_rps": 26,
+          "measured_rps": 26.49,
+          "p95_max_s": 0.865
+        },
+        {
+          "target_rps": 28,
+          "measured_rps": 27.5,
+          "p95_max_s": 0.376
+        },
+        {
+          "target_rps": 30,
+          "measured_rps": 24.6,
+          "p95_max_s": 3.2
+        }
+      ]
+    },
+    {
+      "started_at": "2026-10-19T17:42:13Z",
+      "capacity_rps": 24,
+      "reason": "P95 above 1.0 s at 26 req/s",
+      "degraded_at": "2026-10-19T17:48:17Z",
+      "degraded_step_rps": 26,
+      "ended_at": "2026-10-19T17:48:29Z",
+      "steps": [
+        {
+          "target_rps": 4,
+          "measured_rps": 4.0,
+          "p95_max_s": 0.083
+        },
+        {
+          "target_rps": 6,
+          "measured_rps": 6.0,
+          "p95_max_s": 0.15
+        },
+        {
+          "target_rps": 8,
+          "measured_rps": 8.0,
+          "p95_max_s": 0.22
+        },
+        {
+          "target_rps": 10,
+          "measured_rps": 10.06,
+          "p95_max_s": 0.229
+        },
+        {
+          "target_rps": 12,
+          "measured_rps": 12.0,
+          "p95_max_s": 0.219
+        },
+        {
+          "target_rps": 14,
+          "measured_rps": 14.08,
+          "p95_max_s": 0.253
+        },
+        {
+          "target_rps": 16,
+          "measured_rps": 15.95,
+          "p95_max_s": 0.3
+        },
+        {
+          "target_rps": 18,
+          "measured_rps": 18.0,
+          "p95_max_s": 0.257
+        },
+        {
+          "target_rps": 20,
+          "measured_rps": 19.85,
+          "p95_max_s": 0.238
+        },
+        {
+          "target_rps": 22,
+          "measured_rps": 22.01,
+          "p95_max_s": 0.484
+        },
+        {
+          "target_rps": 24,
+          "measured_rps": 23.85,
+          "p95_max_s": 0.351
+        },
+        {
+          "target_rps": 26,
+          "measured_rps": 24.85,
+          "p95_max_s": 0.865
+        },
+        {
+          "target_rps": 28,
+          "measured_rps": null,
+          "p95_max_s": 5.607
+        }
+      ]
+    }
+  ],
+  "startup_measurements": [
+    {
+      "pod": "catalog-service-7f5dd44fd8-9xmnj",
+      "request_to_ready_s": 14.2,
+      "created_to_ready_s": 15.0
+    },
+    {
+      "pod": "catalog-service-7f5dd44fd8-gt4fj",
+      "request_to_ready_s": 13.1,
+      "created_to_ready_s": 13.9
+    }
+  ]
+}
