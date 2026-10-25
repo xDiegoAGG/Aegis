@@ -13,7 +13,7 @@ In the cluster: `kubectl port-forward -n aegis-system svc/aegis 8080`. `--port` 
 
 **Live tab**, in the order a viewer needs it:
 
-1. **Do the pods keep up?** A sentence from the last cycle ("Los pods no alcanzan", "Al límite mientras arranca el pod 2"…) and one tank per pod, all filled to the same level because Traefik splits the traffic evenly. Red water and "req/s sin atender" when traffic exceeds the Ready pods; the amber line is the level expected in T + lag.
+1. **Do the pods keep up?** A sentence from the last cycle ("Los pods no alcanzan", "Al límite hasta que el pod 2 esté listo"…) and one tank per pod, all filled to the same level because Traefik splits the traffic evenly. Red water and "req/s sin atender" when traffic exceeds the Ready pods; the amber line is the level expected in T + lag.
 2. **Last minutes:** traffic against the capacity of the Ready pods, with the projection into the next T + lag seconds.
 3. **What Aegis did:** each decision as a sentence with its numbers.
 4. **How Aegis decides** (collapsed): the formula with the cycle's values, forecast vs actual, risk, pods, P95, σ and m, each with one line explaining it; parameters and the raw cycles.
