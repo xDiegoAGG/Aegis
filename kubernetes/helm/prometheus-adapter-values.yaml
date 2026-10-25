@@ -1,0 +1,27 @@
+# Aegis metrics in the Custom Metrics API, attached to the protected Deployment.
+prometheus:
+  url: http://prometheus-kube-prometheus-prometheus.monitoring.svc
+  port: 9090
+
+metricsRelistInterval: 30s
+
+rules:
+  default: false
+  custom:
+    - seriesQuery: '{__name__=~"aegis_(risk|risk_one_less|target_replicas|projected_rps|demand_rps|sigma_rps|capacity_rps)",target_namespace!="",target_deployment!=""}'
+      resources:
+        overrides:
+          target_namespace:
+            resource: namespace
+          target_deployment:
+            group: apps
+            resource: deployment
+      name:
+        matches: "^(.*)$"
+        as: "${1}"
+      metricsQuery: 'max(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)'
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi

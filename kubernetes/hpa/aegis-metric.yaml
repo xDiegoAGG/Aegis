@@ -1,0 +1,48 @@
+# Metric mode: the HPA follows aegis_target_replicas (averageValue 1 -> desired = the metric).
+# CPU 95% is the safety net if Aegis stops.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: catalog-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: catalog-service
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Object
+      object:
+        metric:
+          name: aegis_target_replicas
+        describedObject:
+          apiVersion: apps/v1
+          kind: Deployment
+          name: catalog-service
+        target:
+          type: AverageValue
+          averageValue: "1"
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 95
+  behavior:
+    # No wait: Aegis already decided T + lag ahead.
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      selectPolicy: Max
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 15
+    # Aegis already waits 60 s; this window only absorbs a stale sample.
+    scaleDown:
+      stabilizationWindowSeconds: 30
+      selectPolicy: Min
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 30
