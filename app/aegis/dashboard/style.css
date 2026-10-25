@@ -294,13 +294,25 @@ th { color: var(--quiet); font-weight: 500; position: sticky; top: 0; background
 /* Experiments */
 .compare { display: grid; grid-template-columns: minmax(260px, 380px) minmax(0, 1fr); gap: 40px; align-items: start; }
 .compare h1 { font-weight: 900; font-size: 36px; letter-spacing: -0.02em; margin-bottom: 4px; }
-.runs { display: grid; gap: 2px; margin-top: 16px; max-height: 420px; overflow-y: auto; }
-.run { display: flex; align-items: center; gap: 10px; padding: 4px 6px; border-radius: 3px; cursor: pointer; color: var(--ink-soft); font-size: 14px; }
-.run:hover { background: var(--paper-deep); }
-.run input { accent-color: var(--ink); margin: 0; }
-.run .swatch { width: 18px; height: 3px; background: var(--hair); flex: none; }
-.run:has(input:checked) { color: var(--ink); }
-.run:not(:has(input:checked)) .swatch { opacity: 0.25; }
+.runs { margin-top: 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; }
+.runs > h2, .runs > .presets { grid-column: 1 / -1; }
+.runs h2 { font-size: 15px; margin: 18px 0 8px; }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.preset {
+  border: 1px solid var(--ink); background: var(--paper); color: var(--ink); border-radius: 3px; padding: 6px 12px;
+  cursor: pointer; font-weight: 500; text-align: left;
+}
+.preset:hover { background: var(--ink); color: var(--paper); }
+.run-group { border: 0; margin: 0 0 10px; padding: 0; }
+.run-group legend { padding: 0; font-size: 14px; color: var(--ink-soft); margin-bottom: 4px; }
+.run-box { position: relative; display: inline-flex; margin: 0 4px 4px 0; cursor: pointer; }
+.run-box input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.run-box span {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 3px;
+  border: 1px solid var(--hair); color: var(--ink-soft); font-weight: 500; font-size: 14px;
+}
+.run-box input:checked + span { border: 2px solid var(--run-color, var(--ink)); color: var(--ink); font-weight: 900; box-shadow: inset 0 -4px 0 var(--run-color, var(--ink)); }
+.run-box input:focus-visible + span { outline: 2px solid var(--water); outline-offset: 2px; }
 .summary td.best { font-weight: 900; }
 .summary th { color: var(--ink); text-align: right; white-space: normal; min-width: 120px; }
 .summary th .swatch { display: block; width: 24px; height: 3px; margin: 0 0 6px auto; }

@@ -215,6 +215,7 @@ def make_handler(state, catalog):
             self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
             self.end_headers()
             self.wfile.write(data)
 
@@ -291,11 +292,11 @@ def make_handler(state, catalog):
 
 
 # Serves the dashboard, /metrics and the JSON API in a background thread.
-def start_server(state, port, tests_dir=TESTS_DIR):
+def start_server(state, port, tests_dir=TESTS_DIR, host="0.0.0.0"):
     catalog = None
     if tests_dir is not None and Path(tests_dir).is_dir():
         catalog = TestCatalog(tests_dir)
-    server = ThreadingHTTPServer(("0.0.0.0", port), make_handler(state, catalog))
+    server = ThreadingHTTPServer((host, port), make_handler(state, catalog))
     thread = threading.Thread(target=server.serve_forever, name="aegis-http", daemon=True)
     thread.start()
     logger.info("Dashboard on http://localhost:%s  (metrics on /metrics)", port)

@@ -137,7 +137,8 @@ def main():
     if path.parent.name == "data":
         source = path.parent.parent.name + "/" + path.name
     state = AegisState(build_meta(config, records, calibration, source, args.speed))
-    start_server(state, args.port or config.get("server", {}).get("port", 8080), TESTS_DIR)
+    # Only this machine: the replay can switch runs through POST /api/replay.
+    start_server(state, args.port or config.get("server", {}).get("port", 8080), TESTS_DIR, host="127.0.0.1")
     Replayer(state, config, calibration, args.speed, args.loop).play(path)
     try:
         while True:

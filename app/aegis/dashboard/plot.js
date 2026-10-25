@@ -68,7 +68,7 @@ export class LineChart {
     this.options = Object.assign({ height: 180, yMin: 0, yMaxAtLeast: 1, yFormat: (v) => String(v),
       xFormat: (v) => String(v), valueFormat: null, timeTicks: false }, options);
     this.group = null;
-    this.data = { x: [], columns: {}, domain: null, rules: [], markers: [], bands: [] };
+    this.data = { x: [], columns: {}, domain: null, rules: [], markers: [], bands: [], zones: [], segments: [] };
     this.root = html("figure", "chart", container);
     const head = html("figcaption", "chart-head", this.root);
     this.titleNode = html("span", "chart-title", head, this.options.title || "");
@@ -84,7 +84,12 @@ export class LineChart {
     this.cursorIndex = null;
     this.bindEvents();
     this.renderLegend();
-    new ResizeObserver(() => this.render()).observe(this.plot);
+    // Redraw on the next frame and only when the width changed, so drawing never feeds the observer.
+    new ResizeObserver(() => {
+      if (this.plot.clientWidth === this.lastWidth) return;
+      this.lastWidth = this.plot.clientWidth;
+      requestAnimationFrame(() => this.render());
+    }).observe(this.plot);
   }
 
   setTitle(text) {
