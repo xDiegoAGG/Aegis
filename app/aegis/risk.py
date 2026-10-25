@@ -1,12 +1,16 @@
 import math
 import statistics
 from collections import deque
-from scipy.stats import norm
+
+
+# Standard normal CDF: Phi(z) = (1 + erf(z / sqrt 2)) / 2.
+def normal_cdf(z):
+    return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
 
 
 # Probability that the traffic goes over the capacity when the projection error is normal with std sigma.
 def risk_probability(projected_rps, capacity_rps, sigma_rps):
-    return float(norm.cdf((projected_rps - capacity_rps) / sigma_rps))
+    return normal_cdf((projected_rps - capacity_rps) / sigma_rps)
 
 
 # The projection of one cycle. risk_at gives the risk for any number of replicas.
