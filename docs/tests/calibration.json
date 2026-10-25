@@ -1,15 +1,15 @@
 {
-  "capacity_rps": 24,
+  "capacity_rps": 22,
   "startup_time_seconds": 15,
-  "measured_at": "2026-10-19T17:49:51Z",
-  "measured_at_unix": 1792432191.079557,
-  "started_at": "2026-10-19T17:33:59Z",
+  "measured_at": "2026-10-25T03:16:57Z",
+  "measured_at_unix": 1792898217.8084772,
+  "started_at": "2026-10-25T03:02:54Z",
   "environment": {
     "image": "catalog-service:local",
-    "cpu_limit": "200m",
+    "cpu_limit": "60m",
     "memory_limit": "256Mi",
     "node_instance_type": "",
-    "node_cpu": "2"
+    "node_cpu": "8"
   },
   "degradation": {
     "p95_threshold_seconds": 1.0,
@@ -23,171 +23,151 @@
   },
   "capacity_runs": [
     {
-      "started_at": "2026-10-19T17:34:02Z",
-      "capacity_rps": 28,
-      "reason": "served under 90% of the sent req/s at 30 req/s",
-      "degraded_at": "2026-10-19T17:40:46Z",
-      "degraded_step_rps": 30,
-      "ended_at": "2026-10-19T17:41:01Z",
-      "steps": [
-        {
-          "target_rps": 4,
-          "measured_rps": 3.95,
-          "p95_max_s": 0.41
-        },
-        {
-          "target_rps": 6,
-          "measured_rps": 5.95,
-          "p95_max_s": 0.2
-        },
-        {
-          "target_rps": 8,
-          "measured_rps": 8.0,
-          "p95_max_s": 0.167
-        },
-        {
-          "target_rps": 10,
-          "measured_rps": 10.0,
-          "p95_max_s": 0.24
-        },
-        {
-          "target_rps": 12,
-          "measured_rps": 11.95,
-          "p95_max_s": 0.637
-        },
-        {
-          "target_rps": 14,
-          "measured_rps": 13.99,
-          "p95_max_s": 1.633
-        },
-        {
-          "target_rps": 16,
-          "measured_rps": 16.0,
-          "p95_max_s": 0.302
-        },
-        {
-          "target_rps": 18,
-          "measured_rps": 18.0,
-          "p95_max_s": 0.236
-        },
-        {
-          "target_rps": 20,
-          "measured_rps": 20.0,
-          "p95_max_s": 0.127
-        },
-        {
-          "target_rps": 22,
-          "measured_rps": 22.05,
-          "p95_max_s": 0.78
-        },
-        {
-          "target_rps": 24,
-          "measured_rps": 24.0,
-          "p95_max_s": 0.329
-        },
-        {
-          "target_rps": 26,
-          "measured_rps": 26.49,
-          "p95_max_s": 0.865
-        },
-        {
-          "target_rps": 28,
-          "measured_rps": 27.5,
-          "p95_max_s": 0.376
-        },
-        {
-          "target_rps": 30,
-          "measured_rps": 24.6,
-          "p95_max_s": 3.2
-        }
-      ]
-    },
-    {
-      "started_at": "2026-10-19T17:42:13Z",
-      "capacity_rps": 24,
-      "reason": "P95 above 1.0 s at 26 req/s",
-      "degraded_at": "2026-10-19T17:48:17Z",
-      "degraded_step_rps": 26,
-      "ended_at": "2026-10-19T17:48:29Z",
+      "started_at": "2026-10-25T03:03:20Z",
+      "capacity_rps": 22,
+      "reason": "served under 90% of the sent req/s at 24 req/s",
+      "degraded_at": "2026-10-25T03:08:36Z",
+      "degraded_step_rps": 24,
+      "ended_at": "2026-10-25T03:08:48Z",
       "steps": [
         {
           "target_rps": 4,
           "measured_rps": 4.0,
-          "p95_max_s": 0.083
+          "p95_max_s": 0.5
         },
         {
           "target_rps": 6,
           "measured_rps": 6.0,
-          "p95_max_s": 0.15
+          "p95_max_s": 0.225
         },
         {
           "target_rps": 8,
-          "measured_rps": 8.0,
-          "p95_max_s": 0.22
+          "measured_rps": 8.05,
+          "p95_max_s": 0.756
         },
         {
           "target_rps": 10,
-          "measured_rps": 10.06,
-          "p95_max_s": 0.229
+          "measured_rps": 10.0,
+          "p95_max_s": 0.792
         },
         {
           "target_rps": 12,
           "measured_rps": 12.0,
-          "p95_max_s": 0.219
+          "p95_max_s": 0.45
         },
         {
           "target_rps": 14,
-          "measured_rps": 14.08,
-          "p95_max_s": 0.253
+          "measured_rps": 14.0,
+          "p95_max_s": 1.342
         },
         {
           "target_rps": 16,
-          "measured_rps": 15.95,
-          "p95_max_s": 0.3
+          "measured_rps": 16.0,
+          "p95_max_s": 0.55
         },
         {
           "target_rps": 18,
           "measured_rps": 18.0,
-          "p95_max_s": 0.257
+          "p95_max_s": 0.487
         },
         {
           "target_rps": 20,
-          "measured_rps": 19.85,
-          "p95_max_s": 0.238
+          "measured_rps": 20.0,
+          "p95_max_s": 0.808
         },
         {
           "target_rps": 22,
-          "measured_rps": 22.01,
-          "p95_max_s": 0.484
+          "measured_rps": 22.05,
+          "p95_max_s": 0.892
         },
         {
           "target_rps": 24,
-          "measured_rps": 23.85,
-          "p95_max_s": 0.351
+          "measured_rps": 22.13,
+          "p95_max_s": 2.325
+        }
+      ]
+    },
+    {
+      "started_at": "2026-10-25T03:09:54Z",
+      "capacity_rps": 22,
+      "reason": "served under 90% of the sent req/s at 24 req/s",
+      "degraded_at": "2026-10-25T03:15:25Z",
+      "degraded_step_rps": 24,
+      "ended_at": "2026-10-25T03:15:37Z",
+      "steps": [
+        {
+          "target_rps": 4,
+          "measured_rps": 4.0,
+          "p95_max_s": 0.075
+        },
+        {
+          "target_rps": 6,
+          "measured_rps": 6.0,
+          "p95_max_s": 0.225
+        },
+        {
+          "target_rps": 8,
+          "measured_rps": 8.0,
+          "p95_max_s": 0.049
+        },
+        {
+          "target_rps": 10,
+          "measured_rps": 10.0,
+          "p95_max_s": 0.48
+        },
+        {
+          "target_rps": 12,
+          "measured_rps": 12.0,
+          "p95_max_s": 0.625
+        },
+        {
+          "target_rps": 14,
+          "measured_rps": 14.0,
+          "p95_max_s": 0.383
+        },
+        {
+          "target_rps": 16,
+          "measured_rps": 16.0,
+          "p95_max_s": 0.414
+        },
+        {
+          "target_rps": 18,
+          "measured_rps": 18.0,
+          "p95_max_s": 0.887
+        },
+        {
+          "target_rps": 20,
+          "measured_rps": 20.0,
+          "p95_max_s": 2.36
+        },
+        {
+          "target_rps": 22,
+          "measured_rps": 22.0,
+          "p95_max_s": 0.828
+        },
+        {
+          "target_rps": 24,
+          "measured_rps": 24.0,
+          "p95_max_s": 1.702
         },
         {
           "target_rps": 26,
-          "measured_rps": 24.85,
-          "p95_max_s": 0.865
-        },
-        {
-          "target_rps": 28,
           "measured_rps": null,
-          "p95_max_s": 5.607
+          "p95_max_s": 1.967
         }
       ]
     }
   ],
   "startup_measurements": [
     {
-      "pod": "catalog-service-7f5dd44fd8-9xmnj",
-      "request_to_ready_s": 14.2,
-      "created_to_ready_s": 15.0
+      "pod": "catalog-service-84dccb7884-55lch",
+      "request_to_ready_s": 14.1,
+      "created_to_ready_s": 14.8
     },
     {
-      "pod": "catalog-service-7f5dd44fd8-gt4fj",
-      "request_to_ready_s": 13.1,
-      "created_to_ready_s": 13.9
+      "pod": "catalog-service-84dccb7884-msv7h",
+      "request_to_ready_s": 14.1,
+      "created_to_ready_s": 14.8
     }
   ]
 }

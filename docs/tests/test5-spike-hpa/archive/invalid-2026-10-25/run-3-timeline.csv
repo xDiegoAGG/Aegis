@@ -1,0 +1,24 @@
+seconds,time_utc,source,event,detail
+-4881.0,03:31:44,pod,created,catalog-service-84dccb7884-477qq
+-284.0,04:48:21,pod,created,catalog-service-84dccb7884-xm5zt
+-135.0,04:50:50,pod,ready,catalog-service-84dccb7884-xm5zt
+-117.0,04:51:08,pod,ready,catalog-service-84dccb7884-477qq
+-16.0,04:52:49,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-wkxws: Successfully assigned default/catalog-service-84dccb7884-wkxws to minikube
+-16.0,04:52:49,pod,created,catalog-service-84dccb7884-wkxws
+-15.0,04:52:50,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-wkxws: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+-15.0,04:52:50,kubernetes,Created,Pod/catalog-service-84dccb7884-wkxws: Container created
+-14.0,04:52:51,kubernetes,Started,Pod/catalog-service-84dccb7884-wkxws: Container started
+-2.0,04:53:03,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-wkxws: Readiness probe failed: Get ""http://10.244.0.72:3003/health"": dial tcp 10.244.0.72:3003: connect: connection refused"
+0,04:53:05,k6,load started,spike
+0.0,04:53:05,kubernetes,Scheduled,Pod/load-spike-2ghsf: Successfully assigned default/load-spike-2ghsf to minikube
+0.0,04:53:05,kubernetes,Pulled,"Pod/load-spike-2ghsf: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,04:53:05,kubernetes,Created,Pod/load-spike-2ghsf: Container created
+0.0,04:53:05,kubernetes,Started,Pod/load-spike-2ghsf: Container started
+0.0,04:53:05,kubernetes,SuccessfulCreate,Job/load-spike: Created pod: load-spike-2ghsf
+1.0,04:53:06,pod,ready,catalog-service-84dccb7884-wkxws
+32.5,04:53:37,k6,planned traffic passes C,22.0 req/s
+35,04:53:40,client,degraded,P95 above L or over 1% failed for T_d
+52.0,04:53:57,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-477qq: Readiness probe failed: Get ""http://10.244.0.34:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+133.0,04:55:18,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-wkxws: Readiness probe failed: Get ""http://10.244.0.72:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+190.0,04:56:15,k6,load finished,
+221.0,04:56:46,kubernetes,Killing,Pod/load-spike-2ghsf: Stopping container k6

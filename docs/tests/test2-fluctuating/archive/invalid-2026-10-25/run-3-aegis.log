@@ -1,0 +1,23 @@
+2026-10-25 00:17:47,831 INFO Calibration from 2026-10-25T03:16:57Z: C=22 req/s, T=15 s
+2026-10-25 00:17:47,832 INFO Dashboard on http://localhost:8080  (metrics on /metrics)
+2026-10-25 00:17:47,838 INFO Aegis running every 5 s (min_replicas mode): C=22.0 req/s, T=15.0 s, start at 1 replica(s) (Ctrl+C to stop)
+2026-10-25 00:17:47,849 INFO demand=0.0 projected=0.0 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:17:52,848 INFO demand=0.0 projected=0.0 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:17:57,848 INFO demand=0.0 projected=0.0 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:02,848 INFO demand=0.5 projected=1.6 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:07,848 INFO demand=1.5 projected=4.0 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:12,848 INFO demand=2.5 projected=6.1 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:17,848 INFO demand=3.5 projected=8.8 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:22,848 INFO demand=4.5 projected=10.2 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:27,849 INFO demand=5.0 projected=11.2 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:32,848 INFO demand=5.0 projected=10.2 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:37,847 INFO demand=5.4 projected=9.4 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:42,847 INFO demand=6.2 projected=10.0 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:47,847 INFO demand=7.2 projected=10.7 sigma=5.52 risk=2.1% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:52,847 INFO demand=8.6 projected=13.7 sigma=5.11 risk=5.3% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:18:57,847 INFO demand=10.3 projected=17.7 sigma=4.78 risk=18.5% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:19:02,847 INFO demand=12.2 projected=20.7 sigma=4.53 risk=38.8% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:19:07,847 INFO demand=13.9 projected=24.0 sigma=4.6 risk=67.1% ready=1 | HOLD 1 -> 1 (already at min_replicas)
+2026-10-25 00:19:12,855 INFO minReplicas 1 -> 2 on HPA catalog-service
+2026-10-25 00:19:12,858 WARNING demand=15.8 projected=27.9 sigma=5.17 risk=87.1% ready=1 | SCALE_UP 1 -> 2 (risk with 1 pod(s) 87.1% >= 70.0%)
+2026-10-25 00:19:14,208 INFO Aegis stopped

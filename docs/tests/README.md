@@ -1,34 +1,45 @@
 # Tests
 
-Three tests, one representative run each, on minikube (1 node, 2 CPUs) on 2026-10-19. Calibration used by all of them (`calibration.json`, measured 17:34–17:49 UTC): **C = 24 req/s per pod** (runs: 28, 24), **T = 15 s** (14.2, 13.1). Slow means P95 > L = 1 s for 15 s.
+32 runs on minikube, 2026-10-25. Calibration (`calibration.json`, pod 60m CPU): **C = 22 req/s**, **T = 15 s**. Degraded = client P95 > 1 s or > 1% failed, for 15 s. Load files are written for C = 24 and scaled by C / 24.
 
-| Test | Traffic | Mode | What it shows |
-|---|---|---|---|
-| [Test 1](test1-linear-ramp/) | Ramp 5 → 50 req/s in 2 min | Aegis | It asks for the pod before the traffic goes over one pod |
-| [Test 2](test2-fluctuating/) | Two waves (30 and 50 req/s) | Aegis | It scales up on each wave and down when the traffic drops |
-| [Test 3](test3-hpa-baseline/) | Same ramp as test 1 | HPA only (CPU 70%) | The usual HPA scales late |
+| Test | Traffic | Mode | Runs | Failed (mean, min–max) |
+|---|---|---|---|---|
+| [1](test1-linear-ramp/) | Ramp 5 → 46 req/s in 2 min | Aegis | 5 | **2.5%** (0.48–4.69) |
+| [3](test3-hpa-baseline/) | Same ramp | HPA only (CPU 70%) | 5 | **37.1%** (34.7–40.1) |
+| [4](test4-spike-aegis/) | Spike 5 → 41 req/s in 5 s | Aegis | 5 | **13.3%** (11.7–16.1) |
+| [5](test5-spike-hpa/) | Same spike | HPA only | 5 | **54.8%** (51.9–61.0) |
+| [2](test2-fluctuating/) | Waves to 28 and 46 req/s | Aegis | 3 | 0.64% (0.32–0.97) |
+| [6](test6-ramp-045/) | Ramp at 0.41 req/s per s | Aegis | 3 | 1.06% (0.34–1.82) |
+| [7](test7-ramp-050/) | Ramp at 0.46 req/s per s | Aegis | 3 | 1.73% (0.94–2.78) |
+| [8](test8-metric-mode/) | Ramp of test 1 | Aegis via Custom Metrics API | 3 | 20.2% (18.4–21.3) |
 
-## Aegis vs the HPA, same ramp
+Details: [comparison.md](comparison.md), [forecast.md](forecast.md), [capacity.md](../capacity.md), [limitations.md](../limitations.md).
 
-| | Test 1 (Aegis) | Test 3 (HPA only) |
+## Aegis vs HPA, same ramp
+
+![Aegis vs HPA, same traffic](evidence.png)
+
+Median runs: test 1 run 4 and test 3 run 1. Red is traffic above the capacity of the Ready pods.
+
+![Summary in numbers](summary.png)
+
+| 5 runs each | Aegis | HPA only |
 |---|---|---|
-| Traffic passes C | second 81 | second 81 |
-| 2nd pod asked | second 71 (10 s before) | second 142 (61 s after) |
-| 2nd pod Ready | second 84 | second 154 |
-| Failed requests | **0.77%** | **30.65%** |
-| Seconds with P95 > 1 s | 40 | 140 |
-| Highest pods | 3 | 2 |
-| Pod-minutes | 8.6 | 5.6 |
+| 2nd pod requested | 73.5–74.5 s (**6 s before** C) | 116–145 s (**36–65 s after**) |
+| Failed | **2.5%** | **37.1%** |
+| Seconds degraded | 100 | 162 |
+| Pod-minutes | 8.53 | 5.74 |
 
-Test 1 was repeated 5 times: the 2nd pod was always asked between second 70 and 75, with 0.24–0.95% failed.
+Compare request times, not Ready times: Traefik routes to not-ready pods, so a pod started during overload serves before it is Ready ([limitations.md](../limitations.md#pod-startup-under-overload)).
 
-## Test 2 in short
-Pods 1 → 2 → 1 → 2 → 3 → 2 → 1, **0.22% failed**. With waves twice as steep, 12.59% failed: Aegis needs about T + 20 ≈ 35 s of visible trend to get ahead.
-
-## Run them again
+## Run
 
 ```bash
 cd scripts/experiments
-python3 run.py test1-linear-ramp   # or test2-fluctuating, test3-hpa-baseline
-python3 report.py                  # charts again from the saved data
+python3 preflight.py       # what is missing and how long it takes
+./run_all.sh               # all tests (~3 h, resumable), then charts, comparison, capacity, forecast
+python3 run.py test1-linear-ramp --runs 5
+python3 report.py && python3 compare.py && python3 forecast_accuracy.py
 ```
+
+Every run starts from 1 Ready pod, a new HPA and no traffic. Runs with another calibration go to `archive/` (`--archive`); invalid runs of 2026-10-25 are in `archive/invalid-2026-10-25/`.

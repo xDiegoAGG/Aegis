@@ -1,0 +1,49 @@
+{
+  "run": 2,
+  "profile": "ramp-045",
+  "mode": "aegis",
+  "date_utc": "2026-10-25",
+  "k6_start_utc": "05:26:42",
+  "end_utc": "05:31:35",
+  "capacity_rps": 22.0,
+  "startup_time_seconds": 15,
+  "requests": 6214,
+  "failed_percent": 0.34,
+  "client_p95_s": 1.865,
+  "client_max_s": 10.001,
+  "dropped_iterations": 11,
+  "degraded_seconds": 65,
+  "first_degraded_s": 108,
+  "crosses_c_s": 71.5,
+  "first_scale_up_s": 69.3,
+  "second_pod_ready_s": 79.0,
+  "lead_s": -7.5,
+  "scale_ups": [
+    {
+      "s": 69.3,
+      "from": 1,
+      "to": 2
+    },
+    {
+      "s": 119.3,
+      "from": 2,
+      "to": 3
+    }
+  ],
+  "scale_downs": [
+    {
+      "s": 274.3,
+      "from": 3,
+      "to": 2
+    }
+  ],
+  "max_pods": 3,
+  "pod_minutes": 7.83,
+  "p95_excess_s2": 200.4,
+  "degraded_to_ready_s": -29.0,
+  "false_scale_ups": 0,
+  "needed_pod_minutes": 7.03,
+  "extra_pod_minutes": 0.8,
+  "calibration_measured_at": "2026-10-25T03:16:57Z",
+  "load_scale": 0.917
+}

@@ -1,0 +1,41 @@
+{
+  "run": 1,
+  "profile": "linear",
+  "mode": "metric",
+  "date_utc": "2026-10-25",
+  "k6_start_utc": "05:56:17",
+  "end_utc": "06:01:35",
+  "capacity_rps": 22.0,
+  "startup_time_seconds": 15,
+  "requests": 6556,
+  "failed_percent": 21.34,
+  "client_p95_s": 10.0,
+  "client_max_s": 10.002,
+  "dropped_iterations": 178,
+  "degraded_seconds": 165,
+  "first_degraded_s": 58,
+  "crosses_c_s": 80.0,
+  "first_scale_up_s": 87.0,
+  "second_pod_ready_s": 162.0,
+  "lead_s": -82.0,
+  "scale_ups": [
+    {
+      "s": 87.0,
+      "from": 1,
+      "to": 2
+    }
+  ],
+  "scale_downs": [],
+  "max_pods": 2,
+  "pod_minutes": 6.55,
+  "p95_excess_s2": 1280.2,
+  "degraded_to_ready_s": 104.0,
+  "false_scale_ups": 0,
+  "needed_pod_minutes": 7.58,
+  "extra_pod_minutes": -1.03,
+  "calibration_measured_at": "2026-10-25T03:16:57Z",
+  "load_scale": 0.917,
+  "metric_path_delays_s": [
+    10.6
+  ]
+}

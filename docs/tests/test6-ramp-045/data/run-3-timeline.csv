@@ -1,0 +1,41 @@
+seconds,time_utc,source,event,detail
+-7258.0,03:31:44,pod,created,catalog-service-84dccb7884-477qq
+-780.0,05:19:42,pod,ready,catalog-service-84dccb7884-477qq
+-241.0,05:28:41,pod,created,catalog-service-84dccb7884-zjg97
+-231.0,05:28:51,pod,ready,catalog-service-84dccb7884-zjg97
+-1.0,05:32:41,kubernetes,Scheduled,Pod/load-ramp-045-2ntm6: Successfully assigned default/load-ramp-045-2ntm6 to minikube
+-1.0,05:32:41,kubernetes,SuccessfulCreate,Job/load-ramp-045: Created pod: load-ramp-045-2ntm6
+0,05:32:42,k6,load started,ramp-045
+0.0,05:32:42,kubernetes,Pulled,"Pod/load-ramp-045-2ntm6: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,05:32:42,kubernetes,Created,Pod/load-ramp-045-2ntm6: Container created
+0.0,05:32:42,kubernetes,Started,Pod/load-ramp-045-2ntm6: Container started
+71.5,05:33:53,k6,planned traffic passes C,22.0 req/s
+74.0,05:33:56,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-rkqdj: Successfully assigned default/catalog-service-84dccb7884-rkqdj to minikube
+74.0,05:33:56,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-rkqdj: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+74.0,05:33:56,kubernetes,Created,Pod/catalog-service-84dccb7884-rkqdj: Container created
+74.0,05:33:56,kubernetes,Started,Pod/catalog-service-84dccb7884-rkqdj: Container started
+74.0,05:33:56,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-84dccb7884: (combined from similar events): Created pod: catalog-service-84dccb7884-rkqdj
+74.0,05:33:56,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: Current number of replicas below Spec.MinReplicas
+74.0,05:33:56,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-84dccb7884 from 1 to 2
+74.0,05:33:56,pod,created,catalog-service-84dccb7884-rkqdj
+74.0,05:33:56,aegis,scale_up 1->2,risk 0.8963: risk with 1 pod(s) 89.6% >= 70.0%
+81.0,05:34:03,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-rkqdj: Readiness probe failed: Get ""http://10.244.0.91:3003/health"": dial tcp 10.244.0.91:3003: connect: connection refused"
+83,05:34:05,client,degraded,P95 above L or over 1% failed for T_d
+84.0,05:34:06,pod,ready,catalog-service-84dccb7884-rkqdj
+119.0,05:34:41,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-d5rsl: Successfully assigned default/catalog-service-84dccb7884-d5rsl to minikube
+119.0,05:34:41,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-d5rsl: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+119.0,05:34:41,kubernetes,Created,Pod/catalog-service-84dccb7884-d5rsl: Container created
+119.0,05:34:41,kubernetes,Started,Pod/catalog-service-84dccb7884-d5rsl: Container started
+119.0,05:34:41,pod,created,catalog-service-84dccb7884-d5rsl
+119.0,05:34:41,aegis,scale_up 2->3,risk 0.7656: risk with 2 pod(s) 76.6% >= 70.0%
+126.0,05:34:48,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-d5rsl: Readiness probe failed: Get ""http://10.244.0.92:3003/health"": dial tcp 10.244.0.92:3003: connect: connection refused"
+129.0,05:34:51,pod,ready,catalog-service-84dccb7884-d5rsl
+133.0,05:34:55,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-rkqdj: Readiness probe failed: Get ""http://10.244.0.91:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+147.0,05:35:09,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-d5rsl: Readiness probe failed: Get ""http://10.244.0.92:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+220.0,05:36:22,k6,load finished,
+264.0,05:37:06,kubernetes,Killing,Pod/catalog-service-84dccb7884-rkqdj: Stopping container catalog-service
+264.0,05:37:06,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-84dccb7884: (combined from similar events): Deleted pod: catalog-service-84dccb7884-rkqdj
+264.0,05:37:06,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: All metrics below target
+264.0,05:37:06,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-84dccb7884 from 3 to 2
+264.0,05:37:06,aegis,scale_down 3->2,risk 0.0: risk with 2 pod(s) 0.0% < 30.0% for 60 s
+297.0,05:37:39,kubernetes,Killing,Pod/load-ramp-045-2ntm6: Stopping container k6

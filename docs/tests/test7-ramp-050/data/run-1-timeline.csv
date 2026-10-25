@@ -1,0 +1,39 @@
+seconds,time_utc,source,event,detail
+-7619.0,03:31:44,pod,created,catalog-service-84dccb7884-477qq
+-1141.0,05:19:42,pod,ready,catalog-service-84dccb7884-477qq
+-242.0,05:34:41,pod,created,catalog-service-84dccb7884-d5rsl
+-212.0,05:35:11,pod,ready,catalog-service-84dccb7884-d5rsl
+-1.0,05:38:42,kubernetes,Scheduled,Pod/load-ramp-050-gqc5l: Successfully assigned default/load-ramp-050-gqc5l to minikube
+-1.0,05:38:42,kubernetes,Pulled,"Pod/load-ramp-050-gqc5l: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+-1.0,05:38:42,kubernetes,Created,Pod/load-ramp-050-gqc5l: Container created
+-1.0,05:38:42,kubernetes,Started,Pod/load-ramp-050-gqc5l: Container started
+-1.0,05:38:42,kubernetes,SuccessfulCreate,Job/load-ramp-050: Created pod: load-ramp-050-gqc5l
+0,05:38:43,k6,load started,ramp-050
+62,05:39:45,client,degraded,P95 above L or over 1% failed for T_d
+67.5,05:39:50,k6,planned traffic passes C,22.0 req/s
+68.0,05:39:51,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-pm4d2: Successfully assigned default/catalog-service-84dccb7884-pm4d2 to minikube
+68.0,05:39:51,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-pm4d2: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+68.0,05:39:51,kubernetes,Created,Pod/catalog-service-84dccb7884-pm4d2: Container created
+68.0,05:39:51,pod,created,catalog-service-84dccb7884-pm4d2
+68.3,05:39:51,aegis,scale_up 1->2,risk 0.8242: risk with 1 pod(s) 82.4% >= 70.0%
+69.0,05:39:52,kubernetes,Started,Pod/catalog-service-84dccb7884-pm4d2: Container started
+75.0,05:39:58,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-pm4d2: Readiness probe failed: Get ""http://10.244.0.94:3003/health"": dial tcp 10.244.0.94:3003: connect: connection refused"
+107.0,05:40:30,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-477qq: Readiness probe failed: Get ""http://10.244.0.34:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+108.0,05:40:31,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-qrzgw: Successfully assigned default/catalog-service-84dccb7884-qrzgw to minikube
+108.0,05:40:31,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-qrzgw: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+108.0,05:40:31,kubernetes,Created,Pod/catalog-service-84dccb7884-qrzgw: Container created
+108.0,05:40:31,pod,created,catalog-service-84dccb7884-qrzgw
+108.3,05:40:31,aegis,scale_up 2->3,risk 0.731: risk with 2 pod(s) 73.1% >= 70.0%
+109.0,05:40:32,kubernetes,Started,Pod/catalog-service-84dccb7884-qrzgw: Container started
+115.0,05:40:38,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-qrzgw: Readiness probe failed: Get ""http://10.244.0.95:3003/health"": dial tcp 10.244.0.95:3003: connect: connection refused"
+118.0,05:40:41,pod,ready,catalog-service-84dccb7884-qrzgw
+127.0,05:40:50,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-pm4d2: Readiness probe failed: Get ""http://10.244.0.94:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+131.0,05:40:54,pod,ready,catalog-service-84dccb7884-pm4d2
+135.0,05:40:58,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-qrzgw: Readiness probe failed: Get ""http://10.244.0.95:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+210.0,05:42:13,k6,load finished,
+258.0,05:43:01,kubernetes,Killing,Pod/catalog-service-84dccb7884-pm4d2: Stopping container catalog-service
+258.0,05:43:01,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-84dccb7884: (combined from similar events): Deleted pod: catalog-service-84dccb7884-pm4d2
+258.0,05:43:01,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: All metrics below target
+258.0,05:43:01,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-84dccb7884 from 3 to 2
+258.3,05:43:01,aegis,scale_down 3->2,risk 0.0: risk with 2 pod(s) 0.0% < 30.0% for 60 s
+286.0,05:43:29,kubernetes,Killing,Pod/load-ramp-050-gqc5l: Stopping container k6

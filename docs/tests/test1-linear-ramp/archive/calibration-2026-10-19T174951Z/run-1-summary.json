@@ -1,0 +1,42 @@
+{
+  "run": 1,
+  "profile": "linear",
+  "mode": "aegis",
+  "date_utc": "2026-10-19",
+  "k6_start_utc": "17:54:37",
+  "end_utc": "18:00:00",
+  "capacity_rps": 24.0,
+  "startup_time_seconds": 15,
+  "requests": 7266,
+  "failed_percent": 0.77,
+  "client_p95_s": 1.382,
+  "client_max_s": 10.048,
+  "dropped_iterations": 8,
+  "degraded_seconds": 40,
+  "first_degraded_s": 133,
+  "crosses_c_s": 81.0,
+  "first_scale_up_s": 71.3,
+  "second_pod_ready_s": 84.0,
+  "lead_s": -3.0,
+  "scale_ups": [
+    {
+      "s": 71.3,
+      "from": 1,
+      "to": 2
+    },
+    {
+      "s": 131.3,
+      "from": 2,
+      "to": 3
+    }
+  ],
+  "scale_downs": [
+    {
+      "s": 286.3,
+      "from": 3,
+      "to": 2
+    }
+  ],
+  "max_pods": 3,
+  "pod_minutes": 8.6
+}

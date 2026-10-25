@@ -1,0 +1,24 @@
+seconds,time_utc,source,event,detail
+-4340.0,03:31:44,pod,created,catalog-service-84dccb7884-477qq
+-271.0,04:39:33,pod,created,catalog-service-84dccb7884-t5tf8
+-253.0,04:39:51,pod,ready,catalog-service-84dccb7884-477qq
+-231.0,04:40:13,pod,ready,catalog-service-84dccb7884-t5tf8
+-1.0,04:44:03,kubernetes,Scheduled,Pod/load-spike-fkfhl: Successfully assigned default/load-spike-fkfhl to minikube
+-1.0,04:44:03,kubernetes,Pulled,"Pod/load-spike-fkfhl: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+-1.0,04:44:03,kubernetes,Created,Pod/load-spike-fkfhl: Container created
+-1.0,04:44:03,kubernetes,Started,Pod/load-spike-fkfhl: Container started
+-1.0,04:44:03,kubernetes,SuccessfulCreate,Job/load-spike: Created pod: load-spike-fkfhl
+0,04:44:04,k6,load started,spike
+31,04:44:35,client,degraded,P95 above L or over 1% failed for T_d
+32.5,04:44:36,k6,planned traffic passes C,22.0 req/s
+41.0,04:44:45,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-477qq: Readiness probe failed: Get ""http://10.244.0.34:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+97.0,04:45:41,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-rjtpn: Successfully assigned default/catalog-service-84dccb7884-rjtpn to minikube
+97.0,04:45:41,pod,created,catalog-service-84dccb7884-rjtpn
+98.0,04:45:42,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-rjtpn: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+98.0,04:45:42,kubernetes,Created,Pod/catalog-service-84dccb7884-rjtpn: Container created
+98.0,04:45:42,kubernetes,Started,Pod/catalog-service-84dccb7884-rjtpn: Container started
+105.0,04:45:49,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-rjtpn: Readiness probe failed: Get ""http://10.244.0.69:3003/health"": dial tcp 10.244.0.69:3003: connect: connection refused"
+151.0,04:46:35,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-rjtpn: Readiness probe failed: Get ""http://10.244.0.69:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+155.0,04:46:39,pod,ready,catalog-service-84dccb7884-rjtpn
+190.0,04:47:14,k6,load finished,
+221.0,04:47:45,kubernetes,Killing,Pod/load-spike-fkfhl: Stopping container k6

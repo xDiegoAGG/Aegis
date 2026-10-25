@@ -1,0 +1,40 @@
+seconds,time_utc,source,event,detail
+-8673.0,03:31:44,pod,created,catalog-service-84dccb7884-477qq
+-252.0,05:52:05,pod,created,catalog-service-84dccb7884-splkm
+-241.0,05:52:16,pod,ready,catalog-service-84dccb7884-477qq
+-218.0,05:52:39,pod,ready,catalog-service-84dccb7884-splkm
+-3.0,05:56:14,kubernetes,FailedGetObjectMetric,HorizontalPodAutoscaler/catalog-service: unable to get metric aegis_target_replicas on Deployment default/catalog-service: unable to fetch metrics from custom metrics API: the server could not find the metric aegis_target_replicas for deployments.apps
+0,05:56:17,k6,load started,linear
+0.0,05:56:17,kubernetes,Scheduled,Pod/load-linear-mlptj: Successfully assigned default/load-linear-mlptj to minikube
+0.0,05:56:17,kubernetes,Pulled,"Pod/load-linear-mlptj: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,05:56:17,kubernetes,Created,Pod/load-linear-mlptj: Container created
+0.0,05:56:17,kubernetes,Started,Pod/load-linear-mlptj: Container started
+0.0,05:56:17,kubernetes,SuccessfulCreate,Job/load-linear: Created pod: load-linear-mlptj
+58,05:57:15,client,degraded,P95 above L or over 1% failed for T_d
+76.0,05:57:33,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-477qq: Readiness probe failed: Get ""http://10.244.0.34:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+76.4,05:57:33,aegis,scale_up 1->2,risk 0.8023: risk with 1 pod(s) 80.2% >= 70.0%
+80.0,05:57:37,k6,planned traffic passes C,22.0 req/s
+87.0,05:57:44,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-z2vrs: Successfully assigned default/catalog-service-84dccb7884-z2vrs to minikube
+87.0,05:57:44,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-84dccb7884: (combined from similar events): Created pod: catalog-service-84dccb7884-z2vrs
+87.0,05:57:44,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-84dccb7884 from 1 to 2
+87.0,05:57:44,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: external metric aegis_target_replicas(nil) above target
+87.0,05:57:44,pod,created,catalog-service-84dccb7884-z2vrs
+88.0,05:57:45,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-z2vrs: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+88.0,05:57:45,kubernetes,Created,Pod/catalog-service-84dccb7884-z2vrs: Container created
+88.0,05:57:45,kubernetes,Started,Pod/catalog-service-84dccb7884-z2vrs: Container started
+98.0,05:57:55,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-z2vrs: Readiness probe failed: Get ""http://10.244.0.104:3003/health"": dial tcp 10.244.0.104:3003: connect: connection refused"
+136.4,05:58:33,aegis,scale_up 2->3,risk 0.7336: risk with 2 pod(s) 73.4% >= 70.0%
+147.0,05:58:44,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-w8ggs: Successfully assigned default/catalog-service-84dccb7884-w8ggs to minikube
+147.0,05:58:44,pod,created,catalog-service-84dccb7884-w8ggs
+148.0,05:58:45,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-w8ggs: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+148.0,05:58:45,kubernetes,Created,Pod/catalog-service-84dccb7884-w8ggs: Container created
+148.0,05:58:45,kubernetes,Started,Pod/catalog-service-84dccb7884-w8ggs: Container started
+158.0,05:58:55,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-w8ggs: Readiness probe failed: Get ""http://10.244.0.105:3003/health"": dial tcp 10.244.0.105:3003: connect: connection refused"
+162.0,05:58:59,pod,ready,catalog-service-84dccb7884-z2vrs
+195.0,05:59:32,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-z2vrs: Readiness probe failed: Get ""http://10.244.0.104:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+221.0,05:59:58,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-w8ggs: Readiness probe failed: Get ""http://10.244.0.105:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+222.0,05:59:59,pod,ready,catalog-service-84dccb7884-w8ggs
+240.0,06:00:17,k6,load finished,
+281.4,06:00:58,aegis,scale_down 3->2,risk 0.0: risk with 2 pod(s) 0.0% < 30.0% for 60 s
+297.0,06:01:14,kubernetes,Killing,Pod/catalog-service-84dccb7884-w8ggs: Stopping container catalog-service
+319.0,06:01:36,kubernetes,Killing,Pod/load-linear-mlptj: Stopping container k6

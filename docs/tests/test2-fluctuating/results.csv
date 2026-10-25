@@ -1,0 +1,4 @@
+run,k6_start_utc,scale_changes,failed_percent,client_p95_s,degraded_seconds,p95_excess_s2,crosses_c_s,first_scale_up_s,second_pod_ready_s,lead_s,degraded_to_ready_s,max_pods,pod_minutes,extra_pod_minutes,false_scale_ups,dropped_iterations
+1,2026-10-25 15:38:12,"1->2 at 74 s, 2->1 at 219 s, 1->2 at 304 s, 2->3 at 364 s, 3->2 at 504 s, 2->1 at 569 s",0.63,2.006,130,377.5,78.5,74.4,87.0,-8.5,9.0,3,18.33,5.0,0,0
+2,2026-10-25 05:06:52,"1->2 at 73 s, 2->1 at 218 s, 1->2 at 303 s, 2->3 at 368 s, 3->2 at 498 s, 2->1 at 568 s",0.32,1.384,100,221.5,78.5,73.7,83.0,-4.5,5.0,3,18.18,4.85,0,0
+3,2026-10-25 15:49:40,"1->2 at 73 s, 2->1 at 213 s, 1->2 at 303 s, 2->3 at 363 s, 3->2 at 503 s, 2->1 at 568 s",0.97,1.907,75,435.9,78.5,73.9,84.0,-5.5,-1.0,3,18.27,4.94,0,14

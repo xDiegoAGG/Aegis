@@ -1,36 +1,29 @@
 # Prueba 2: Aegis con tráfico fluctuante
 
-**Fecha:** 2026-10-19, 18:58:22 – 19:09:10 UTC
+**Fecha:** 2026-10-25, corridas a las 05:06, 15:38 y 15:49 UTC
 **Objetivo:** mostrar que Aegis sube en cada ola y **devuelve los pods** cuando el tráfico baja.
 
 ## Qué se hizo
-- Tráfico (`kubernetes/load/fluctuating.yaml`, 560 s): 30 s a 5 req/s, una ola hasta 30 req/s (65 s subiendo, 45 s plano), 105 s en 5, una ola hasta 50 req/s (120 s subiendo, 45 s plano), 120 s en 5. Las dos olas suben tan rápido como la rampa de la prueba 1.
+- Tráfico (`kubernetes/load/fluctuating.yaml`, 560 s, ×0.917): 30 s a 5 req/s, una ola a 28 req/s (65 s de subida, 45 s plana), 105 s a 5, una ola a 46 req/s (120 s de subida, 45 s plana), 120 s a 5.
 - Aegis corriendo con el HPA de `kubernetes/hpa/aegis.yaml`.
-- Calibración: C = 24 req/s por pod, T = 15 s. El tráfico pasa C en el segundo 79 (ola 1) y 311 (ola 2), y 2C (48) en el segundo 375.
+- Calibración: C = 22 req/s por pod, T = 15 s. El tráfico pasa C en el segundo 78.5 (ola 1) y otra vez en la ola 2, y 2C (44) cerca de su pico.
 
 ## Resultados
 
-![Prueba 2](chart.png)
+![Prueba 2, todas las corridas](all-runs.es.png)
 
-| Segundo (desde que arrancó k6) | Qué pasó |
-|---|---|
-| 73 | Aegis pide el 2º pod (demanda 16.1, proyección 28.2, riesgo 78.9%) |
-| 79 | El tráfico pasa C |
-| 86 | El 2º pod está Ready |
-| 140–155 | El tráfico baja a 5 req/s |
-| 223 | **Baja 2 → 1**: 60 s con riesgo bajo 30% con un pod menos |
-| 303 | Segunda ola: Aegis pide el 2º pod (riesgo 72.4%), antes de que el tráfico pase C en el 311 |
-| 363 | Aegis pide el 3er pod (proyección 51.8 > 2C), antes de que el tráfico pase 2C en el 375 |
-| 425–440 | El tráfico baja a 5 req/s |
-| 498 | **Baja 3 → 2** |
-| 568 | **Baja 2 → 1** |
+![Prueba 2, corrida 1](run-1.es.png)
 
-k6: 9817 peticiones, **0.22% fallidas**, P95 1.89 s. 100 s con el P95 sobre 1 s, en picos cortos mientras arrancaba un pod nuevo (el nodo tiene solo 2 CPUs). Pods: 1 → 2 → 1 → 2 → 3 → 2 → 1, 18.4 pods-minuto.
+| Corrida | Cambios de pods (s desde que empezó k6) | Fallidas | Segundos degradado | Pods-minuto | Falsas alarmas |
+|---|---|---|---|---|---|
+| 1 | 1→2 en 74, 2→1 en 219, 1→2 en 304, 2→3 en 364, 3→2 en 504, 2→1 en 569 | 0.63% | 130 | 18.33 | 0 |
+| 2 | 1→2 en 74, 2→1 en 219, 1→2 en 304, 2→3 en 369, 3→2 en 499, 2→1 en 569 | 0.32% | 100 | 18.18 | 0 |
+| 3 | 1→2 en 74, 2→1 en 214, 1→2 en 304, 2→3 en 364, 3→2 en 504, 2→1 en 569 | 0.97% | 75 | 18.27 | 0 |
 
 ## Conclusión
-En las dos olas Aegis pidió el pod antes de que el tráfico pasara lo que aguantan los pods que ya había, y después de cada ola volvió a 1 pod, de a un paso, sin subir y bajar en el medio.
+La misma secuencia en todas las corridas (±5 s): sube antes de que cada ola pase C, baja de a un paso 60 s después de que cae el riesgo, sin pods innecesarios. La espera de 60 s cuesta ~4.9 pods-minuto por corrida.
 
-## Límite: olas más bruscas
-Una primera versión de esta prueba tenía olas casi el doble de empinadas (a 40 req/s en 60 s y a 55 req/s en 45 s). Ahí Aegis pidió el pod en el mismo momento en que el tráfico pasaba C, no antes, y **fallaron 12.59% de las peticiones** (`data/steep-waves-summary.json`, `data/steep-waves-chart.png`). Entre pedir un pod y tenerlo Ready, Aegis necesita unos T + 20 ≈ 35 s de tendencia visible. Una subida más rápida no se puede anticipar con ese margen. Es la hipótesis H2 de `docs/experiments/methodology.md` y se va a medir contra el HPA en la evaluación formal.
+## Límite: olas más empinadas
+Con olas el doble de empinadas (0.58 req/s por s, primera evaluación) el pod se pidió en el cruce y **fallaron 12.59%** (`data/steep-waves-*`). Las pruebas 6 y 7 miden el límite ([comparison.md](../comparison.md#boundary-how-fast-the-traffic-can-rise)).
 
-Datos: `data/run-1.csv` (cada 5 s), `data/run-1-aegis.ndjson` (cada ciclo de Aegis), `data/run-1-k6.log`, `data/run-1-summary.json`.
+Datos: `data/` (archivos por corrida) y `results.csv`.
