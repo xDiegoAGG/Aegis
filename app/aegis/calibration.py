@@ -95,6 +95,7 @@ def load_cluster_calibration(config):
                        ", ".join(changes))
     config["capacity_rps"] = float(calibration["capacity_rps"])
     config["startup_time_seconds"] = float(calibration["startup_time_seconds"])
+    config["calibrated_at"] = calibration["measured_at"]
     logger.info("Calibration from %s: C=%s req/s, T=%s s", calibration["measured_at"],
                 calibration["capacity_rps"], calibration["startup_time_seconds"])
     return True

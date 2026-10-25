@@ -1,0 +1,65 @@
+# Experiment signals with fixed names, every 5 s. catalog-service rules skip /health and /metrics.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: aegis
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  groups:
+    - name: aegis.catalog
+      interval: 5s
+      rules:
+        - record: aegis:catalog_p95_latency
+          expr: >-
+            histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{namespace="default",
+            service="catalog-service",route!~"/health|/metrics"}[30s])))
+        - record: aegis:catalog_p95_latency:by_pod
+          expr: >-
+            histogram_quantile(0.95, sum by (le, pod) (rate(http_request_duration_seconds_bucket{namespace="default",
+            service="catalog-service",route!~"/health|/metrics"}[30s])))
+        - record: aegis:catalog_rps
+          expr: >-
+            sum(rate(http_request_duration_seconds_count{namespace="default",service="catalog-service",
+            route!~"/health|/metrics"}[30s]))
+        - record: aegis:catalog_rps:by_pod
+          expr: >-
+            sum by (pod) (rate(http_request_duration_seconds_count{namespace="default",service="catalog-service",
+            route!~"/health|/metrics"}[30s]))
+        - record: aegis:replica_count
+          expr: sum(kube_deployment_status_replicas_ready{namespace="default",deployment="catalog-service"})
+        - record: aegis:catalog_rps_per_replica
+          expr: aegis:catalog_rps / clamp_min(aegis:replica_count, 1)
+    # What Aegis reads at the entrance.
+    - name: aegis.entrypoint
+      interval: 5s
+      rules:
+        - record: aegis:entrypoint_demand_rps
+          expr: >-
+            sum(rate(traefik_entrypoint_requests_total{entrypoint="web"}[30s]))
+            + sum(deriv(traefik_open_connections{entrypoint="web"}[30s]))
+        - record: aegis:entrypoint_p95_latency
+          expr: >-
+            histogram_quantile(0.95, sum by (le) (rate(traefik_entrypoint_request_duration_seconds_bucket{
+            entrypoint="web"}[30s])))
+        - record: aegis:entrypoint_error_ratio
+          expr: >-
+            sum(rate(traefik_entrypoint_requests_total{entrypoint="web",code!~"2.."}[30s]))
+            / clamp_min(sum(rate(traefik_entrypoint_requests_total{entrypoint="web"}[30s])), 0.001)
+    # In-cluster Aegis health (Alertmanager is off: see the Prometheus UI).
+    - name: aegis.engine
+      rules:
+        - alert: AegisStalled
+          expr: time() - max(aegis_last_cycle_timestamp_seconds) > 30
+          for: 30s
+          labels:
+            severity: warning
+          annotations:
+            summary: Aegis has not run a cycle for more than 30 s; the HPA keeps the last minReplicas.
+        - alert: AegisCannotUpdateHpa
+          expr: increase(aegis_failed_applies_total[1m]) > 0
+          labels:
+            severity: warning
+          annotations:
+            summary: Aegis decided a change but could not write it on the HPA.

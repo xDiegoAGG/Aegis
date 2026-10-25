@@ -2,6 +2,8 @@ import json
 import logging
 import math
 import time
+import urllib.parse
+import urllib.request
 from kubernetes import client
 
 logger = logging.getLogger(__name__)
@@ -22,32 +24,43 @@ class Sample:
         self.replicas_ready = replicas_ready
 
 
-# Queries Prometheus through the Kubernetes API server, so no tunnel is needed.
+# Queries Prometheus through the API server, or directly at url in the cluster.
 class PrometheusClient:
-    def __init__(self, namespace, service, timeout_seconds):
+    def __init__(self, namespace, service, timeout_seconds, url=""):
         self.path = "/api/v1/namespaces/" + namespace + "/services/" + service + "/proxy/api/v1/"
+        self.url = url.rstrip("/")
         self.timeout_seconds = timeout_seconds
-        self.api = client.ApiClient()
+        self.api = None
+        if not self.url:
+            self.api = client.ApiClient()
 
     @classmethod
     def from_config(cls, config):
         prometheus = config["prometheus"]
-        return cls(prometheus["namespace"], prometheus["service"], prometheus["timeout_seconds"])
+        return cls(prometheus["namespace"], prometheus["service"], prometheus["timeout_seconds"],
+                   prometheus.get("url") or "")
+
+    def fetch(self, endpoint, params):
+        if self.url:
+            address = self.url + "/api/v1/" + endpoint + "?" + urllib.parse.urlencode(params)
+            with urllib.request.urlopen(address, timeout=self.timeout_seconds) as response:
+                return response.read()
+        response = self.api.call_api(
+            self.path + endpoint,
+            "GET",
+            query_params=params,
+            header_params={"Accept": "application/json"},
+            auth_settings=["BearerToken"],
+            _preload_content=False,
+            _return_http_data_only=True,
+            _request_timeout=self.timeout_seconds,
+        )
+        return response.data
 
     # Returns the result list of one API call, or None on any error: a failed query never stops Aegis.
     def get(self, endpoint, params):
         try:
-            response = self.api.call_api(
-                self.path + endpoint,
-                "GET",
-                query_params=params,
-                header_params={"Accept": "application/json"},
-                auth_settings=["BearerToken"],
-                _preload_content=False,
-                _return_http_data_only=True,
-                _request_timeout=self.timeout_seconds,
-            )
-            body = json.loads(response.data)
+            body = json.loads(self.fetch(endpoint, params))
         except Exception as error:
             logger.warning("Prometheus did not answer: %s", error)
             return None
