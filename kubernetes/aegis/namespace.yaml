@@ -1,0 +1,5 @@
+# Aegis runs apart from the workload it protects.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aegis-system

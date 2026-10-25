@@ -1,0 +1,86 @@
+# Aegis in the cluster; stop any local Aegis first. aegis-config is app/config.yaml (scripts/setup.sh --aegis).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aegis
+  namespace: aegis-system
+  labels:
+    app: aegis
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: aegis
+  template:
+    metadata:
+      labels:
+        app: aegis
+    spec:
+      serviceAccountName: aegis
+      # The Service "aegis" would otherwise set AEGIS_PORT=tcp://...
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      containers:
+        - name: aegis
+          image: aegis:local
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: AEGIS_CONFIG
+              value: /etc/aegis/config.yaml
+            - name: AEGIS_PROMETHEUS_URL
+              value: http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090
+            # min_replicas with kubernetes/hpa/aegis.yaml, metric with kubernetes/hpa/aegis-metric.yaml.
+            - name: AEGIS_ACTUATOR_MODE
+              value: min_replicas
+          volumeMounts:
+            - name: config
+              mountPath: /etc/aegis
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: config
+          configMap:
+            name: aegis-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aegis
+  namespace: aegis-system
+  labels:
+    app: aegis
+spec:
+  selector:
+    app: aegis
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

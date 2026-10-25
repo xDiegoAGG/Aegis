@@ -1,5 +1,4 @@
-# kube-prometheus-stack with only what Aegis needs. Grafana and Alertmanager are off: they are not used
-# and on minikube they pushed the node into swap until Prometheus restarted.
+# Only what Aegis needs. Grafana and Alertmanager are off (they pushed minikube into swap).
 grafana:
   enabled: false
 
