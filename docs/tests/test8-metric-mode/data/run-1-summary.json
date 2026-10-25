@@ -23,19 +23,31 @@
       "s": 87.0,
       "from": 1,
       "to": 2
+    },
+    {
+      "s": 147.0,
+      "from": 2,
+      "to": 3
     }
   ],
-  "scale_downs": [],
-  "max_pods": 2,
-  "pod_minutes": 6.55,
+  "scale_downs": [
+    {
+      "s": 297.0,
+      "from": 3,
+      "to": 2
+    }
+  ],
+  "max_pods": 3,
+  "pod_minutes": 8.1,
   "p95_excess_s2": 1280.2,
   "degraded_to_ready_s": 104.0,
   "false_scale_ups": 0,
   "needed_pod_minutes": 7.58,
-  "extra_pod_minutes": -1.03,
+  "extra_pod_minutes": 0.52,
   "calibration_measured_at": "2026-10-25T03:16:57Z",
   "load_scale": 0.917,
   "metric_path_delays_s": [
+    10.6,
     10.6
   ]
 }

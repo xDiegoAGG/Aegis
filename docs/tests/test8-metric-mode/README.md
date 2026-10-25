@@ -13,13 +13,13 @@
 
 | Run | Scale changes (s since k6 started) | 2nd pod Ready (s) | Failed | Seconds degraded | Pod-minutes |
 |---|---|---|---|---|---|
-| 1 | 1→2 at 87 | 162 | 21.34% | 165 | 6.55 |
-| 2 | 1→2 at 86 | 165 | 18.36% | 165 | 6.57 |
-| 3 | 1→3 at 144 | 161 | 20.86% | 150 | 7.2 |
+| 1 | 1→2 at 87, 2→3 at 147, 3→2 at 297 | 162 | 21.34% | 165 | 8.1 |
+| 2 | 1→2 at 86, 2→3 at 146, 3→2 at 311 | 165 | 18.36% | 165 | 8.13 |
+| 3 | 1→2 at 84, 2→3 at 144, 3→2 at 309 | 161 | 20.86% | 150 | 8.2 |
 
-Aegis decides as in test 1 (2nd pod at 72–76 s); the HPA applied it **8.3, 10.6 and 72 s** later. In run 3 the first decision never arrived and the HPA went 1 → 3 at 144 s (cause not identified). Pods were Ready 68–79 s after creation ([started under overload](../../limitations.md#pod-startup-under-overload)).
+Aegis decides as in test 1 (2nd pod at 72–78 s, 3rd at 132–143 s); the HPA created each pod **3–12 s** later (9.5 s on average). That moves the 2nd pod to ~86 s, after the traffic passed C, so it starts under overload and is Ready 68–79 s after creation ([limitations.md](../../limitations.md#pod-startup-under-overload)).
 
 ## Conclusion
-The path works but loses the lead: **20.2% failed** against 2.5% in `min_replicas` mode. Use metric mode only if patching HPAs is not allowed, and shorten the path first.
+The path works, but ~10 s is enough to lose the lead: **20.2% failed** against 2.5% in `min_replicas` mode. Use metric mode only if patching HPAs is not allowed, and shorten the path first.
 
 Data: `data/` (files per run) and `results.csv`.

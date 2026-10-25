@@ -15,28 +15,39 @@
   "degraded_seconds": 150,
   "first_degraded_s": 74,
   "crosses_c_s": 80.0,
-  "first_scale_up_s": 144.0,
+  "first_scale_up_s": 84.0,
   "second_pod_ready_s": 161.0,
   "lead_s": -81.0,
   "scale_ups": [
     {
-      "s": 144.0,
+      "s": 84.0,
       "from": 1,
+      "to": 2
+    },
+    {
+      "s": 144.0,
+      "from": 2,
       "to": 3
     }
   ],
-  "scale_downs": [],
+  "scale_downs": [
+    {
+      "s": 309.0,
+      "from": 3,
+      "to": 2
+    }
+  ],
   "max_pods": 3,
-  "pod_minutes": 7.2,
+  "pod_minutes": 8.2,
   "p95_excess_s2": 1236.9,
   "degraded_to_ready_s": 87.0,
   "false_scale_ups": 0,
   "needed_pod_minutes": 7.58,
-  "extra_pod_minutes": -0.38,
+  "extra_pod_minutes": 0.62,
   "calibration_measured_at": "2026-10-25T03:16:57Z",
   "load_scale": 0.917,
   "metric_path_delays_s": [
-    72.0,
+    12.0,
     12.0
   ]
 }

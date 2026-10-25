@@ -39,7 +39,7 @@ Between the start of a climb and a Ready pod there are three delays: the demand 
 
 ## 3. Metric mode
 
-With the HPA reading the decision through the Custom Metrics API (test 8), the decision reaches the HPA **8–72 s** later (scrape, prometheus-adapter, 15 s HPA sync), and in one run the first decision never arrived. Failures rise from 2.5% to **20.2%**. Use `min_replicas` mode unless that path is shortened.
+With the HPA reading the decision through the Custom Metrics API (test 8), each decision reaches the HPA **3–12 s** later (9.5 s on average: scrape, prometheus-adapter, 15 s HPA sync). The first pod is created at ~86 s instead of ~74 s, after the traffic passed C, so it starts under overload and takes ~75 s to be Ready (section 4). Failures rise from 2.5% to **20.2%**. Use `min_replicas` mode unless that path is shortened.
 
 ## 4. Assumptions
 

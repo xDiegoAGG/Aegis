@@ -171,5 +171,21 @@ class ManifestsTest(unittest.TestCase):
                     self.assertIn("metadata", document, path)
 
 
+class ReplicaChangesTest(unittest.TestCase):
+    # Metric-mode run 2 lost its 2->3 SuccessfulRescale event; the pods themselves show all three changes.
+    def test_changes_from_pods(self):
+        from cluster import replica_changes
+        from rebuild_changes import timeline_inputs
+        from settings import TESTS_DIR
+        pods, events, _ = timeline_inputs(TESTS_DIR / "test8-metric-mode" / "data" / "run-2-timeline.csv")
+        changes = replica_changes(pods, events, -31)
+        self.assertEqual([(c["from"], c["to"]) for c in changes], [(1, 2), (2, 3), (3, 2)])
+
+    def test_pods_created_together_are_one_change(self):
+        from cluster import replica_changes
+        pods = {"a": {"created": 10.0}, "b": {"created": 11.0}}
+        self.assertEqual(replica_changes(pods, [], 0), [{"time": 10.0, "from": 1, "to": 3}])
+
+
 if __name__ == "__main__":
     unittest.main()
