@@ -1,0 +1,16 @@
+# /metrics every 5 s, one Aegis cycle.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: aegis
+  namespace: aegis-system
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: aegis
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 5s

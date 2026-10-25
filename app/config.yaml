@@ -45,10 +45,19 @@ kubernetes:
   min_replicas: 1
   max_replicas: 3
 
-# Reached through the API server. Demand = requests finished at the entrance + growth of the ones waiting.
+# min_replicas: patch the HPA (hpa/aegis.yaml). metric: only publish aegis_target_replicas (hpa/aegis-metric.yaml).
+actuator:
+  mode: min_replicas
+
+# Dashboard (/), Prometheus metrics (/metrics) and JSON API (/api/state).
+server:
+  port: 8080
+
+# Through the API server, or at url in the cluster. Demand = finished requests + growth of the waiting ones.
 prometheus:
   namespace: monitoring
   service: prometheus-kube-prometheus-prometheus:9090
+  url: ""
   timeout_seconds: 3
   query_rps: 'sum(rate(traefik_entrypoint_requests_total{entrypoint="web"}[30s])) + sum(deriv(traefik_open_connections{entrypoint="web"}[30s]))'
   query_p95: 'histogram_quantile(0.95, sum(rate(traefik_entrypoint_request_duration_seconds_bucket{entrypoint="web"}[30s])) by (le))'
