@@ -123,7 +123,13 @@ h2 { font-size: 15px; font-weight: 500; color: var(--ink-soft); margin-bottom: 1
 main { padding: 28px 32px 56px; max-width: 1480px; }
 
 /* Now: the verdict and one tank per pod */
-.replay-note { margin: 0 0 14px; padding: 8px 12px; border-left: 3px solid var(--forecast); background: var(--paper-deep); color: var(--ink-soft); font-size: 15px; max-width: 80ch; }
+.replay-bar { margin: 0 0 18px; padding: 10px 14px; border-left: 3px solid var(--forecast); background: var(--paper-deep); max-width: 80ch; }
+.replay-bar label { display: block; font-size: 13px; color: var(--quiet); margin-bottom: 4px; }
+.replay-bar select {
+  font: inherit; font-weight: 500; color: var(--ink); background: var(--paper); border: 1px solid var(--hair);
+  border-radius: 3px; padding: 5px 8px; max-width: 100%;
+}
+.replay-bar p { margin: 8px 0 0; color: var(--ink-soft); font-size: 15px; }
 .now { max-width: 1100px; }
 .now h1 {
   font-weight: 900; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.08; letter-spacing: -0.02em; max-width: 24ch;

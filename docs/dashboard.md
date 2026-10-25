@@ -18,7 +18,7 @@ In the cluster: `kubectl port-forward -n aegis-system svc/aegis 8080`. `--port` 
 3. **What Aegis did:** each decision as a sentence with its numbers.
 4. **How Aegis decides** (collapsed): the formula with the cycle's values, forecast vs actual, risk, pods, P95, σ and m, each with one line explaining it; parameters and the raw cycles.
 
-`?lang=es` or `?lang=en` picks the language; `#how` opens the technical section.
+When replaying, a selector at the top switches between the saved Aegis runs (HPA-only runs have no Aegis log to replay) and says what traffic that test has; it calls `POST /api/replay {"test": ..., "run": N}`. `?lang=es` or `?lang=en` picks the language; `#how` opens the technical section.
 
 **Experiments tab:** up to 3 saved runs on one axis, a summary table, their charts, and the calibration curves.
 
@@ -28,6 +28,7 @@ In the cluster: `kubectl port-forward -n aegis-system svc/aegis 8080`. `--port` 
 | `/api/tests` | run summaries and calibration |
 | `/api/tests/<test>/<run>` | rows, summary and Aegis log of one run |
 | `/metrics` | Prometheus metrics ([list](deployment.md#metrics)) |
+| `POST /api/replay` | replay only: switch to another saved run |
 | `/healthz`, `/readyz` | probes |
 
 Light/dark and ES/EN toggles in the header. Font: Chivo (OFL), bundled in `dashboard/fonts/`.

@@ -1,6 +1,7 @@
 import argparse
 import json
 import logging
+import re
 import signal
 import threading
 import time
@@ -52,20 +53,59 @@ def build_meta(config, records, calibration, source, speed):
     }
 
 
-# Feeds the recorded cycles to the dashboard at `speed` times their real pace; starts over when looping.
-def feed(state, records, speed, loop):
-    while True:
-        state.restart()
-        previous = None
-        for record in records:
-            if previous is not None:
-                time.sleep(max(0.0, (record["time"] - previous) / speed))
-            state.push(record)
-            previous = record["time"]
-        if not loop:
-            logger.info("Replay finished; the dashboard keeps the whole run")
+# Plays recorded runs on the dashboard at `speed` times their real pace; the dashboard can switch the run.
+class Replayer:
+    def __init__(self, state, config, calibration, speed, loop):
+        self.state = state
+        self.config = config
+        self.calibration = calibration
+        self.speed = speed
+        self.loop = loop
+        self.generation = 0
+        self.lock = threading.Lock()
+        state.select = self.select
+
+    # Only runs saved under docs/tests with an Aegis log can be chosen.
+    def select(self, test, run):
+        if not re.fullmatch(r"test[\w-]+", test) or run < 1:
+            return "unknown run"
+        path = TESTS_DIR / test / "data" / ("run-" + str(run) + "-aegis.ndjson")
+        if not path.is_file():
+            return "no Aegis log for " + test + " run " + str(run)
+        self.play(path)
+        return None
+
+    def play(self, path):
+        records = read_ndjson(path)
+        if not records:
             return
-        time.sleep(5)
+        source = path.parent.parent.name + "/" + path.name if path.parent.name == "data" else path.name
+        with self.lock:
+            self.generation += 1
+            generation = self.generation
+        meta = build_meta(self.config, records, self.calibration, source, self.speed)
+        logger.info("Replaying %s cycles of %s at x%s", len(records), source, self.speed)
+        threading.Thread(target=self.feed, args=(records, meta, generation), daemon=True).start()
+
+    def feed(self, records, meta, generation):
+        while True:
+            with self.lock:
+                if generation != self.generation:
+                    return
+                self.state.restart(meta)
+            previous = None
+            for record in records:
+                if previous is not None:
+                    time.sleep(max(0.0, (record["time"] - previous) / self.speed))
+                with self.lock:
+                    if generation != self.generation:
+                        return
+                    self.state.push(record)
+                previous = record["time"]
+            if not self.loop:
+                logger.info("Replay finished; the dashboard keeps the whole run")
+                return
+            time.sleep(5)
 
 
 def stop(signum, frame):
@@ -98,8 +138,7 @@ def main():
         source = path.parent.parent.name + "/" + path.name
     state = AegisState(build_meta(config, records, calibration, source, args.speed))
     start_server(state, args.port or config.get("server", {}).get("port", 8080), TESTS_DIR)
-    logger.info("Replaying %s cycles of %s at x%s", len(records), source, args.speed)
-    threading.Thread(target=feed, args=(state, records, args.speed, args.loop), daemon=True).start()
+    Replayer(state, config, calibration, args.speed, args.loop).play(path)
     try:
         while True:
             time.sleep(1)
