@@ -1,9 +1,8 @@
 import csv
-import math
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
-from settings import L_SECONDS, MAX_FAILED_RATIO, STEP, SUSTAINED_BUCKETS, TESTS_DIR
+from settings import L_SECONDS, MAX_FAILED_RATIO, STEP, SUSTAINED_BUCKETS
 
 # One color per role, the same in every chart.
 AEGIS = "#2a78d6"
