@@ -1,11 +1,12 @@
 import argparse
 import csv
 import json
-from charts import plot_all_runs, plot_run
+from charts import plot_all_runs, plot_run, read_timeline
 from settings import TESTS, TESTS_DIR
 
-RESULT_KEYS = ["failed_percent", "client_p95_s", "degraded_seconds", "crosses_c_s", "first_scale_up_s",
-               "second_pod_ready_s", "lead_s", "max_pods", "pod_minutes", "dropped_iterations"]
+RESULT_KEYS = ["failed_percent", "client_p95_s", "degraded_seconds", "p95_excess_s2", "crosses_c_s",
+               "first_scale_up_s", "second_pod_ready_s", "lead_s", "degraded_to_ready_s", "max_pods", "pod_minutes",
+               "extra_pod_minutes", "false_scale_ups", "dropped_iterations"]
 
 
 def load_rows(path):
@@ -42,7 +43,7 @@ def load_test(folder):
 def stats(summaries, key):
     values = []
     for summary in summaries:
-        if summary[key] is not None:
+        if summary.get(key) is not None:
             values.append(summary[key])
     if not values:
         return None
@@ -68,14 +69,14 @@ def write_results(folder, title, summaries):
         for summary in summaries:
             row = [summary["run"], summary["date_utc"] + " " + summary["k6_start_utc"], changes_text(summary)]
             for key in RESULT_KEYS:
-                row.append(summary[key])
+                row.append(summary.get(key))
             writer.writerow(row)
     print()
     print(title)
     for summary in summaries:
         line = ["  run", summary["run"], summary["k6_start_utc"]]
         for key in RESULT_KEYS:
-            line.append(key + "=" + str(summary[key]))
+            line.append(key + "=" + str(summary.get(key)))
         print(*line)
         print("     ", changes_text(summary))
     for key in RESULT_KEYS:
@@ -91,14 +92,20 @@ def report(names):
         if not summaries:
             print(name, "has no runs yet")
             continue
-        if len(summaries) == 1:
-            plot_run(folder / "chart.png", title, summaries[0], runs[0])
-        else:
+        # chart.png (English) and chart.es.png (Spanish); with several runs one chart per run plus all-runs.
+        for lang, suffix in (("en", ".png"), ("es", ".es.png")):
+            if len(summaries) == 1:
+                plot_run(folder / ("chart" + suffix), title, summaries[0], runs[0], lang,
+                         read_timeline(folder, summaries[0]["run"]))
+                continue
             for index, summary in enumerate(summaries):
-                plot_run(folder / ("run-" + str(summary["run"]) + ".png"), title, summary, runs[index])
-            plot_all_runs(folder / "all-runs.png", title, summaries, runs)
+                plot_run(folder / ("run-" + str(summary["run"]) + suffix), title, summary, runs[index], lang,
+                         read_timeline(folder, summary["run"]))
+            plot_all_runs(folder / ("all-runs" + suffix), title, summaries, runs, lang)
         write_results(folder, title, summaries)
         tests.append((title, summaries))
+    import evidence  # here, not at the top: evidence imports this module
+    evidence.main()
     print("charts saved")
 
 

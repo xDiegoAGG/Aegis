@@ -1,6 +1,8 @@
 import datetime
-from load import first_crossing, percentile, summary_value, total_duration
-from settings import BEFORE_SECONDS, L_SECONDS, MAX_FAILED_RATIO, STEP, SUSTAINED_BUCKETS
+import math
+from load import first_crossing, percentile, planned_rate, summary_value, total_duration
+from settings import (BEFORE_SECONDS, CONFIG, FALSE_ALARM_SECONDS, L_SECONDS, MAX_FAILED_RATIO, STEP,
+                      SUSTAINED_BUCKETS)
 
 
 def utc(timestamp):
@@ -44,6 +46,42 @@ def degraded_time(buckets, k6_start):
     return degraded, first
 
 
+# Area of the client P95 above L, in s x s: how far and for how long the service was slow.
+def p95_excess_area(buckets):
+    area = 0.0
+    for bucket in buckets.values():
+        if bucket["durations"]:
+            area += max(0.0, percentile(bucket["durations"], 0.95) - L_SECONDS) * STEP
+    return round(area, 1)
+
+
+# Pod-minutes the planned traffic needed: ceil(planned / C) pods every second, between 1 and max_replicas.
+def needed_pod_minutes(profile, capacity):
+    pod_seconds = 0
+    second = 0
+    while second < total_duration(profile):
+        pods = math.ceil(planned_rate(profile, second) / capacity)
+        pod_seconds += max(1, min(CONFIG["kubernetes"]["max_replicas"], pods))
+        second += 1
+    return round(pod_seconds / 60, 2)
+
+
+# Scale-ups the planned traffic did not need: it never went over the pods before them in FALSE_ALARM_SECONDS.
+def false_alarms(ups, profile, capacity):
+    count = 0
+    for up in ups:
+        needed = False
+        second = max(0.0, up["s"])
+        while second <= up["s"] + FALSE_ALARM_SECONDS:
+            if planned_rate(profile, second) > capacity * up["from"]:
+                needed = True
+                break
+            second += 1
+        if not needed:
+            count += 1
+    return count
+
+
 def second_pod_ready(pods, k6_start):
     first = None
     for name, times in pods.items():
@@ -81,6 +119,9 @@ def summarize(run_number, profile, mode, k6_start, buckets, logs, changes, calib
     lead = None
     if crosses is not None and ready is not None:
         lead = round(crosses - ready, 1)
+    degraded_to_ready = None
+    if first_degraded is not None and ready is not None:
+        degraded_to_ready = round(ready - first_degraded, 1)
     pod_seconds = 0
     max_pods = 1
     second = 0
@@ -89,6 +130,7 @@ def summarize(run_number, profile, mode, k6_start, buckets, logs, changes, calib
         max_pods = max(max_pods, replicas)
         pod_seconds += replicas
         second += 1
+    needed = needed_pod_minutes(profile, capacity)
     return {
         "run": run_number,
         "profile": profile["name"],
@@ -113,4 +155,9 @@ def summarize(run_number, profile, mode, k6_start, buckets, logs, changes, calib
         "scale_downs": downs,
         "max_pods": max_pods,
         "pod_minutes": round(pod_seconds / 60, 2),
+        "p95_excess_s2": p95_excess_area(buckets),
+        "degraded_to_ready_s": degraded_to_ready,
+        "false_scale_ups": false_alarms(ups, profile, capacity),
+        "needed_pod_minutes": needed,
+        "extra_pod_minutes": round(pod_seconds / 60 - needed, 2),
     }

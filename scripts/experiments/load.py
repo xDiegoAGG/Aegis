@@ -2,19 +2,31 @@ import csv
 import gzip
 import math
 import re
+import subprocess
 import time
 from cluster import kubectl
-from settings import PROFILES, STEP
+from settings import PROFILES, REFERENCE_CAPACITY_RPS, STEP
+
+RATE_FIELDS = r"(startRate|target|preAllocatedVUs|maxVUs):(\s*)(\d+)"
 
 
-# Reads the k6 stages of a load file, so the planned traffic has a single source.
-def read_profile(name):
-    text = PROFILES[name].read_text()
+# Multiplies rates and VUs by scale; durations stay.
+def scaled_text(text, scale):
+    def replace(match):
+        return match.group(1) + ":" + match.group(2) + str(max(1, int(round(int(match.group(3)) * scale))))
+    return re.sub(RATE_FIELDS, replace, text)
+
+
+# Stages of a load file, rates scaled to capacity_rps.
+def read_profile(name, capacity_rps=REFERENCE_CAPACITY_RPS):
+    scale = float(capacity_rps) / REFERENCE_CAPACITY_RPS
+    text = scaled_text(PROFILES[name].read_text(), scale)
     stages = []
     for target, duration in re.findall(r"target:\s*(\d+),\s*duration:\s*'(\d+)s'", text):
         stages.append((float(target), float(duration)))
     start_rate = float(re.search(r"startRate:\s*(\d+)", text).group(1))
-    return {"name": name, "job": "load-" + name, "file": PROFILES[name], "start_rate": start_rate, "stages": stages}
+    return {"name": name, "job": "load-" + name, "file": PROFILES[name], "start_rate": start_rate, "stages": stages,
+            "scale": round(scale, 3), "text": text}
 
 
 def total_duration(profile):
@@ -45,9 +57,12 @@ def first_crossing(profile, level):
     return None
 
 
+# Foreground, so wait_k6 never reads the previous run's pod.
 def start_load(profile):
-    kubectl(["delete", "job", profile["job"], "--ignore-not-found", "--wait=true"])
-    kubectl(["apply", "-f", str(profile["file"])])
+    kubectl(["delete", "job", profile["job"], "--ignore-not-found", "--wait=true", "--cascade=foreground"])
+    result = subprocess.run(["kubectl", "apply", "-f", "-"], input=profile["text"].encode(), capture_output=True)
+    if result.returncode != 0:
+        raise RuntimeError("kubectl apply of " + profile["name"] + ": " + result.stderr.decode().strip())
 
 
 # Waits until k6 printed its summary and returns the pod name and its log.
@@ -64,7 +79,7 @@ def wait_k6(profile):
     raise RuntimeError("k6 did not finish in time")
 
 
-# Groups every k6 request in STEP-second buckets: durations, count and failures, as the client saw them.
+# k6 requests in STEP-second buckets: durations, count, failures.
 def client_buckets(pod):
     data = kubectl(["exec", pod, "--", "cat", "/results/requests.csv.gz"])
     buckets = {}

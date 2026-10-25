@@ -1,5 +1,5 @@
 # Linear ramp: 30 s at 5 req/s, 2 min from 5 to 50 req/s, 1 min at 50, 30 s down (tests 1 and 3, demo 1).
-# Every request is saved to /results/requests.csv.gz; the pod then waits 10 min so it can be copied.
+# Requests are saved to /results/requests.csv.gz; the pod waits 10 min so it can be copied.
 apiVersion: v1
 kind: ConfigMap
 metadata:
