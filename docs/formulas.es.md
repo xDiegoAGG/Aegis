@@ -16,8 +16,6 @@ T es el tiempo que necesita un pod nuevo para estar Ready. Preguntar por "ahora"
 
 La regla de decisión encima de ellas (70% para subir, 30% durante 60 s para bajar) es histéresis, la misma idea que usa el HPA.
 
----
-
 ## 1. Capacidad: C · N
 
 **De dónde sale.** Teoría de colas [13][14]. Un servidor que puede terminar μ peticiones por segundo y recibe λ peticiones por segundo está ocupado una fracción ρ = λ/μ del tiempo. En el modelo básico (M/M/1) el tiempo medio de respuesta es
@@ -49,13 +47,15 @@ $$r = \text{terminadas por segundo} + \frac{d(\text{peticiones esperando})}{dt}$
 
 **Por qué algo tan simple.** El horizonte es corto (~40 s), corre cada 5 s, no hay datos para entrenar, y cada decisión tiene que poder explicarse. En horizontes tan cortos una tendencia lineal es una referencia fuerte. Su debilidad conocida: cuando una rampa se detiene, sigue proyectando la subida un momento y puede pedir un pod de más. Aegis lo quita después (regla 6), y las pruebas miden ese costo en pod-minutos.
 
+**Comparado con otros pronósticos** ([forecast.md](tests/forecast.md)). Sobre las 22 corridas de Aegis, Holt amortiguado [21] tiene el menor error a 35 s (MAE 7.2 contra 8.1 req/s; ingenuo 10.9) porque se pasa menos cuando una rampa se detiene. Pero con el motor de decisión completo, la tendencia lineal deja menos segundos bajo capacidad (21.6 por corrida contra 22.8 Holt amortiguado, 26.8 lineal amortiguada, 106.9 ingenuo) con los mismos pods-minuto. Pasarse cuesta un pod durante un minuto; quedarse corto cuesta peticiones fallidas. Se mantuvo la tendencia lineal; un pronóstico para ese costo asimétrico queda como trabajo futuro.
+
 ## 4. Riesgo: Φ((p − C·N) / σ)
 
 **De dónde sale.** La proyección nunca es exacta. Se modela el tráfico futuro X como una variable normal centrada en la proyección, con el error típico de la proyección σ como desviación estándar: X ~ N(p, σ²). La probabilidad de pasarse de la capacidad es
 
 $$P(X > C N) = 1 - \Phi\left(\frac{C N - p}{\sigma}\right) = \Phi\left(\frac{p - C N}{\sigma}\right)$$
 
-usando la simetría de la distribución normal. Φ es su función de distribución acumulada (`scipy.stats.norm.cdf`). Así es como el pronóstico construye intervalos de predicción, suponiendo errores normales [16]. La teoría de inventarios usa la misma fórmula para la probabilidad de quedarse sin existencias cuando la demanda es normal, y con ella dimensiona el stock de seguridad [20]: Aegis mantiene un "stock" de capacidad.
+usando la simetría de la distribución normal. Φ es su función de distribución acumulada (calculada como (1 + erf(z/√2))/2 en `risk.py`). Así es como el pronóstico construye intervalos de predicción, suponiendo errores normales [16]. La teoría de inventarios usa la misma fórmula para la probabilidad de quedarse sin existencias cuando la demanda es normal, y con ella dimensiona el stock de seguridad [20]: Aegis mantiene un "stock" de capacidad.
 
 **Por qué una probabilidad y no solo "p > C·N".**
 - Incluye **qué tan confiable es la proyección ahora mismo**: la misma p con tráfico ruidoso (σ grande) da más riesgo que con tráfico estable.

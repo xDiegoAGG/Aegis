@@ -16,8 +16,6 @@ T is the time a new pod needs to be Ready. Asking about "now" is too late: a pod
 
 The decision rule on top of them (70% up, 30% for 60 s down) is hysteresis, the same idea the HPA uses.
 
----
-
 ## 1. Capacity: C · N
 
 **Where it comes from.** Queueing theory [13][14]. A server that can finish μ requests per second, receiving λ requests per second, is busy a fraction ρ = λ/μ of the time. In the basic model (M/M/1) the mean response time is
@@ -47,7 +45,9 @@ $$r = \text{completed per second} + \frac{d(\text{requests waiting})}{dt}$$
 - **T** is the provisioning delay, measured by the calibration (from asking for pods until they are Ready). Looking less than T ahead is reacting late; looking much more asks for pods too early.
 - **lag**: the demand comes from a rate over a 30 s window, which describes the middle of the window plus one scrape. Measured on a real ramp, it was 19 s behind the traffic k6 was sending; Aegis uses 20 s. Without it, the projection would point to "T − 20 seconds from now".
 
-**Why something this simple.** The horizon is short (~40 s), it runs every 5 s, there is no training data, and every decision has to be explainable. At such short horizons a linear trend is a strong baseline. Its known weakness: when a ramp stops, it keeps projecting the climb for a moment and can ask for one pod too many. Aegis removes it later (rule 5), and the tests measure that cost in pod-minutes.
+**Why something this simple.** The horizon is short (~40 s), it runs every 5 s, there is no training data, and every decision has to be explainable. At such short horizons a linear trend is a strong baseline. Its known weakness: when a ramp stops, it keeps projecting the climb for a moment and can ask for one pod too many. Aegis removes it later (rule 6), and the tests measure that cost in pod-minutes.
+
+**Checked against other forecasters** ([forecast.md](tests/forecast.md)). Replayed on the 22 Aegis runs, damped Holt [21] has the lowest error 35 s ahead (MAE 7.2 vs 8.1 req/s; naive 10.9) because it overshoots less when a ramp stops. But with the full decision engine, the linear trend leaves the fewest seconds under capacity (21.6 per run vs 22.8 damped Holt, 26.8 damped linear, 106.9 naive) for the same pod-minutes. Overshooting costs a pod for a minute; undershooting costs failed requests. The linear trend was kept; a forecaster for that asymmetric cost is future work.
 
 ## 4. Risk: Φ((p − C·N) / σ)
 
@@ -55,7 +55,7 @@ $$r = \text{completed per second} + \frac{d(\text{requests waiting})}{dt}$$
 
 $$P(X > C N) = 1 - \Phi\left(\frac{C N - p}{\sigma}\right) = \Phi\left(\frac{p - C N}{\sigma}\right)$$
 
-using the symmetry of the normal distribution. Φ is its cumulative distribution function (`scipy.stats.norm.cdf`). This is how forecasting builds prediction intervals, assuming normal forecast errors [16]. Inventory theory uses the same formula for the probability of running out of stock when demand is normal, and sizes the safety stock with it [20]: Aegis keeps a "stock" of capacity.
+using the symmetry of the normal distribution. Φ is its cumulative distribution function (computed as (1 + erf(z/√2))/2 in `risk.py`). This is how forecasting builds prediction intervals, assuming normal forecast errors [16]. Inventory theory uses the same formula for the probability of running out of stock when demand is normal, and sizes the safety stock with it [20]: Aegis keeps a "stock" of capacity.
 
 **Why a probability and not just "p > C·N".**
 - It includes **how reliable the projection is right now**: the same p with noisy traffic (large σ) gives more risk than with steady traffic.

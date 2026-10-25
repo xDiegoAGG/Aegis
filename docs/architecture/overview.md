@@ -1,10 +1,8 @@
 # Architecture Overview
 
-Aegis is a preventive horizontal scaling controller for a Kubernetes service. Every 5 seconds it projects the demand T seconds ahead (T = time a new pod needs to be Ready), calculates the probability of going over the capacity of the pods already requested, and raises or lowers `minReplicas` of the service's HorizontalPodAutoscaler (HPA). The HPA, the Deployment and the Service keep doing their usual work: Aegis only moves the floor of the HPA earlier than the CPU would.
+Aegis is a preventive scaling controller. Every 5 s it projects the demand T seconds ahead (T = time a new pod needs to be Ready), computes the probability of exceeding the capacity of the requested pods, and raises or lowers `minReplicas` of the HPA. It moves the HPA's floor earlier than the CPU would; everything else stays standard.
 
-The formulas and where they come from are in [formulas.md](../formulas.md).
-
----
+Formulas: [formulas.md](../formulas.md).
 
 ## System components
 
@@ -22,7 +20,13 @@ flowchart LR
     deploy --> pods
     aegis <-->|"read C and T"| cm["ConfigMap<br/>aegis-calibration"]
     calibrate["aegis.calibrate"] -->|"write C and T"| cm
+    aegis -->|"dashboard, /api/state"| browser["Browser"]
+    aegis -. "/metrics (in the cluster)" .-> prom
+    prom --> adapter["prometheus-adapter"]
+    adapter -. "custom.metrics.k8s.io (metric mode)" .-> hpa
 ```
+
+Aegis runs on the laptop or as a Deployment in `aegis-system` ([deployment.md](../deployment.md)). In `min_replicas` mode (default) it patches `minReplicas`; in `metric` mode it only publishes `aegis_target_replicas` and a standard HPA reads it through prometheus-adapter.
 
 ## Responsibility boundaries
 
@@ -31,13 +35,14 @@ flowchart LR
 | Traefik | Single entrance for the traffic. Balances request by request across Ready pods and exports request counts, open connections and latency |
 | Prometheus | Scrapes Traefik, the pods and kube-state-metrics every 5 s and answers PromQL queries |
 | kube-state-metrics | Exposes Deployment and pod state (Ready replicas, pod creation and Ready times) |
-| Aegis (`app/aegis/`) | Reads the demand, projects it, calculates the risk, decides the replicas and writes `minReplicas` of the HPA. Logs every cycle (NDJSON) |
+| Aegis (`app/aegis/`) | Reads the demand, projects it, calculates the risk, decides the replicas and writes `minReplicas` of the HPA (or publishes it as a metric). Logs every cycle (NDJSON), serves the dashboard and `/metrics` |
+| prometheus-adapter | Publishes the Aegis metrics in the Custom Metrics API, attached to the Deployment |
 | Calibration (`aegis.calibrate`) | Measures C (capacity of one pod) and T (startup time) with a step load and saves them in a ConfigMap |
 | HPA | Keeps the replicas between `minReplicas` and `maxReplicas`. With Aegis its CPU target is 95% (never reached), so Aegis decides; without Aegis it scales on CPU at 70% (baseline) |
 | Deployment / ReplicaSet | Creates and removes pods to match the replicas |
-| Readiness probe | Decides when a pod receives traffic (`/health`, 5 s timeout) |
+| Readiness probe | Marks a pod Ready (`/health`, 5 s timeout); Traefik v3.7 also routes to not-ready pods ([limitations.md](../limitations.md#pod-startup-under-overload)) |
 
-Aegis never creates pods, edits the Deployment or routes traffic. It reads Prometheus and changes one field of the HPA. If Aegis stops, the HPA keeps the last `minReplicas` and keeps working on its own.
+Aegis only reads Prometheus and changes one field of the HPA. If it stops, the HPA keeps the last `minReplicas` and works on its own.
 
 ## Aegis internal pipeline
 
@@ -66,6 +71,7 @@ flowchart TD
 | Decide | `decision.py` | Up at 70% with the pods already requested; down when the risk with one pod less stays under 30% for 60 s |
 | Act | `actuator.py` | Sets `minReplicas` only when it changes; on an API error it retries next cycle |
 | Log | `actuator.py` (`--log`) | One JSON line per cycle with every value above |
+| Publish | `server.py` | The same cycle on `/api/state` (dashboard) and `/metrics` (Prometheus) |
 
 ## Preventive vs reactive scaling
 
@@ -89,8 +95,8 @@ sequenceDiagram
 |---|---|---|---|
 | L | P95 latency that counts as slow | 1 s | Decided (`config.yaml`, `degradation`) |
 | T_d | Time above L that counts as degraded | 15 s | Decided (`config.yaml`, `degradation`) |
-| C | req/s one pod serves before degrading | measured | `aegis.calibrate`: step load on 1 pod (24 req/s on the development machine) |
-| T | Time from asking for a pod until it is Ready | measured | `aegis.calibrate`: raises `minReplicas` and times it (15 s on the development machine) |
+| C | req/s one pod serves before degrading | measured | `aegis.calibrate`: step load on 1 pod (22 req/s in the 2026-10-25 campaign) |
+| T | Time from asking for a pod until it is Ready | measured | `aegis.calibrate`: raises `minReplicas` and times it (15 s) |
 | lag | Delay of the demand measurement | 20 s | Measured once on a real ramp (`config.yaml`, `sampling.metric_lag_seconds`) |
 | σ | Projection error | live | `SigmaEstimator`, from the projection errors |
 | Thresholds | Scale up / scale down / waiting time | 70% / 30% / 60 s | Decided (`config.yaml`, `risk_thresholds`) |
