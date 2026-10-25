@@ -5,7 +5,7 @@ Plain HTML/JS served by Aegis on port 8080, no CDN.
 ```bash
 cd app
 python3 -m aegis.actuator                 # live: http://localhost:8080
-python3 -m aegis.replay --speed 5         # a recorded run, no cluster needed
+python3 -m aegis.replay --speed 5         # a recorded run (test 1, run 4), no cluster needed
 python3 -m aegis.replay ../docs/tests/test1-linear-ramp/data/run-4-aegis.ndjson --speed 10 --loop
 ```
 

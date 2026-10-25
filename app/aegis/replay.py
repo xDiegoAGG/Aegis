@@ -10,7 +10,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_RUN = TESTS_DIR / "test2-fluctuating" / "data" / "run-1-aegis.ndjson"
+DEFAULT_RUN = TESTS_DIR / "test1-linear-ramp" / "data" / "run-4-aegis.ndjson"
 
 
 # The same parameters a live Aegis shows, from config.yaml and the calibration the run used.

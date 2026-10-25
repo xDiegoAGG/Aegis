@@ -123,6 +123,7 @@ h2 { font-size: 15px; font-weight: 500; color: var(--ink-soft); margin-bottom: 1
 main { padding: 28px 32px 56px; max-width: 1480px; }
 
 /* Now: the verdict and one tank per pod */
+.replay-note { margin: 0 0 14px; padding: 8px 12px; border-left: 3px solid var(--forecast); background: var(--paper-deep); color: var(--ink-soft); font-size: 15px; max-width: 80ch; }
 .now { max-width: 1100px; }
 .now h1 {
   font-weight: 900; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.08; letter-spacing: -0.02em; max-width: 24ch;
