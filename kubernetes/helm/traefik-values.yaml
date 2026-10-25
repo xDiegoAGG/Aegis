@@ -1,5 +1,4 @@
-# Traefik is the entrance of the cluster: it counts every request that arrives (Aegis reads the demand
-# there) and balances request by request across the pods. ClusterIP on minikube; LoadBalancer on EKS.
+# The entrance: Aegis reads the demand here. ClusterIP on minikube, LoadBalancer on EKS.
 service:
   spec:
     type: ClusterIP
@@ -12,7 +11,7 @@ providers:
   kubernetesIngress:
     enabled: true
 
-# Prometheus metrics every 5 s, with a bucket at 1 s (L) so the P95 near the threshold is precise.
+# A bucket at 1 s (L) keeps the P95 near the threshold exact.
 metrics:
   prometheus:
     entryPoint: metrics

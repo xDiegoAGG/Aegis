@@ -88,12 +88,18 @@ def check_hpa():
     code, out, err = kubectl(["get", "hpa", "catalog-service", "-o", "json"])
     if code != 0:
         return False, "HPA catalog-service not found"
-    spec = json.loads(out)["spec"]
-    cpu = "?"
+    hpa = json.loads(out)
+    spec = hpa["spec"]
+    targets = []
     for metric in spec.get("metrics", []):
         if metric.get("type") == "Resource" and metric["resource"]["name"] == "cpu":
-            cpu = str(metric["resource"]["target"].get("averageUtilization", "?")) + "%"
-    return True, "CPU " + cpu + ", minReplicas " + str(spec.get("minReplicas", 1)) + ", maxReplicas " + str(spec["maxReplicas"])
+            targets.append("CPU " + str(metric["resource"]["target"].get("averageUtilization", "?")) + "%")
+        if metric.get("type") == "Object":
+            targets.append(metric["object"]["metric"]["name"])
+    for condition in hpa.get("status", {}).get("conditions", []):
+        if condition["type"] == "ScalingActive" and condition["status"] != "True":
+            return False, "the HPA cannot read its metrics: " + condition.get("message", "")
+    return True, ", ".join(targets) + ", minReplicas " + str(spec.get("minReplicas", 1)) + ", maxReplicas " + str(spec["maxReplicas"])
 
 
 def check_metrics_server():
@@ -101,6 +107,42 @@ def check_metrics_server():
     if code != 0 or not out:
         return False, "metrics-server has no CPU data yet"
     return True, "CPU data available"
+
+
+def check_recording_rules():
+    result = prometheus_query("aegis:replica_count")
+    if result is None:
+        return False, "Prometheus did not answer"
+    if not result:
+        return False, "aegis:replica_count has no data yet (kubernetes/monitoring/recording-rules.yaml)"
+    return True, "aegis:replica_count = " + result[0]["value"][1]
+
+
+def check_custom_metrics_api():
+    code, out, err = kubectl(["get", "--raw", "/apis/custom.metrics.k8s.io/v1beta1"])
+    if code != 0:
+        return False, "custom.metrics.k8s.io not available (prometheus-adapter): " + err
+    resources = json.loads(out).get("resources", [])
+    names = sorted({resource["name"].split("/")[-1] for resource in resources})
+    if not names:
+        return True, "API up, no Aegis metric yet (they appear when Aegis runs in the cluster)"
+    return True, ", ".join(names)
+
+
+# Only when Aegis runs in the cluster (scripts/setup.sh --aegis); otherwise informative.
+def check_aegis_in_cluster():
+    code, out, err = kubectl(["get", "deploy", "aegis", "-n", "aegis-system", "-o", "json"])
+    if code != 0:
+        return True, "not deployed (Aegis runs on this machine)"
+    deployment = json.loads(out)
+    if deployment["spec"].get("replicas", 1) == 0:
+        return True, "scaled to 0 (Aegis runs on this machine)"
+    if deployment["status"].get("readyReplicas", 0) < 1:
+        return False, "the aegis pod is not Ready (calibrated? kubectl logs -n aegis-system deploy/aegis)"
+    result = prometheus_query("aegis_risk")
+    if not result:
+        return False, "Prometheus has no aegis_risk yet (ServiceMonitor aegis)"
+    return True, "running, risk = " + str(round(float(result[0]["value"][1]) * 100, 1)) + "%"
 
 
 def check_calibration():
@@ -117,9 +159,12 @@ CHECKS = [
     ("Prometheus scrapes Traefik", check_traefik_metrics),
     ("Prometheus scrapes catalog-service", check_prometheus_target),
     ("kube-state-metrics reports replicas", check_replica_metric),
+    ("Recording rules evaluate", check_recording_rules),
+    ("Custom Metrics API (prometheus-adapter)", check_custom_metrics_api),
     ("HPA exists", check_hpa),
     ("metrics-server works", check_metrics_server),
     ("Aegis calibration", check_calibration),
+    ("Aegis in the cluster", check_aegis_in_cluster),
 ]
 
 
