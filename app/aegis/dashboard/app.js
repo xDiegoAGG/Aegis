@@ -9,6 +9,14 @@ const TEXT = {
     tabLive: "En vivo", tabExperiments: "Experimentos", all: "Todo",
     waitingTitle: "Esperando el primer ciclo de Aegis",
     waitingBody: "Este panel lo sirve Aegis. Arráncalo en vivo o reproduce una corrida grabada:",
+    replayNote: "Repetición grabada de la prueba {n}: {desc}",
+    test1: "una rampa de 5 a 46 req/s en 2 minutos, 1 minuto arriba y bajada.",
+    test2: "dos olas de tráfico (hasta 28 y hasta 46 req/s) con 2 minutos de tráfico bajo después de cada una. Aegis sube en cada ola y devuelve los pods entre ellas.",
+    test4: "un salto de 5 a 41 req/s en 5 segundos, sin tendencia previa: no se puede anticipar.",
+    test6: "una rampa más rápida (0.41 req/s por segundo).",
+    test7: "una rampa más rápida (0.46 req/s por segundo).",
+    test8: "la rampa de la prueba 1, con el HPA leyendo la decisión de Aegis por la Custom Metrics API.",
+    testOther: "una corrida guardada.",
     stateLive: "En vivo", stateReplay: "Reproduciendo", stateDry: "Dry-run, sin aplicar", stateOffline: "Sin conexión con Aegis",
     lastCycle: "último ciclo hace {s} s", speed: "a ×{v}",
     vOverflow: "Los pods no alcanzan.", vScale: "En {h} s no alcanzarían: Aegis pide otro pod.",
@@ -24,7 +32,7 @@ const TEXT = {
     lTraffic: "tráfico", lCapacity: "capacidad (pods listos)", lForecast: "en {h} s",
     upEvent: "Pidió el pod {n}", downEvent: "Apagó el pod {n}",
     upWhy: "En {h} s esperaba {p} req/s y {n} {podsWord} {serveVerb} {cap}. Probabilidad de no alcanzar: {risk}.",
-    downWhy: "Con un pod menos, la probabilidad de no alcanzar llevaba 60 s bajo {down}.",
+    downWhy: "El tráfico bajó: con {n} {podsWord} la probabilidad de no alcanzar llevaba 60 s bajo {down}, así que sobraba uno.",
     noDecisions: "Todavía no cambió nada: Aegis mantiene los pods.",
     markUp: "+1 pod", markDown: "−1 pod",
     techTitle: "Cómo decide Aegis", techHint: "La fórmula y las señales que usa en cada ciclo",
@@ -67,6 +75,14 @@ const TEXT = {
     tabLive: "Live", tabExperiments: "Experiments", all: "All",
     waitingTitle: "Waiting for the first Aegis cycle",
     waitingBody: "Aegis serves this page. Start it live or replay a recorded run:",
+    replayNote: "Recorded replay of test {n}: {desc}",
+    test1: "a ramp from 5 to 46 req/s in 2 minutes, 1 minute at the top, then down.",
+    test2: "two waves of traffic (up to 28 and up to 46 req/s) with 2 minutes of low traffic after each. Aegis scales up on each wave and gives the pods back in between.",
+    test4: "a jump from 5 to 41 req/s in 5 seconds, with no trend before it: it cannot be anticipated.",
+    test6: "a faster ramp (0.41 req/s per second).",
+    test7: "a faster ramp (0.46 req/s per second).",
+    test8: "the ramp of test 1, with the HPA reading the Aegis decision through the Custom Metrics API.",
+    testOther: "a saved run.",
     stateLive: "Live", stateReplay: "Replaying", stateDry: "Dry-run, not applying", stateOffline: "Aegis is not answering",
     lastCycle: "last cycle {s} s ago", speed: "at ×{v}",
     vOverflow: "The pods are not enough.", vScale: "In {h} s they would not be enough: Aegis asks for another pod.",
@@ -82,7 +98,7 @@ const TEXT = {
     lTraffic: "traffic", lCapacity: "capacity (ready pods)", lForecast: "in {h} s",
     upEvent: "Asked for pod {n}", downEvent: "Turned off pod {n}",
     upWhy: "In {h} s it expected {p} req/s and {n} {podsWord} {serveVerb} {cap}. Chance of falling short: {risk}.",
-    downWhy: "With one pod less, the chance of falling short had stayed under {down} for 60 s.",
+    downWhy: "Traffic dropped: with {n} {podsWord} the chance of falling short had stayed under {down} for 60 s, so one was spare.",
     noDecisions: "Nothing changed yet: Aegis holds the pods.",
     markUp: "+1 pod", markDown: "−1 pod",
     techTitle: "How Aegis decides", techHint: "The formula and the signals it uses every cycle",
@@ -338,6 +354,7 @@ function renderLive() {
     { rules: [{ y: meta.p95_threshold_seconds, label: t("ruleL", { v: meta.p95_threshold_seconds }) }] }));
   live.charts.sigma.setData(Object.assign({}, base, { markers: [] }));
   live.charts.slope.setData(Object.assign({}, base, { markers: [], rules: [{ y: 0, label: "" }] }));
+  renderReplayNote(meta);
   renderVerdict(last, meta);
   renderTanks(last, meta);
   renderEquation(last, meta);
@@ -348,6 +365,15 @@ function renderLive() {
 
 const podsWord = (n) => (n === 1 ? t("pod") : t("pods"));
 const serveVerb = (n) => (n === 1 ? t("serveOne") : t("serveMany"));
+
+function renderReplayNote(meta) {
+  const note = document.getElementById("replay-note");
+  const match = meta.mode === "replay" ? (meta.source || "").match(/^test(\d+)-/) : null;
+  note.hidden = meta.mode !== "replay";
+  if (note.hidden) return;
+  const n = match ? match[1] : "";
+  note.textContent = t("replayNote", { n, desc: TEXT[lang]["test" + n] ? t("test" + n) : t("testOther") });
+}
 
 function renderVerdict(r, meta) {
   const title = document.getElementById("verdict");
@@ -456,7 +482,7 @@ function renderDecisions(records, meta) {
     const why = up
       ? t("upWhy", { h: num(horizonOf(meta), 0), p: num(r.projected_rps, 0), n: r.previous_target,
         podsWord: podsWord(r.previous_target), serveVerb: serveVerb(r.previous_target), cap: num(C * r.previous_target, 0), risk: pct(r.risk, 0) })
-      : t("downWhy", { down: pct(meta.scale_down_threshold, 0) });
+      : t("downWhy", { down: pct(meta.scale_down_threshold, 0), n: r.target, podsWord: podsWord(r.target) });
     el("p", "why", li, why);
   }
 }
