@@ -1,7 +1,6 @@
 import datetime
 import json
 import math
-import re
 import subprocess
 import time
 import urllib.parse

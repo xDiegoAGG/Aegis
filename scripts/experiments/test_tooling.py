@@ -7,7 +7,7 @@ from unittest import mock
 import yaml
 import run
 from charts import degraded_intervals, deficit_seconds, serving_pods
-from compare import climb, collect
+from compare import climb
 from load import first_crossing, planned_rate, read_profile, total_duration
 from metrics import false_alarms, needed_pod_minutes
 from run import metric_path_delays
@@ -138,7 +138,6 @@ class CalibrationRuleTest(unittest.TestCase):
 class ForecastTest(unittest.TestCase):
     # The offline linear forecaster must project exactly what Aegis projects.
     def test_linear_trend_matches_aegis(self):
-        import sys
         from forecast_accuracy import LinearTrend
         from settings import CONFIG
         from aegis.collector import Sample
