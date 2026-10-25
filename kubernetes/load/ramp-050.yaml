@@ -1,0 +1,58 @@
+# Boundary ramp: 30 s at 5 req/s, 5 -> 50 req/s in 90 s, 1 min at 50, 30 s down (test 7).
+# Requests are saved to /results/requests.csv.gz; the pod waits 10 min so it can be copied.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: load-ramp-050
+data:
+  test.js: |
+    import http from 'k6/http';
+    export const options = {
+      noConnectionReuse: true,
+      scenarios: {
+        load: {
+          executor: 'ramping-arrival-rate',
+          startRate: 5,
+          timeUnit: '1s',
+          preAllocatedVUs: 100,
+          maxVUs: 600,
+          stages: [
+            { target: 5, duration: '30s' },
+            { target: 50, duration: '90s' },
+            { target: 50, duration: '60s' },
+            { target: 5, duration: '30s' },
+          ],
+        },
+      },
+    };
+    export default function () {
+      http.get('http://traefik.traefik.svc.cluster.local/api/books', { timeout: '10s' });
+    }
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: load-ramp-050
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: k6
+          image: grafana/k6:2.3.0
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c"]
+          args:
+            - k6 run --out csv=/results/requests.csv.gz /scripts/test.js; echo K6_FINISHED; sleep 600
+          volumeMounts:
+            - name: script
+              mountPath: /scripts
+            - name: results
+              mountPath: /results
+      volumes:
+        - name: script
+          configMap:
+            name: load-ramp-050
+        - name: results
+          emptyDir: {}

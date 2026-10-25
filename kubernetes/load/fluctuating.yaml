@@ -1,5 +1,5 @@
-# Fluctuating traffic: a wave to 30 req/s, 2 min low, a wave to 50 req/s, 2 min low; both climb like the linear ramp (test 2, demo 2).
-# Every request is saved to /results/requests.csv.gz; the pod then waits 10 min so it can be copied.
+# Two waves (30 and 50 req/s) with 2 min low after each (test 2, demo 2).
+# Requests are saved to /results/requests.csv.gz; the pod waits 10 min so it can be copied.
 apiVersion: v1
 kind: ConfigMap
 metadata:
