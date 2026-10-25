@@ -9,6 +9,14 @@ const TEXT = {
     tabLive: "En vivo", tabExperiments: "Experimentos", all: "Todo",
     waitingTitle: "Esperando el primer ciclo de Aegis",
     waitingBody: "Este panel lo sirve Aegis. Arráncalo en vivo o reproduce una corrida grabada:",
+    versusTitle: "Aegis frente al HPA solo, con la misma carga",
+    versusLead: "Con esta misma carga, el HPA solo dejó fallar <b>{hpa} %</b> de las peticiones; con Aegis, <b>{aegis} %</b>. Aegis pidió el 2º pod <b>{gain} s antes</b>.",
+    vsAegis: "Aegis (esta corrida)", vsHpa: "Solo HPA (corrida mediana)",
+    vsAsk: "Pide el 2º pod", vsFailed: "Peticiones fallidas", vsSlow: "Segundos con el servicio lento", vsCost: "Costo (pods-minuto)",
+    vsBefore: "{s} s, {d} s antes de superar un pod", vsAfter: "{s} s, {d} s después de superar un pod", vsNever: "nunca",
+    vsNote: "Resultados finales de cada corrida, medidos por k6 desde el cliente. Solo HPA: {n} corridas, fallos entre {min} y {max} %. En «Últimos minutos», la línea gris es la capacidad que tuvo el HPA solo en el mismo momento de la carga.",
+    vsMissing: "Esta carga no se probó con el HPA solo. Elige la prueba 1 (rampa) o la 4 (pico) para ver la comparación.",
+    lHpa: "capacidad del HPA solo",
     profiles: { linear: "rampa", fluctuating: "olas", spike: "pico", "ramp-045": "rampa rápida", "ramp-050": "rampa más rápida" },
     replayPick: "Corrida grabada que se reproduce", replayNote: "Prueba {n}: {desc}", replayError: "No se pudo cambiar la corrida: {e}",
     test1: "una rampa de 5 a 46 req/s en 2 minutos, 1 minuto arriba y bajada.",
@@ -76,6 +84,14 @@ const TEXT = {
     tabLive: "Live", tabExperiments: "Experiments", all: "All",
     waitingTitle: "Waiting for the first Aegis cycle",
     waitingBody: "Aegis serves this page. Start it live or replay a recorded run:",
+    versusTitle: "Aegis against the HPA alone, same load",
+    versusLead: "With this same load, the HPA alone let <b>{hpa} %</b> of requests fail; with Aegis, <b>{aegis} %</b>. Aegis asked for the 2nd pod <b>{gain} s earlier</b>.",
+    vsAegis: "Aegis (this run)", vsHpa: "HPA alone (median run)",
+    vsAsk: "Asks for the 2nd pod", vsFailed: "Failed requests", vsSlow: "Seconds with the service slow", vsCost: "Cost (pod-minutes)",
+    vsBefore: "{s} s, {d} s before one pod is exceeded", vsAfter: "{s} s, {d} s after one pod is exceeded", vsNever: "never",
+    vsNote: "Final results of each run, measured by k6 on the client. HPA alone: {n} runs, failures between {min} and {max} %. In “Last minutes”, the grey line is the capacity the HPA alone had at the same moment of the load.",
+    vsMissing: "This load was not run with the HPA alone. Pick test 1 (ramp) or test 4 (spike) to see the comparison.",
+    lHpa: "HPA alone capacity",
     profiles: { linear: "ramp", fluctuating: "waves", spike: "spike", "ramp-045": "faster ramp", "ramp-050": "fastest ramp" },
     replayPick: "Recorded run being replayed", replayNote: "Test {n}: {desc}", replayError: "Could not switch the run: {e}",
     test1: "a ramp from 5 to 46 req/s in 2 minutes, 1 minute at the top, then down.",
@@ -204,6 +220,7 @@ function buildLiveCharts() {
     series: [
       { key: "rps", label: t("lTraffic"), endLabel: t("lTraffic"), color: "var(--water)", fill: true, width: 2.5, connect: true },
       { key: "capacity", label: t("lCapacity"), endLabel: t("lCapacity"), color: "var(--ink)", step: true, width: 3, connect: true },
+      { key: "hpaCapacity", label: t("lHpa"), endLabel: t("lHpa"), color: "var(--quiet)", step: true, dash: "6 4", width: 2, connect: true },
     ],
   }, timeOptions)));
 
@@ -303,7 +320,16 @@ function columns(records, meta) {
     cols.slope.push(r.slope);
   }
   const traffic = { rps: records.map((r) => r.rps),
-    capacity: records.map((r) => (r.replicas_ready === null ? null : C * r.replicas_ready)) };
+    capacity: records.map((r) => (r.replicas_ready === null ? null : C * r.replicas_ready)), hpaCapacity: records.map(() => null) };
+  // Same moment of the load in the HPA-only run: seconds since its k6 start, rows every 5 s.
+  const pair = comparison(meta);
+  if (pair && pair.rows) {
+    const bySecond = new Map(pair.rows.map((row) => [Math.round(row.seconds / 5) * 5, row]));
+    traffic.hpaCapacity = records.map((r) => {
+      const row = bySecond.get(Math.round((r.time - pair.k6Start) / 5) * 5);
+      return row && row.ready !== null && row.ready !== "" ? C * Number(row.ready) : null;
+    });
+  }
   // Forecast check: each projection at the moment it was made for (T + lag later).
   const horizon = horizonOf(meta);
   const byTime = new Map(records.map((r) => [r.time, { rps: r.rps, projected: null }]));
@@ -357,6 +383,7 @@ function renderLive() {
   live.charts.sigma.setData(Object.assign({}, base, { markers: [] }));
   live.charts.slope.setData(Object.assign({}, base, { markers: [], rules: [{ y: 0, label: "" }] }));
   renderReplayNote(meta);
+  renderVersus(meta);
   renderVerdict(last, meta);
   renderTanks(last, meta);
   renderEquation(last, meta);
@@ -369,21 +396,19 @@ const podsWord = (n) => (n === 1 ? t("pod") : t("pods"));
 const serveVerb = (n) => (n === 1 ? t("serveOne") : t("serveMany"));
 
 // Recorded runs that can be replayed: the ones with an Aegis log (not the HPA-only tests).
-const replay = { runs: null, loading: false };
+const replay = { runs: null, all: null, loading: false, hpaRows: {} };
 
 async function loadReplayRuns() {
   if (replay.runs || replay.loading) return;
   replay.loading = true;
   try {
     const catalog = await (await fetch("api/tests", { cache: "no-store" })).json();
-    replay.runs = [];
-    for (const test of catalog.tests) {
-      for (const summary of test.runs) {
-        if (summary.mode !== "hpa") replay.runs.push({ test: test.name, summary });
-      }
-    }
+    replay.all = [];
+    for (const test of catalog.tests) for (const summary of test.runs) replay.all.push({ test: test.name, summary });
+    replay.runs = replay.all.filter((entry) => entry.summary.mode !== "hpa");
   } catch {
     replay.runs = [];
+    replay.all = [];
   }
   replay.loading = false;
   fillReplayPicker();
@@ -413,6 +438,69 @@ async function switchReplay(value) {
   live.records = [];
   live.lastTime = null;
   poll();
+}
+
+// The Aegis run being replayed and the HPA-only runs with the same load (median by failed requests).
+function comparison(meta) {
+  if (meta.mode !== "replay" || !replay.all) return null;
+  const current = (meta.source || "").replace("-aegis.ndjson", "");
+  const aegis = replay.all.find((e) => e.test + "/run-" + e.summary.run === current);
+  if (!aegis) return null;
+  const hpa = replay.all.filter((e) => e.summary.mode === "hpa" && e.summary.profile === aegis.summary.profile)
+    .sort((a, b) => a.summary.failed_percent - b.summary.failed_percent);
+  const median = hpa.length ? hpa[Math.floor((hpa.length - 1) / 2)] : null;
+  if (median && !replay.hpaRows[median.test + median.summary.run]) {
+    replay.hpaRows[median.test + median.summary.run] = "loading";
+    fetch("api/tests/" + median.test + "/" + median.summary.run, { cache: "no-store" }).then((r) => r.json())
+      .then((run) => { replay.hpaRows[median.test + median.summary.run] = run.rows; renderLive(); });
+  }
+  const rows = median ? replay.hpaRows[median.test + median.summary.run] : null;
+  return { aegis, hpa, median, rows: Array.isArray(rows) ? rows : null,
+    k6Start: Date.parse(aegis.summary.date_utc + "T" + aegis.summary.k6_start_utc + "Z") / 1000 };
+}
+
+function renderVersus(meta) {
+  const box = document.getElementById("versus");
+  const pair = comparison(meta);
+  box.hidden = !pair;
+  if (!pair) return;
+  const lead = document.getElementById("versus-lead");
+  const table = document.getElementById("versus-table");
+  const note = document.getElementById("versus-note");
+  table.replaceChildren();
+  if (!pair.median) {
+    lead.textContent = "";
+    note.textContent = t("vsMissing");
+    return;
+  }
+  const a = pair.aegis.summary;
+  const h = pair.median.summary;
+  lead.innerHTML = t("versusLead", { hpa: num(h.failed_percent, 1), aegis: num(a.failed_percent, 1),
+    gain: num((h.first_scale_up_s ?? 0) - (a.first_scale_up_s ?? 0), 0) });
+  const ask = (s) => {
+    if (s.first_scale_up_s === null || s.first_scale_up_s === undefined) return t("vsNever");
+    const delta = s.crosses_c_s - s.first_scale_up_s;
+    return t(delta >= 0 ? "vsBefore" : "vsAfter", { s: num(s.first_scale_up_s, 0), d: num(Math.abs(delta), 0) });
+  };
+  const head = el("tr", "", el("thead", "", table));
+  el("th", "", head, "");
+  el("th", "aegis", head, t("vsAegis"));
+  el("th", "hpa", head, t("vsHpa"));
+  const body = el("tbody", "", table);
+  const rows = [
+    [t("vsAsk"), ask(a), ask(h), null],
+    [t("vsFailed"), num(a.failed_percent, 1) + " %", num(h.failed_percent, 1) + " %", a.failed_percent < h.failed_percent],
+    [t("vsSlow"), num(a.degraded_seconds, 0) + " s", num(h.degraded_seconds, 0) + " s", a.degraded_seconds < h.degraded_seconds],
+    [t("vsCost"), num(a.pod_minutes, 1), num(h.pod_minutes, 1), null],
+  ];
+  for (const [label, av, hv, aegisBetter] of rows) {
+    const row = el("tr", "", body);
+    el("td", "", row, label);
+    el("td", "aegis" + (aegisBetter === true ? " better" : ""), row, av);
+    el("td", "hpa" + (aegisBetter === false ? " better" : ""), row, hv);
+  }
+  const failures = pair.hpa.map((e) => e.summary.failed_percent);
+  note.textContent = t("vsNote", { n: pair.hpa.length, min: num(Math.min(...failures), 1), max: num(Math.max(...failures), 1) });
 }
 
 function renderReplayNote(meta) {
