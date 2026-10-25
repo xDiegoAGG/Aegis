@@ -51,10 +51,14 @@ class AegisState:
         self.actions = {"scale_up": 0, "scale_down": 0, "hold": 0}
         self.failed_applies = 0
         self.lock = threading.Lock()
+        # Set by the replay: select(test, run) switches the recorded run and returns an error text or None.
+        self.select = None
 
     # Called by the replay when it starts over, so the dashboard drops what it already drew.
-    def restart(self):
+    def restart(self, meta=None):
         with self.lock:
+            if meta:
+                self.meta.update(meta)
             self.meta["session"] = uuid.uuid4().hex
             self.history.clear()
             self.actions = {"scale_up": 0, "scale_down": 0, "hold": 0}
@@ -247,6 +251,21 @@ def make_handler(state, catalog):
                 self.serve_test(path)
             else:
                 self.serve_static(path)
+
+        def do_POST(self):
+            if urlparse(self.path).path != "/api/replay" or state.select is None:
+                self.send_json(404, {"error": "not found"})
+                return
+            try:
+                length = min(int(self.headers.get("Content-Length") or 0), 4096)
+                body = json.loads(self.rfile.read(length) or b"{}")
+                error = state.select(str(body.get("test", "")), int(body.get("run", 0)))
+            except (ValueError, TypeError):
+                error = "expected {\"test\": name, \"run\": number}"
+            if error:
+                self.send_json(400, {"error": error})
+            else:
+                self.send_json(200, {"ok": True})
 
         def serve_test(self, path):
             parts = path.split("/")

@@ -9,7 +9,8 @@ const TEXT = {
     tabLive: "En vivo", tabExperiments: "Experimentos", all: "Todo",
     waitingTitle: "Esperando el primer ciclo de Aegis",
     waitingBody: "Este panel lo sirve Aegis. Arráncalo en vivo o reproduce una corrida grabada:",
-    replayNote: "Repetición grabada de la prueba {n}: {desc}",
+    profiles: { linear: "rampa", fluctuating: "olas", spike: "pico", "ramp-045": "rampa rápida", "ramp-050": "rampa más rápida" },
+    replayPick: "Corrida grabada que se reproduce", replayNote: "Prueba {n}: {desc}", replayError: "No se pudo cambiar la corrida: {e}",
     test1: "una rampa de 5 a 46 req/s en 2 minutos, 1 minuto arriba y bajada.",
     test2: "dos olas de tráfico (hasta 28 y hasta 46 req/s) con 2 minutos de tráfico bajo después de cada una. Aegis sube en cada ola y devuelve los pods entre ellas.",
     test4: "un salto de 5 a 41 req/s en 5 segundos, sin tendencia previa: no se puede anticipar.",
@@ -75,7 +76,8 @@ const TEXT = {
     tabLive: "Live", tabExperiments: "Experiments", all: "All",
     waitingTitle: "Waiting for the first Aegis cycle",
     waitingBody: "Aegis serves this page. Start it live or replay a recorded run:",
-    replayNote: "Recorded replay of test {n}: {desc}",
+    profiles: { linear: "ramp", fluctuating: "waves", spike: "spike", "ramp-045": "faster ramp", "ramp-050": "fastest ramp" },
+    replayPick: "Recorded run being replayed", replayNote: "Test {n}: {desc}", replayError: "Could not switch the run: {e}",
     test1: "a ramp from 5 to 46 req/s in 2 minutes, 1 minute at the top, then down.",
     test2: "two waves of traffic (up to 28 and up to 46 req/s) with 2 minutes of low traffic after each. Aegis scales up on each wave and gives the pods back in between.",
     test4: "a jump from 5 to 41 req/s in 5 seconds, with no trend before it: it cannot be anticipated.",
@@ -366,13 +368,65 @@ function renderLive() {
 const podsWord = (n) => (n === 1 ? t("pod") : t("pods"));
 const serveVerb = (n) => (n === 1 ? t("serveOne") : t("serveMany"));
 
+// Recorded runs that can be replayed: the ones with an Aegis log (not the HPA-only tests).
+const replay = { runs: null, loading: false };
+
+async function loadReplayRuns() {
+  if (replay.runs || replay.loading) return;
+  replay.loading = true;
+  try {
+    const catalog = await (await fetch("api/tests", { cache: "no-store" })).json();
+    replay.runs = [];
+    for (const test of catalog.tests) {
+      for (const summary of test.runs) {
+        if (summary.mode !== "hpa") replay.runs.push({ test: test.name, summary });
+      }
+    }
+  } catch {
+    replay.runs = [];
+  }
+  replay.loading = false;
+  fillReplayPicker();
+}
+
+function fillReplayPicker() {
+  const select = document.getElementById("replay-run");
+  if (!replay.runs || !live.meta) return;
+  const current = (live.meta.source || "").replace("-aegis.ndjson", "");
+  select.replaceChildren();
+  for (const entry of replay.runs) {
+    const option = el("option", "", select, runLabel(entry));
+    option.value = entry.test + "/run-" + entry.summary.run;
+    option.selected = option.value === current;
+  }
+}
+
+async function switchReplay(value) {
+  const [test, run] = value.split("/run-");
+  const response = await fetch("api/replay", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ test, run: Number(run) }) });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    document.getElementById("replay-note").textContent = t("replayError", { e: body.error || response.status });
+    return;
+  }
+  live.records = [];
+  live.lastTime = null;
+  poll();
+}
+
 function renderReplayNote(meta) {
-  const note = document.getElementById("replay-note");
-  const match = meta.mode === "replay" ? (meta.source || "").match(/^test(\d+)-/) : null;
-  note.hidden = meta.mode !== "replay";
-  if (note.hidden) return;
+  const bar = document.getElementById("replay-bar");
+  bar.hidden = meta.mode !== "replay";
+  if (bar.hidden) return;
+  loadReplayRuns();
+  const select = document.getElementById("replay-run");
+  const current = (meta.source || "").replace("-aegis.ndjson", "");
+  if (replay.runs && select.value !== current && document.activeElement !== select) fillReplayPicker();
+  const match = (meta.source || "").match(/^test(\d+)-/);
   const n = match ? match[1] : "";
-  note.textContent = t("replayNote", { n, desc: TEXT[lang]["test" + n] ? t("test" + n) : t("testOther") });
+  document.getElementById("replay-note").textContent =
+    t("replayNote", { n, desc: TEXT[lang]["test" + n] ? t("test" + n) : t("testOther") });
 }
 
 function renderVerdict(r, meta) {
@@ -539,7 +593,8 @@ function runId(test, run) {
 function runLabel(entry, short) {
   const match = entry.test.match(/^test(\d+)/);
   const mode = { hpa: "HPA", metric: "Aegis (metric)" }[entry.summary.mode] || "Aegis";
-  return t(short ? "runShort" : "runName", { n: match ? match[1] : entry.test, mode, profile: entry.summary.profile,
+  const profile = TEXT[lang].profiles[entry.summary.profile] || entry.summary.profile;
+  return t(short ? "runShort" : "runName", { n: match ? match[1] : entry.test, mode, profile,
     run: entry.summary.run });
 }
 
@@ -800,6 +855,7 @@ function init() {
     writePreference("aegis-lang", lang);
     applyText();
     buildLiveCharts();
+    fillReplayPicker();
     renderLive();
     if (experiments.loaded) {
       buildRunPicker();
@@ -810,6 +866,7 @@ function init() {
   });
   document.querySelector(".cycles").addEventListener("toggle", () => renderLive());
   document.getElementById("tech").addEventListener("toggle", () => renderLive());
+  document.getElementById("replay-run").addEventListener("change", (event) => switchReplay(event.target.value));
   setWindow(live.windowSeconds);
   selectTab(location.hash === "#experiments" ? "experiments" : "live");
   if (location.hash === "#how") document.getElementById("tech").open = true;

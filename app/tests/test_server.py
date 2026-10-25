@@ -92,6 +92,35 @@ class HttpTest(unittest.TestCase):
             self.get("/../config.yaml")
         self.assertEqual(error.exception.code, 404)
 
+    def post(self, path, payload):
+        request = urllib.request.Request(self.base + path, data=json.dumps(payload).encode(), method="POST")
+        try:
+            with urllib.request.urlopen(request, timeout=5) as response:
+                return response.status, json.loads(response.read())
+        except urllib.error.HTTPError as error:
+            return error.code, json.loads(error.read())
+
+    def test_replay_switch(self):
+        self.assertEqual(self.post("/api/replay", {"test": "test1", "run": 1})[0], 404)
+        chosen = []
+        self.state.select = lambda test, run: chosen.append((test, run)) or (None if run == 4 else "no log")
+        try:
+            self.assertEqual(self.post("/api/replay", {"test": "test1-linear-ramp", "run": 4}), (200, {"ok": True}))
+            self.assertEqual(self.post("/api/replay", {"test": "test1-linear-ramp", "run": 9})[0], 400)
+            self.assertEqual(self.post("/api/replay", {"test": "x", "run": "a"})[0], 400)
+        finally:
+            self.state.select = None
+        self.assertEqual(chosen, [("test1-linear-ramp", 4), ("test1-linear-ramp", 9)])
+
+
+class ReplayTest(unittest.TestCase):
+    def test_only_saved_aegis_runs(self):
+        from aegis.replay import Replayer
+        state = AegisState(META)
+        replayer = Replayer(state, None, None, 1000, False)
+        self.assertEqual(replayer.select("../../etc", 1), "unknown run")
+        self.assertIn("no Aegis log", replayer.select("test3-hpa-baseline", 1))
+
 
 if __name__ == "__main__":
     unittest.main()
