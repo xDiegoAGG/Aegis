@@ -87,6 +87,6 @@ Every run also saves a timeline (`run-N-timeline.csv`) with the load, the Aegis 
 - [Deployment in the cluster, metrics, Custom Metrics API and HPA](docs/deployment.md)
 - [Workload capacity, L and T_d](docs/capacity.md)
 - [Operating boundaries, limitations and threats to validity](docs/limitations.md)
-- [Business case](docs/business_case.md)
+- [Business case, with the ROI model step by step](docs/business-case.md) (Spanish; replaces the earlier [business_case.md](docs/business_case.md))
 - [Experimental methodology](docs/experiments/methodology.md)
 - [References](docs/references.md)
