@@ -1,0 +1,24 @@
+seconds,time_utc,source,event,detail
+-42403.0,03:31:44,pod,created,catalog-service-84dccb7884-477qq
+-166.0,15:15:41,pod,ready,catalog-service-84dccb7884-477qq
+-1.0,15:18:26,kubernetes,Scheduled,Pod/load-spike-b5ccr: Successfully assigned default/load-spike-b5ccr to minikube
+-1.0,15:18:26,kubernetes,Pulled,"Pod/load-spike-b5ccr: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+-1.0,15:18:26,kubernetes,Created,Pod/load-spike-b5ccr: Container created
+-1.0,15:18:26,kubernetes,Started,Pod/load-spike-b5ccr: Container started
+-1.0,15:18:26,kubernetes,SuccessfulCreate,Job/load-spike: Created pod: load-spike-b5ccr
+0,15:18:27,k6,load started,spike
+32.5,15:18:59,k6,planned traffic passes C,22.0 req/s
+33,15:19:00,client,degraded,P95 above L or over 1% failed for T_d
+40.0,15:19:07,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-477qq: Readiness probe failed: Get ""http://10.244.0.34:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+144.0,15:20:51,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-l9j7b: Successfully assigned default/catalog-service-84dccb7884-l9j7b to minikube
+144.0,15:20:51,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-84dccb7884: Created pod: catalog-service-84dccb7884-l9j7b
+144.0,15:20:51,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-84dccb7884 from 1 to 2
+144.0,15:20:51,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: cpu resource utilization (percentage of request) above target
+144.0,15:20:51,pod,created,catalog-service-84dccb7884-l9j7b
+145.0,15:20:52,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-l9j7b: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+145.0,15:20:52,kubernetes,Created,Pod/catalog-service-84dccb7884-l9j7b: Container created
+145.0,15:20:52,kubernetes,Started,Pod/catalog-service-84dccb7884-l9j7b: Container started
+154.0,15:21:01,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-l9j7b: Readiness probe failed: Get ""http://10.244.0.129:3003/health"": dial tcp 10.244.0.129:3003: connect: connection refused"
+157.0,15:21:04,pod,ready,catalog-service-84dccb7884-l9j7b
+190.0,15:21:37,k6,load finished,
+221.0,15:22:08,kubernetes,Killing,Pod/load-spike-b5ccr: Stopping container k6

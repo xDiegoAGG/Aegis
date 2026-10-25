@@ -1,0 +1,38 @@
+{
+  "run": 5,
+  "profile": "linear",
+  "mode": "hpa",
+  "date_utc": "2026-10-25",
+  "k6_start_utc": "15:07:18",
+  "end_utc": "15:11:50",
+  "capacity_rps": 22.0,
+  "startup_time_seconds": 15,
+  "requests": 6504,
+  "failed_percent": 38.48,
+  "client_p95_s": 10.001,
+  "client_max_s": 10.003,
+  "dropped_iterations": 230,
+  "degraded_seconds": 155,
+  "first_degraded_s": 82,
+  "crosses_c_s": 80.0,
+  "first_scale_up_s": 144.0,
+  "second_pod_ready_s": 233.0,
+  "lead_s": -153.0,
+  "scale_ups": [
+    {
+      "s": 144.0,
+      "from": 1,
+      "to": 2
+    }
+  ],
+  "scale_downs": [],
+  "max_pods": 2,
+  "pod_minutes": 5.6,
+  "p95_excess_s2": 1224.1,
+  "degraded_to_ready_s": 151.0,
+  "false_scale_ups": 0,
+  "needed_pod_minutes": 7.58,
+  "extra_pod_minutes": -1.98,
+  "calibration_measured_at": "2026-10-25T03:16:57Z",
+  "load_scale": 0.917
+}

@@ -1,0 +1,27 @@
+seconds,time_utc,source,event,detail
+-2383.0,03:31:44,pod,created,catalog-service-84dccb7884-477qq
+-335.0,04:05:52,pod,created,catalog-service-84dccb7884-wjxbl
+-94.0,04:09:53,pod,ready,catalog-service-84dccb7884-477qq
+-78.0,04:10:09,pod,ready,catalog-service-84dccb7884-wjxbl
+-16.0,04:11:11,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-xfzcb: Successfully assigned default/catalog-service-84dccb7884-xfzcb to minikube
+-16.0,04:11:11,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-xfzcb: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+-16.0,04:11:11,kubernetes,Created,Pod/catalog-service-84dccb7884-xfzcb: Container created
+-16.0,04:11:11,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-84dccb7884: (combined from similar events): Created pod: catalog-service-84dccb7884-xfzcb
+-16.0,04:11:11,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-84dccb7884 from 1 to 2
+-16.0,04:11:11,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason:
+-16.0,04:11:11,pod,created,catalog-service-84dccb7884-xfzcb
+-15.0,04:11:12,kubernetes,Started,Pod/catalog-service-84dccb7884-xfzcb: Container started
+-3.0,04:11:24,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-xfzcb: Readiness probe failed: Get ""http://10.244.0.51:3003/health"": dial tcp 10.244.0.51:3003: connect: connection refused"
+-1.0,04:11:26,kubernetes,Scheduled,Pod/load-linear-2v4rv: Successfully assigned default/load-linear-2v4rv to minikube
+-1.0,04:11:26,kubernetes,Pulled,"Pod/load-linear-2v4rv: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+-1.0,04:11:26,kubernetes,Created,Pod/load-linear-2v4rv: Container created
+-1.0,04:11:26,kubernetes,Started,Pod/load-linear-2v4rv: Container started
+-1.0,04:11:26,kubernetes,SuccessfulCreate,Job/load-linear: Created pod: load-linear-2v4rv
+0,04:11:27,k6,load started,linear
+1.0,04:11:28,pod,ready,catalog-service-84dccb7884-xfzcb
+80.0,04:12:47,k6,planned traffic passes C,22.0 req/s
+113,04:13:20,client,degraded,P95 above L or over 1% failed for T_d
+141.0,04:13:48,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-477qq: Readiness probe failed: Get ""http://10.244.0.34:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+238.0,04:15:25,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-xfzcb: Readiness probe failed: Get ""http://10.244.0.51:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+240.0,04:15:27,k6,load finished,
+281.0,04:16:08,kubernetes,Killing,Pod/load-linear-2v4rv: Stopping container k6

@@ -2,56 +2,63 @@
   "run": 1,
   "profile": "fluctuating",
   "mode": "aegis",
-  "date_utc": "2026-10-19",
-  "k6_start_utc": "18:58:22",
-  "end_utc": "19:09:10",
-  "capacity_rps": 24.0,
+  "date_utc": "2026-10-25",
+  "k6_start_utc": "15:38:12",
+  "end_utc": "15:48:50",
+  "capacity_rps": 22.0,
   "startup_time_seconds": 15,
-  "requests": 9817,
-  "failed_percent": 0.22,
-  "client_p95_s": 1.888,
-  "client_max_s": 11.141,
-  "dropped_iterations": 170,
-  "degraded_seconds": 100,
-  "first_degraded_s": 73,
-  "crosses_c_s": 79.5,
-  "first_scale_up_s": 72.9,
-  "second_pod_ready_s": 86.0,
-  "lead_s": -6.5,
+  "requests": 9367,
+  "failed_percent": 0.63,
+  "client_p95_s": 2.006,
+  "client_max_s": 10.001,
+  "dropped_iterations": 0,
+  "degraded_seconds": 130,
+  "first_degraded_s": 78,
+  "crosses_c_s": 78.5,
+  "first_scale_up_s": 74.4,
+  "second_pod_ready_s": 87.0,
+  "lead_s": -8.5,
   "scale_ups": [
     {
-      "s": 72.9,
+      "s": 74.4,
       "from": 1,
       "to": 2
     },
     {
-      "s": 302.7,
+      "s": 304.4,
       "from": 1,
       "to": 2
     },
     {
-      "s": 362.8,
+      "s": 364.4,
       "from": 2,
       "to": 3
     }
   ],
   "scale_downs": [
     {
-      "s": 222.8,
+      "s": 219.4,
       "from": 2,
       "to": 1
     },
     {
-      "s": 497.9,
+      "s": 504.4,
       "from": 3,
       "to": 2
     },
     {
-      "s": 567.8,
+      "s": 569.4,
       "from": 2,
       "to": 1
     }
   ],
   "max_pods": 3,
-  "pod_minutes": 18.37
+  "pod_minutes": 18.33,
+  "p95_excess_s2": 377.5,
+  "degraded_to_ready_s": 9.0,
+  "false_scale_ups": 0,
+  "needed_pod_minutes": 13.33,
+  "extra_pod_minutes": 5.0,
+  "calibration_measured_at": "2026-10-25T03:16:57Z",
+  "load_scale": 0.917
 }

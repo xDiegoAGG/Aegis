@@ -1,0 +1,39 @@
+seconds,time_utc,source,event,detail
+-8313.0,03:31:44,pod,created,catalog-service-84dccb7884-477qq
+-282.0,05:45:35,pod,created,catalog-service-84dccb7884-vqtlh
+-229.0,05:46:28,pod,ready,catalog-service-84dccb7884-477qq
+-222.0,05:46:35,pod,ready,catalog-service-84dccb7884-vqtlh
+-1.0,05:50:16,kubernetes,Scheduled,Pod/load-ramp-050-k5km5: Successfully assigned default/load-ramp-050-k5km5 to minikube
+-1.0,05:50:16,kubernetes,Pulled,"Pod/load-ramp-050-k5km5: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+-1.0,05:50:16,kubernetes,Created,Pod/load-ramp-050-k5km5: Container created
+-1.0,05:50:16,kubernetes,Started,Pod/load-ramp-050-k5km5: Container started
+-1.0,05:50:16,kubernetes,SuccessfulCreate,Job/load-ramp-050: Created pod: load-ramp-050-k5km5
+0,05:50:17,k6,load started,ramp-050
+67.5,05:51:24,k6,planned traffic passes C,22.0 req/s
+68.0,05:51:25,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-zzn2l: Successfully assigned default/catalog-service-84dccb7884-zzn2l to minikube
+68.0,05:51:25,pod,created,catalog-service-84dccb7884-zzn2l
+68.4,05:51:25,aegis,scale_up 1->2,risk 0.8449: risk with 1 pod(s) 84.5% >= 70.0%
+69.0,05:51:26,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-zzn2l: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+69.0,05:51:26,kubernetes,Created,Pod/catalog-service-84dccb7884-zzn2l: Container created
+69.0,05:51:26,kubernetes,Started,Pod/catalog-service-84dccb7884-zzn2l: Container started
+73,05:51:30,client,degraded,P95 above L or over 1% failed for T_d
+76.0,05:51:33,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-zzn2l: Readiness probe failed: Get ""http://10.244.0.100:3003/health"": dial tcp 10.244.0.100:3003: connect: connection refused"
+79.0,05:51:36,pod,ready,catalog-service-84dccb7884-zzn2l
+108.0,05:52:05,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-splkm: Successfully assigned default/catalog-service-84dccb7884-splkm to minikube
+108.0,05:52:05,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-84dccb7884: (combined from similar events): Created pod: catalog-service-84dccb7884-splkm
+108.0,05:52:05,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 3; reason: Current number of replicas below Spec.MinReplicas
+108.0,05:52:05,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-84dccb7884 from 2 to 3
+108.0,05:52:05,pod,created,catalog-service-84dccb7884-splkm
+108.5,05:52:05,aegis,scale_up 2->3,risk 0.7041: risk with 2 pod(s) 70.4% >= 70.0%
+109.0,05:52:06,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-splkm: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+109.0,05:52:06,kubernetes,Created,Pod/catalog-service-84dccb7884-splkm: Container created
+109.0,05:52:06,kubernetes,Started,Pod/catalog-service-84dccb7884-splkm: Container started
+112.0,05:52:09,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-477qq: Readiness probe failed: Get ""http://10.244.0.34:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+115.0,05:52:12,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-splkm: Readiness probe failed: Get ""http://10.244.0.101:3003/health"": dial tcp 10.244.0.101:3003: connect: connection refused"
+118.0,05:52:15,pod,ready,catalog-service-84dccb7884-splkm
+128.0,05:52:25,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-zzn2l: Readiness probe failed: Get ""http://10.244.0.100:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+139.0,05:52:36,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-splkm: Readiness probe failed: Get ""http://10.244.0.101:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+210.0,05:53:47,k6,load finished,
+258.0,05:54:35,kubernetes,Killing,Pod/catalog-service-84dccb7884-zzn2l: Stopping container catalog-service
+258.4,05:54:35,aegis,scale_down 3->2,risk 0.0: risk with 2 pod(s) 0.0% < 30.0% for 65 s
+286.0,05:55:03,kubernetes,Killing,Pod/load-ramp-050-k5km5: Stopping container k6

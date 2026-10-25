@@ -1,0 +1,39 @@
+seconds,time_utc,source,event,detail
+-4026.0,03:31:44,pod,created,catalog-service-84dccb7884-477qq
+-276.0,04:34:14,pod,created,catalog-service-84dccb7884-6dxg4
+-256.0,04:34:34,pod,ready,catalog-service-84dccb7884-477qq
+-235.0,04:34:55,pod,ready,catalog-service-84dccb7884-6dxg4
+-1.0,04:38:49,kubernetes,Scheduled,Pod/load-spike-946rk: Successfully assigned default/load-spike-946rk to minikube
+-1.0,04:38:49,kubernetes,Pulled,"Pod/load-spike-946rk: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+-1.0,04:38:49,kubernetes,Created,Pod/load-spike-946rk: Container created
+-1.0,04:38:49,kubernetes,Started,Pod/load-spike-946rk: Container started
+-1.0,04:38:49,kubernetes,SuccessfulCreate,Job/load-spike: Created pod: load-spike-946rk
+0,04:38:50,k6,load started,spike
+32.5,04:39:22,k6,planned traffic passes C,22.0 req/s
+35,04:39:25,client,degraded,P95 above L or over 1% failed for T_d
+41.0,04:39:31,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-477qq: Readiness probe failed: Get ""http://10.244.0.34:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+43.0,04:39:33,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-t5tf8: Successfully assigned default/catalog-service-84dccb7884-t5tf8 to minikube
+43.0,04:39:33,pod,created,catalog-service-84dccb7884-t5tf8
+43.6,04:39:33,aegis,scale_up 1->2,risk 1.0: risk with 1 pod(s) 100.0% >= 70.0%
+44.0,04:39:34,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-t5tf8: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+44.0,04:39:34,kubernetes,Created,Pod/catalog-service-84dccb7884-t5tf8: Container created
+44.0,04:39:34,kubernetes,Started,Pod/catalog-service-84dccb7884-t5tf8: Container started
+50.0,04:39:40,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-t5tf8: Readiness probe failed: Get ""http://10.244.0.66:3003/health"": dial tcp 10.244.0.66:3003: connect: connection refused"
+53.0,04:39:43,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-thlpj: Successfully assigned default/catalog-service-84dccb7884-thlpj to minikube
+53.0,04:39:43,pod,ready,catalog-service-84dccb7884-t5tf8
+53.0,04:39:43,pod,created,catalog-service-84dccb7884-thlpj
+53.6,04:39:43,aegis,scale_up 2->3,risk 0.8471: risk with 2 pod(s) 84.7% >= 70.0%
+54.0,04:39:44,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-thlpj: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+54.0,04:39:44,kubernetes,Created,Pod/catalog-service-84dccb7884-thlpj: Container created
+54.0,04:39:44,kubernetes,Started,Pod/catalog-service-84dccb7884-thlpj: Container started
+60.0,04:39:50,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-thlpj: Readiness probe failed: Get ""http://10.244.0.67:3003/health"": dial tcp 10.244.0.67:3003: connect: connection refused"
+63.0,04:39:53,pod,ready,catalog-service-84dccb7884-thlpj
+81.0,04:40:11,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-t5tf8: Readiness probe failed: Get ""http://10.244.0.66:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+86.0,04:40:16,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-thlpj: Readiness probe failed: Get ""http://10.244.0.67:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+190.0,04:42:00,k6,load finished,
+198.0,04:42:08,kubernetes,Killing,Pod/catalog-service-84dccb7884-thlpj: Stopping container catalog-service
+198.0,04:42:08,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-84dccb7884: (combined from similar events): Deleted pod: catalog-service-84dccb7884-thlpj
+198.0,04:42:08,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: All metrics below target
+198.0,04:42:08,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-84dccb7884 from 3 to 2
+198.6,04:42:08,aegis,scale_down 3->2,risk 0.0: risk with 2 pod(s) 0.2% < 30.0% for 64 s
+266.0,04:43:16,kubernetes,Killing,Pod/load-spike-946rk: Stopping container k6

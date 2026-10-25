@@ -1,0 +1,44 @@
+seconds,time_utc,source,event,detail
+-2723.0,03:31:44,pod,created,catalog-service-84dccb7884-477qq
+-356.0,04:11:11,pod,created,catalog-service-84dccb7884-xfzcb
+-103.0,04:15:24,pod,ready,catalog-service-84dccb7884-477qq
+-99.0,04:15:28,pod,ready,catalog-service-84dccb7884-xfzcb
+-1.0,04:17:06,kubernetes,Scheduled,Pod/load-spike-ffl9g: Successfully assigned default/load-spike-ffl9g to minikube
+-1.0,04:17:06,kubernetes,SuccessfulCreate,Job/load-spike: Created pod: load-spike-ffl9g
+0,04:17:07,k6,load started,spike
+0.0,04:17:07,kubernetes,Pulled,"Pod/load-spike-ffl9g: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,04:17:07,kubernetes,Created,Pod/load-spike-ffl9g: Container created
+0.0,04:17:07,kubernetes,Started,Pod/load-spike-ffl9g: Container started
+32.5,04:17:39,k6,planned traffic passes C,22.0 req/s
+33,04:17:40,client,degraded,P95 above L or over 1% failed for T_d
+40.0,04:17:47,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-477qq: Readiness probe failed: Get ""http://10.244.0.34:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+44.0,04:17:51,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-4wnbf: Successfully assigned default/catalog-service-84dccb7884-4wnbf to minikube
+44.0,04:17:51,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-4wnbf: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+44.0,04:17:51,kubernetes,Created,Pod/catalog-service-84dccb7884-4wnbf: Container created
+44.0,04:17:51,kubernetes,Started,Pod/catalog-service-84dccb7884-4wnbf: Container started
+44.0,04:17:51,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: Current number of replicas below Spec.MinReplicas
+44.0,04:17:51,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-84dccb7884 from 1 to 2
+44.0,04:17:51,pod,created,catalog-service-84dccb7884-4wnbf
+44.0,04:17:51,aegis,scale_up 1->2,risk 0.9981: risk with 1 pod(s) 99.8% >= 70.0%
+50.0,04:17:57,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-4wnbf: Readiness probe failed: Get ""http://10.244.0.54:3003/health"": dial tcp 10.244.0.54:3003: connect: connection refused"
+54.0,04:18:01,kubernetes,Scheduled,Pod/catalog-service-84dccb7884-rdhnv: Successfully assigned default/catalog-service-84dccb7884-rdhnv to minikube
+54.0,04:18:01,kubernetes,Pulled,"Pod/catalog-service-84dccb7884-rdhnv: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+54.0,04:18:01,kubernetes,Created,Pod/catalog-service-84dccb7884-rdhnv: Container created
+54.0,04:18:01,kubernetes,Started,Pod/catalog-service-84dccb7884-rdhnv: Container started
+54.0,04:18:01,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-84dccb7884: (combined from similar events): Created pod: catalog-service-84dccb7884-rdhnv
+54.0,04:18:01,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 3; reason: Current number of replicas below Spec.MinReplicas
+54.0,04:18:01,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-84dccb7884 from 2 to 3
+54.0,04:18:01,pod,created,catalog-service-84dccb7884-rdhnv
+54.0,04:18:01,aegis,scale_up 2->3,risk 0.7685: risk with 2 pod(s) 76.9% >= 70.0%
+60.0,04:18:07,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-rdhnv: Readiness probe failed: Get ""http://10.244.0.55:3003/health"": dial tcp 10.244.0.55:3003: connect: connection refused"
+63.0,04:18:10,pod,ready,catalog-service-84dccb7884-rdhnv
+82.0,04:18:29,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-4wnbf: Readiness probe failed: Get ""http://10.244.0.54:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+83.0,04:18:30,pod,ready,catalog-service-84dccb7884-4wnbf
+88.0,04:18:35,kubernetes,Unhealthy,"Pod/catalog-service-84dccb7884-rdhnv: Readiness probe failed: Get ""http://10.244.0.55:3003/health"": context deadline exceeded (Client.Timeout exceeded while awaiting headers)"
+190.0,04:20:17,k6,load finished,
+199.0,04:20:26,kubernetes,Killing,Pod/catalog-service-84dccb7884-4wnbf: Stopping container catalog-service
+199.0,04:20:26,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-84dccb7884: (combined from similar events): Deleted pod: catalog-service-84dccb7884-4wnbf
+199.0,04:20:26,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: All metrics below target
+199.0,04:20:26,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-84dccb7884 from 3 to 2
+199.0,04:20:26,aegis,scale_down 3->2,risk 0.0: risk with 2 pod(s) 0.3% < 30.0% for 60 s
+266.0,04:21:33,kubernetes,Killing,Pod/load-spike-ffl9g: Stopping container k6
