@@ -1,15 +1,10 @@
 # Demo en vivo
 
-Dos demos en consola, de unos 6 y 10 minutos:
-
-1. **Rampa lineal**: Aegis pide un pod **antes** de que el tráfico pase lo que un pod puede atender.
-2. **Tráfico fluctuante**: Aegis sube en cada ola y **baja** cuando el tráfico cae.
-
-Los números de abajo salen de las 5 corridas de cada prueba (`docs/tests/`). Cambian un poco de una corrida a otra.
+Dos demos en consola (~6 y ~10 min): una rampa lineal, donde Aegis pide un pod **antes** de que se supere un pod, y tráfico fluctuante, donde sube en cada ola y **baja** después.
 
 ## 1. Una máquina nueva, desde cero (unos 45 minutos, hazlo antes de la clase)
 
-Probado en Linux (Kali, basado en Debian) con las versiones de abajo; los comandos son para Ubuntu o Debian en un PC de 64 bits Intel/AMD.
+Probado en Kali Linux; los comandos son para Ubuntu/Debian en amd64.
 
 **Hardware**: al menos 4 hilos de CPU y 8 GB de RAM (minikube usa 2 CPUs y 4 GB), 20 GB libres en disco, internet.
 
@@ -65,11 +60,11 @@ pip install -r scripts/experiments/requirements.txt
 scripts/setup.sh
 ```
 
-Crea el clúster de minikube y descarga todas las imágenes (Prometheus, Traefik, DynamoDB Local, k6, Node.js). Tiene que terminar con `Environment ready`. La última línea dice `Aegis calibration - not calibrated yet`: es lo esperado en una máquina nueva. Si el PC tiene más recursos, dale más a minikube: `MINIKUBE_CPUS=4 MINIKUBE_MEMORY=6g scripts/setup.sh` (solo la primera vez, cuando se crea el clúster).
+Tiene que terminar con `Environment ready`; `Aegis calibration - not calibrated yet` es lo esperado en una máquina nueva. Más recursos para minikube (solo la primera vez): `MINIKUBE_CPUS=4 MINIKUBE_MEMORY=6g scripts/setup.sh`.
 
 ### 1.4 Calibrar (~17 min, una vez por máquina)
 
-C y T dependen de la máquina, así que se miden en esta. No puede correr nada más mientras tanto.
+No puede correr nada más mientras tanto.
 
 ```bash
 cd app
@@ -77,7 +72,7 @@ python3 -m aegis.calibrate
 cd ..
 ```
 
-Termina con `Saved in ConfigMap aegis-calibration: C=… req/s, T=… s`. Los perfiles de tráfico se hicieron para un C entre 20 y 30 req/s (en la máquina de desarrollo C = 24): con un C en ese rango, la demo 1 necesita 2–3 pods y la demo 2 va 1 → 2 → 1 → 3 → 1.
+Termina con `Saved in ConfigMap aegis-calibration: C=… req/s, T=… s`. Si dice `no degradation up to 80 req/s`, corre `scripts/setup.sh --pod-cpu 60m` y calibra de nuevo: los perfiles esperan un C entre 20 y 30 req/s.
 
 ### 1.5 Dejarlo en reposo
 
@@ -86,11 +81,11 @@ python3 scripts/check_env.py           # todas las líneas OK, y la calibración
 python3 scripts/experiments/reset.py   # 1 pod, sin tráfico
 ```
 
-Si después se apaga el PC, `scripts/setup.sh` recupera todo en pocos minutos y la calibración se conserva.
+Tras reiniciar, `scripts/setup.sh` recupera todo; la calibración se conserva.
 
 ## 2. Terminales
 
-Abre tres terminales en la raíz del repositorio y en cada una corre `source .venv/bin/activate`. No hace falta ningún túnel: Aegis llega a Prometheus a través de la API de Kubernetes.
+Tres terminales en la raíz del repositorio, cada una con `source .venv/bin/activate`.
 
 Justo antes de la demo, revisa que todo siga arriba (después de un reinicio, vuelve a levantar minikube):
 
@@ -121,7 +116,9 @@ demand=0.0 projected=0.0 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min
 | `ready` | pods Ready ahora |
 | `HOLD / SCALE_UP / SCALE_DOWN 1 -> 2` | la decisión y los pods pedidos antes y después |
 
-Las líneas con una decisión salen como `WARNING` para que se noten. No es un error.
+Las decisiones salen como `WARNING` para que se noten.
+
+**Navegador**: http://localhost:8080 muestra los mismos valores en vivo, con la fórmula del último ciclo y cada escalado ([dashboard.md](dashboard.md)). Si el clúster falla, `cd app && python3 -m aegis.replay --speed 3` reproduce una corrida grabada.
 
 **Terminal 2, pods y HPA**:
 
@@ -152,7 +149,7 @@ kubectl logs -f job/load-linear
 | 240 | T3 | resumen de k6: `http_req_failed` cerca de 1% o menos | Casi nadie notó la rampa |
 | ~285–330 | T1 | `SCALE_DOWN 3 -> 2`, luego `2 -> 1` | Un pod menos a la vez, cada uno tras 60 s de riesgo bajo |
 
-Cuando termine (Ctrl+C en la terminal 3 para dejar de seguir el log; el Job guarda su pod 10 min para que los experimentos copien los resultados, es normal):
+Cuando termine (Ctrl+C en la terminal 3; el Job guarda su pod 10 min, es normal):
 
 ```bash
 python3 scripts/experiments/reset.py
@@ -188,7 +185,7 @@ python3 scripts/experiments/reset.py
 
 ## 5. El HPA solo (mostrar las gráficas, no en vivo)
 
-Correr el HPA normal en vivo tarda unos 10 minutos y su bajada otros 5. Mejor muestra `docs/tests/test3-hpa-baseline/`: la misma rampa de la demo 1, donde el HPA pide el segundo pod recién cuando la CPU ya está alta, después de que se rompió la latencia.
+En vivo tarda ~15 minutos. Mejor muestra `docs/tests/test3-hpa-baseline/`, o la pestaña *Experimentos* del dashboard con las pruebas 1 y 3 lado a lado.
 
 Para correrlo en vivo de todas formas: detén Aegis (Ctrl+C en la terminal 1) y luego
 
@@ -205,7 +202,7 @@ y al final `python3 scripts/experiments/reset.py` (vuelve a poner el HPA de Aegi
 |---|---|
 | `permission denied ... docker.sock` | El usuario todavía no está en el grupo `docker`: `sudo usermod -aG docker $USER`, luego cierra sesión y vuelve a entrar |
 | `pip install` dice `externally-managed-environment` | El entorno virtual no está activo: `source .venv/bin/activate` |
-| `ModuleNotFoundError: No module named 'scipy'` (o `kubernetes`, `yaml`) | Lo mismo: activa `.venv` en esa terminal |
+| `ModuleNotFoundError: No module named 'kubernetes'` (o `yaml`) | Lo mismo: activa `.venv` en esa terminal |
 | `minikube start` falla por memoria | Dale menos: `MINIKUBE_MEMORY=3g scripts/setup.sh`, o cierra otros programas |
 | `setup.sh` se detiene por tiempo mientras descarga imágenes | Internet lento: corre `scripts/setup.sh` otra vez, sigue donde quedó |
 | Aegis dice `No calibration found` | `cd app && python3 -m aegis.calibrate` |
@@ -213,5 +210,3 @@ y al final `python3 scripts/experiments/reset.py` (vuelve a poner el HPA de Aegi
 | `kubectl apply` dice que el Job es inmutable | Quedó un Job anterior: `python3 scripts/experiments/reset.py` |
 | `/api/books` devuelve 500 | `scripts/setup.sh` (vuelve a llenar la tabla) |
 | Aegis arranca con más de 1 pod | Detenlo, `python3 scripts/experiments/reset.py`, arráncalo otra vez |
-
-Para ver las mismas demos como gráficas, cada corrida de las pruebas está en `docs/tests/` (`run-N.png` y `all-runs.png`).

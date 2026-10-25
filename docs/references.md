@@ -55,3 +55,5 @@ https://otexts.com/fpp3/
 [19] H. Markowitz, *Portfolio Selection: Efficient Diversification of Investments*, Wiley, 1959.
 
 [20] E. A. Silver, D. F. Pyke, and R. Peterson, *Inventory Management and Production Planning and Scheduling*, 3rd ed., Wiley, 1998.
+
+[21] E. S. Gardner Jr. and E. McKenzie, "Forecasting Trends in Time Series," *Management Science*, vol. 31, no. 10, pp. 1237–1246, 1985.
