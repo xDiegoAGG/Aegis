@@ -21,7 +21,7 @@ In the cluster: `kubectl port-forward -n aegis-system svc/aegis 8080`. `--port` 
 
 When replaying, a selector at the top switches between the saved Aegis runs (HPA-only runs have no Aegis log to replay) and says what traffic that test has; it calls `POST /api/replay {"test": ..., "run": N}`. `?lang=es` or `?lang=en` picks the language; `#how` opens the technical section.
 
-**Experiments tab:** up to 3 saved runs on one axis, a summary table, their charts, and the calibration curves.
+**Experiments tab:** buttons for the main comparisons (ramp and spike, Aegis against the HPA alone, median runs), runs grouped by test, up to 3 on one axis with a plain-language summary table, their charts, and the calibration curves.
 
 | Endpoint | Content |
 |---|---|

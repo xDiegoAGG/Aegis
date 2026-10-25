@@ -17,6 +17,9 @@ const TEXT = {
     vsNote: "Resultados finales de cada corrida, medidos por k6 desde el cliente. Solo HPA: {n} corridas, fallos entre {min} y {max} %. En «Últimos minutos», la línea gris es la capacidad que tuvo el HPA solo en el mismo momento de la carga.",
     vsMissing: "Esta carga no se probó con el HPA solo. Elige la prueba 1 (rampa) o la 4 (pico) para ver la comparación.",
     lHpa: "capacidad del HPA solo",
+    presetsTitle: "Comparaciones principales", presetLabel: "{profile}: Aegis contra HPA solo",
+    pickTitle: "O elige hasta 3 corridas", testGroup: "Prueba {n}: {mode}, {profile}", runNumber: "corrida {n}",
+    mAsk: "Pide el 2º pod", mSlow: "Segundos con el servicio lento", mCost: "Costo (pods-minuto)", mChangeAt: "{from}→{to} a los {s} s",
     profiles: { linear: "rampa", fluctuating: "olas", spike: "pico", "ramp-045": "rampa rápida", "ramp-050": "rampa más rápida" },
     replayPick: "Corrida grabada que se reproduce", replayNote: "Prueba {n}: {desc}", replayError: "No se pudo cambiar la corrida: {e}",
     test1: "una rampa de 5 a 46 req/s en 2 minutos, 1 minuto arriba y bajada.",
@@ -64,16 +67,15 @@ const TEXT = {
     modeMin: "escribe minReplicas", modeMetric: "publica una métrica",
     colTime: "hora", colAction: "pods", colReason: "motivo",
     experimentsTitle: "Corridas grabadas",
-    runHint: "Marca hasta 3 para verlas sobre el mismo eje, en segundos desde que empezó la carga.",
+    runHint: "Las corridas se dibujan sobre el mismo eje: segundos desde que empezó la carga.",
     noTestsTitle: "No hay corridas grabadas",
     noTestsBody: "Se leen de docs/tests: arranca Aegis o el replay desde el repositorio.",
     calibrationTitle: "Calibración: cuánto aguanta un pod y cuánto tarda en arrancar",
     eTraffic: "Carga planificada (punteada) y demanda medida", ePods: "Pods pedidos (sólido) y listos (punteado)",
     eLatency: "P95 que vio el cliente", eFailed: "Peticiones fallidas", eRisk: "Probabilidad de no alcanzar, según Aegis",
     secondsAxis: "s desde el inicio", crossesC: "supera C",
-    mFailed: "Peticiones fallidas", mDegraded: "Segundos degradado", mP95: "P95 del cliente",
-    mCrosses: "El tráfico supera C", mFirstUp: "Primer pod pedido", mReady: "2º pod listo", mLead: "Adelanto (C − listo)",
-    mMaxPods: "Pods máximos", mPodMinutes: "Pods-minuto", mRequests: "Peticiones", mScale: "Cambios de pods",
+    mFailed: "Peticiones fallidas", mReady: "2º pod listo",
+    mMaxPods: "Pods máximos", mScale: "Cambios de pods",
     runName: "Prueba {n}, {mode}, {profile}, corrida {run}", runShort: "Prueba {n}, corrida {run}",
     calText: "C = {c} req/s (corridas: {runs}). T = {t} s (pods listos en {ready} s). Medido el {at}.",
     calP95: "P95 máximo por escalón, 1 pod", calServed: "Atendidas frente a enviadas, 1 pod",
@@ -92,6 +94,9 @@ const TEXT = {
     vsNote: "Final results of each run, measured by k6 on the client. HPA alone: {n} runs, failures between {min} and {max} %. In “Last minutes”, the grey line is the capacity the HPA alone had at the same moment of the load.",
     vsMissing: "This load was not run with the HPA alone. Pick test 1 (ramp) or test 4 (spike) to see the comparison.",
     lHpa: "HPA alone capacity",
+    presetsTitle: "Main comparisons", presetLabel: "{profile}: Aegis against the HPA alone",
+    pickTitle: "Or pick up to 3 runs", testGroup: "Test {n}: {mode}, {profile}", runNumber: "run {n}",
+    mAsk: "Asks for the 2nd pod", mSlow: "Seconds with the service slow", mCost: "Cost (pod-minutes)", mChangeAt: "{from}→{to} at {s} s",
     profiles: { linear: "ramp", fluctuating: "waves", spike: "spike", "ramp-045": "faster ramp", "ramp-050": "fastest ramp" },
     replayPick: "Recorded run being replayed", replayNote: "Test {n}: {desc}", replayError: "Could not switch the run: {e}",
     test1: "a ramp from 5 to 46 req/s in 2 minutes, 1 minute at the top, then down.",
@@ -139,16 +144,16 @@ const TEXT = {
     modeMin: "writes minReplicas", modeMetric: "publishes a metric",
     colTime: "time", colAction: "pods", colReason: "reason",
     experimentsTitle: "Recorded runs",
-    runHint: "Tick up to 3 to see them on one axis, in seconds since the load started.",
+    runHint: "Runs are drawn on one axis: seconds since the load started.",
     noTestsTitle: "No recorded runs",
     noTestsBody: "They are read from docs/tests: start Aegis or the replay from the repository.",
     calibrationTitle: "Calibration: how much one pod serves and how long it takes to start",
     eTraffic: "Planned load (dotted) and measured demand", ePods: "Pods requested (solid) and ready (dotted)",
     eLatency: "P95 seen by the client", eFailed: "Failed requests", eRisk: "Chance of falling short, per Aegis",
     secondsAxis: "s since the start", crossesC: "passes C",
-    mFailed: "Failed requests", mDegraded: "Seconds degraded", mP95: "Client P95",
-    mCrosses: "Traffic passes C", mFirstUp: "First pod requested", mReady: "2nd pod Ready", mLead: "Lead (C − Ready)",
-    mMaxPods: "Max pods", mPodMinutes: "Pod-minutes", mRequests: "Requests", mScale: "Pod changes",
+    mFailed: "Failed requests",
+    mReady: "2nd pod Ready",
+    mMaxPods: "Max pods", mScale: "Pod changes",
     runName: "Test {n}, {mode}, {profile}, run {run}", runShort: "Test {n}, run {run}",
     calText: "C = {c} req/s (runs: {runs}). T = {t} s (pods Ready in {ready} s). Measured {at}.",
     calP95: "Highest P95 per step, 1 pod", calServed: "Served vs sent, 1 pod",
@@ -699,42 +704,75 @@ async function loadExperiments() {
   for (const test of experiments.catalog.tests) {
     for (const summary of test.runs) experiments.runs.push({ id: runId(test.name, summary.run), test: test.name, summary });
   }
-  experiments.runs.forEach((entry, index) => { entry.color = RUN_COLORS[index % RUN_COLORS.length]; });
   document.getElementById("empty-experiments").hidden = experiments.runs.length > 0;
-  // The median runs of the main comparison: test 1 run 4 (Aegis) and test 3 run 1 (HPA only).
-  const preferred = experiments.runs.filter((e) => (/^test1-/.test(e.test) && e.summary.run === 4)
-    || (/^test3-/.test(e.test) && e.summary.run === 1)).map((e) => e.id);
-  experiments.selected = preferred.length ? preferred : experiments.runs.slice(0, 2).map((e) => e.id);
+  experiments.presets = buildPresets();
+  experiments.selected = experiments.presets.length ? experiments.presets[0].ids.slice() : experiments.runs.slice(0, 2).map((e) => e.id);
   buildRunPicker();
   buildExperimentCharts();
   renderCalibration();
   await renderExperiments();
 }
 
+// For every load run both with Aegis and with the HPA alone: the median run of each (by failed requests).
+function buildPresets() {
+  const median = (runs) => runs.slice().sort((a, b) => a.summary.failed_percent - b.summary.failed_percent)[Math.floor((runs.length - 1) / 2)];
+  const presets = [];
+  for (const profile of [...new Set(experiments.runs.map((e) => e.summary.profile))]) {
+    const aegis = experiments.runs.filter((e) => e.summary.profile === profile && e.summary.mode === "aegis");
+    const hpa = experiments.runs.filter((e) => e.summary.profile === profile && e.summary.mode === "hpa");
+    if (aegis.length && hpa.length) presets.push({ profile, ids: [median(aegis).id, median(hpa).id] });
+  }
+  return presets;
+}
+
+function selectRuns(ids) {
+  experiments.selected = ids.slice(0, MAX_RUNS);
+  for (const box of document.querySelectorAll("#run-picker input")) box.checked = experiments.selected.includes(box.dataset.id);
+  renderExperiments();
+}
+
 function buildRunPicker() {
   const picker = document.getElementById("run-picker");
   picker.replaceChildren();
-  for (const entry of experiments.runs) {
-    const label = el("label", "run", picker);
-    const input = el("input", "", label);
-    input.type = "checkbox";
-    input.checked = experiments.selected.includes(entry.id);
-    input.addEventListener("change", () => {
-      if (input.checked) {
-        experiments.selected.push(entry.id);
-        if (experiments.selected.length > MAX_RUNS) {
-          const dropped = experiments.selected.shift();
-          for (const box of picker.querySelectorAll("input")) if (box.dataset.id === dropped) box.checked = false;
+  if (experiments.presets.length) {
+    el("h2", "", picker, t("presetsTitle"));
+    const row = el("div", "presets", picker);
+    for (const preset of experiments.presets) {
+      const name = TEXT[lang].profiles[preset.profile] || preset.profile;
+      const button = el("button", "preset", row, t("presetLabel", { profile: name.charAt(0).toUpperCase() + name.slice(1) }));
+      button.type = "button";
+      button.addEventListener("click", () => selectRuns(preset.ids));
+    }
+  }
+  el("h2", "", picker, t("pickTitle"));
+  const tests = [...new Set(experiments.runs.map((e) => e.test))];
+  for (const test of tests) {
+    const runs = experiments.runs.filter((e) => e.test === test);
+    const group = el("fieldset", "run-group", picker);
+    const first = runs[0];
+    const match = test.match(/^test(\d+)-/);
+    const mode = { hpa: "HPA", metric: "Aegis (metric)" }[first.summary.mode] || "Aegis";
+    el("legend", "", group, t("testGroup", { n: match ? match[1] : test, mode,
+      profile: TEXT[lang].profiles[first.summary.profile] || first.summary.profile }));
+    for (const entry of runs) {
+      const label = el("label", "run-box", group);
+      label.title = t("runNumber", { n: entry.summary.run });
+      const input = el("input", "", label);
+      input.type = "checkbox";
+      input.dataset.id = entry.id;
+      input.checked = experiments.selected.includes(entry.id);
+      input.setAttribute("aria-label", runLabel(entry));
+      input.addEventListener("change", () => {
+        if (input.checked) {
+          experiments.selected.push(entry.id);
+          if (experiments.selected.length > MAX_RUNS) experiments.selected.shift();
+        } else {
+          experiments.selected = experiments.selected.filter((id) => id !== entry.id);
         }
-      } else {
-        experiments.selected = experiments.selected.filter((id) => id !== entry.id);
-      }
-      renderExperiments();
-    });
-    input.dataset.id = entry.id;
-    const swatch = el("span", "swatch", label);
-    swatch.style.background = entry.color;
-    el("span", "", label, runLabel(entry));
+        selectRuns(experiments.selected);
+      });
+      el("span", "", label, String(entry.summary.run));
+    }
   }
 }
 
@@ -761,7 +799,12 @@ async function fetchRun(id) {
 }
 
 async function renderExperiments() {
-  const entries = experiments.runs.filter((e) => experiments.selected.includes(e.id));
+  const entries = experiments.selected.map((id) => experiments.runs.find((e) => e.id === id)).filter(Boolean);
+  entries.forEach((entry, i) => { entry.color = RUN_COLORS[i % RUN_COLORS.length]; });
+  for (const box of document.querySelectorAll("#run-picker input")) {
+    const entry = entries.find((e) => e.id === box.dataset.id);
+    box.parentElement.style.setProperty("--run-color", entry ? entry.color : "transparent");
+  }
   const data = await Promise.all(entries.map((e) => fetchRun(e.id)));
   renderSummary(entries);
   // One x axis (seconds since k6 started), aligned to the nearest 5 s.
@@ -820,20 +863,27 @@ function renderSummary(entries) {
     th.appendChild(document.createTextNode(runLabel(entry)));
   }
   const seconds = (v) => (v === null || v === undefined ? "–" : num(v, 0) + " s");
-  // lower: a smaller value is better and gets highlighted when runs are compared.
   const rows = [
-    [t("mFailed"), "failed_percent", (v) => num(v, 2) + "%", "lower"],
-    [t("mDegraded"), "degraded_seconds", seconds, "lower"],
-    [t("mP95"), "client_p95_s", (v) => num(v, 2) + " s", "lower"],
-    [t("mCrosses"), "crosses_c_s", seconds, null],
-    [t("mFirstUp"), "first_scale_up_s", seconds, "lower"],
+    [t("mFailed"), "failed_percent", (v) => num(v, 1) + " %", "lower"],
+    [t("mSlow"), "degraded_seconds", seconds, "lower"],
     [t("mReady"), "second_pod_ready_s", seconds, "lower"],
-    [t("mLead"), "lead_s", (v) => (v === null ? "–" : signed(v, 0) + " s"), "higher"],
     [t("mMaxPods"), "max_pods", (v) => String(v), null],
-    [t("mPodMinutes"), "pod_minutes", (v) => num(v, 1), "lower"],
-    [t("mRequests"), "requests", (v) => String(v), null],
+    [t("mCost"), "pod_minutes", (v) => num(v, 1), "lower"],
   ];
   const body = el("tbody", "", table);
+  const askRow = el("tr", "", body);
+  el("td", "", askRow, t("mAsk"));
+  const asks = entries.map((e) => e.summary.first_scale_up_s);
+  const firstAsk = Math.min(...asks.filter((v) => v !== null && v !== undefined));
+  for (const entry of entries) {
+    const s = entry.summary;
+    let text = t("vsNever");
+    if (s.first_scale_up_s !== null && s.first_scale_up_s !== undefined) {
+      const delta = s.crosses_c_s - s.first_scale_up_s;
+      text = t(delta >= 0 ? "vsBefore" : "vsAfter", { s: num(s.first_scale_up_s, 0), d: num(Math.abs(delta), 0) });
+    }
+    el("td", entries.length > 1 && s.first_scale_up_s === firstAsk ? "best" : "", askRow, text);
+  }
   for (const [label, key, format, better] of rows) {
     const row = el("tr", "", body);
     el("td", "", row, label);
@@ -841,16 +891,13 @@ function renderSummary(entries) {
     const valid = values.filter((v) => v !== null && v !== undefined);
     let best = null;
     if (better && entries.length > 1 && valid.length > 1) best = better === "lower" ? Math.min(...valid) : Math.max(...valid);
-    for (const value of values) {
-      const cell = el("td", value !== null && value === best ? "best" : "", row, value === null || value === undefined ? "–" : format(value));
-      if (value !== null && value === best) cell.title = "✓";
-    }
+    for (const value of values) el("td", value !== null && value === best ? "best" : "", row, value === null || value === undefined ? "–" : format(value));
   }
   const row = el("tr", "", body);
   el("td", "", row, t("mScale"));
   for (const entry of entries) {
     const changes = entry.summary.scale_ups.concat(entry.summary.scale_downs).sort((a, b) => a.s - b.s)
-      .map((c) => c.from + "→" + c.to + " @" + Math.round(c.s) + "s");
+      .map((c) => t("mChangeAt", { from: c.from, to: c.to, s: Math.round(c.s) }));
     el("td", "", row).appendChild(el("small", "", null, changes.join(", ") || "–"));
   }
 }
