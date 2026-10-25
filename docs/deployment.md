@@ -93,7 +93,7 @@ kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1/namespaces/default/deploym
 
 `aegis-metric.yaml` uses an `Object` metric with `averageValue: 1`, so `desired = ceil(aegis_target_replicas)`; CPU 95% stays as a safety net. Scale-up: no window, up to 2 pods per 15 s. Scale-down: 30 s window, 1 pod per 30 s, so one stale sample never removes a pod. To scale in faster, lower `risk_thresholds.scale_down_sustained_seconds` instead of the HPA window.
 
-The metric path (scrape, adapter, HPA sync) delayed decisions by 8–72 s in test 8, which cost the lead time ([limitations.md](limitations.md#3-metric-mode)).
+The metric path (scrape, adapter, HPA sync) delayed each decision by 3–12 s in test 8 (9.5 s on average), enough to lose the lead time ([limitations.md](limitations.md#3-metric-mode)).
 
 ## Recording rules
 

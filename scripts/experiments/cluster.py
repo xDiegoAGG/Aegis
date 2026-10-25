@@ -175,27 +175,6 @@ def reset(mode):
     say("reset done:", mode, "HPA, 1 pod, no traffic")
 
 
-# Replica changes the HPA made since a moment, from its SuccessfulRescale events.
-def hpa_scale_changes(since):
-    events = json.loads(kubectl(["get", "events", "--field-selector", "reason=SuccessfulRescale", "-o", "json"]))
-    found = []
-    for event in events["items"]:
-        stamp = event.get("lastTimestamp") or event.get("eventTime")
-        size = re.search(r"New size: (\d+)", event.get("message", ""))
-        if not stamp or size is None:
-            continue
-        moment = datetime.datetime.fromisoformat(stamp.replace("Z", "+00:00")).timestamp()
-        if moment >= since:
-            found.append((moment, int(size.group(1))))
-    found.sort()
-    changes = []
-    previous = 1
-    for moment, size in found:
-        changes.append({"time": moment, "from": previous, "to": size})
-        previous = size
-    return changes
-
-
 # Creation and first Ready time of every catalog-service pod seen in the window.
 def pod_times(start, end):
     params = {"start": start, "end": end, "step": STEP, "query": QUERY_POD_CREATED}
@@ -214,11 +193,30 @@ def pod_times(start, end):
     return pods
 
 
+# Latest moment of an event; repeated events are grouped and keep their last time in series.lastObservedTime.
 def event_time(event):
-    stamp = event.get("lastTimestamp") or event.get("eventTime") or event.get("firstTimestamp")
-    if not stamp:
-        return None
-    return datetime.datetime.fromisoformat(stamp.replace("Z", "+00:00")).timestamp()
+    stamps = [event.get("lastTimestamp"), event.get("eventTime"), (event.get("series") or {}).get("lastObservedTime"),
+              event.get("firstTimestamp")]
+    moments = [datetime.datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp() for s in stamps if s]
+    return max(moments) if moments else None
+
+
+# HPA replica changes from the pods themselves: a new pod is a scale-up, a Killing event a scale-down.
+# Not from SuccessfulRescale events: Kubernetes groups identical ones, and a rescale can go missing.
+def replica_changes(pods, events, since):
+    moments = [(pod["created"], 1) for pod in pods.values() if pod["created"] >= since]
+    moments += [(e["time"], -1) for e in events if e["reason"] == "Killing" and e["kind"] == "Pod"
+                and e["name"].startswith("catalog-service-") and e["time"] >= since]
+    changes = []
+    replicas = 1
+    for moment, step in sorted(moments):
+        last = changes[-1] if changes else None
+        if last and step == 1 and last["to"] > last["from"] and moment - last["time"] < 3:
+            last["to"] += 1
+        else:
+            changes.append({"time": moment, "from": replicas, "to": replicas + step})
+        replicas += step
+    return changes
 
 
 # Kubernetes events of the namespace since a moment.

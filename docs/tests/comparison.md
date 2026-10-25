@@ -56,8 +56,8 @@ Aegis runs. Ahead = seconds from requesting the 2nd pod to the traffic passing C
 |---|---|---|
 | Failed requests (%) | 2.5 (0.48 – 4.69) | 20.19 (18.36 – 21.34) |
 | Seconds degraded | 100 (70 – 120) | 160 (150 – 165) |
-| First pod requested by the HPA (s) | 73.9 (73.5 – 74.5) | 105.7 (86.0 – 144.0) |
+| First pod requested by the HPA (s) | 73.9 (73.5 – 74.5) | 85.7 (84.0 – 87.0) |
 | Second pod Ready (s) | 84.0 (83.0 – 85.0) | 162.7 (161.0 – 165.0) |
-| Pod-minutes | 8.53 (8.5 – 8.58) | 6.77 (6.55 – 7.2) |
+| Pod-minutes | 8.53 (8.5 – 8.58) | 8.14 (8.1 – 8.2) |
 
-Aegis decision → HPA rescale: 25.7 (8.3 – 72.0) s over 4 scale-ups.
+Aegis decision → HPA rescale: 9.5 (3.3 – 12.0) s over 6 scale-ups.

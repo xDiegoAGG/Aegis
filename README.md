@@ -77,7 +77,7 @@ Campaign of 2026-10-25, 32 runs, C = 22 req/s, T = 15 s ([all the numbers](docs/
 | [Test 5: same spike, HPA only](docs/tests/test5-spike-hpa/) | 5 | reacts in 67–112 s; 54.8% failed |
 | [Test 2: two waves](docs/tests/test2-fluctuating/), Aegis | 3 | 1 → 2 → 1 → 2 → 3 → 2 → 1 every run, 0.64% failed |
 | [Tests 6 and 7: faster ramps](docs/tests/test6-ramp-045/) (0.41 and 0.46 req/s per s), Aegis | 3 + 3 | the request reaches the crossing itself; 1–2% failed |
-| [Test 8: metric mode](docs/tests/test8-metric-mode/) (HPA reads Aegis through the Custom Metrics API) | 3 | works, but 8–72 s later; 20.2% failed |
+| [Test 8: metric mode](docs/tests/test8-metric-mode/) (HPA reads Aegis through the Custom Metrics API) | 3 | works, but each decision arrives ~10 s later and the pod starts under overload; 20.2% failed |
 
 Every run also saves a timeline (`run-N-timeline.csv`) with the load, the Aegis decisions, the Kubernetes events and the pod transitions on one clock. Comparison: [docs/tests/comparison.md](docs/tests/comparison.md).
 

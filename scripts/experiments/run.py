@@ -4,8 +4,8 @@ import json
 import shutil
 import time
 from aegis_process import aegis_scale_changes, read_ndjson, start_aegis, stop_aegis
-from cluster import (cluster_aegis_records, events_since, hpa_scale_changes, kubectl, pod_times, range_values,
-                     read_calibration, reset, say, start_cluster_aegis, stop_cluster_aegis)
+from cluster import (cluster_aegis_records, events_since, kubectl, pod_times, range_values, read_calibration,
+                     replica_changes, reset, say, start_cluster_aegis, stop_cluster_aegis)
 from load import client_buckets, percentile, planned_rate, read_profile, start_load, total_duration, wait_k6
 from metrics import requested_at, summarize, utc
 from pathlib import Path
@@ -58,7 +58,7 @@ def write_run_csv(path, profile, k6_start, buckets, records, changes, window_sta
                 blank(record.get("risk"), None), blank(record.get("target"), None)])
 
 
-# Seconds from each Aegis scale-up to the HPA rescale it caused (metric mode: scrape + adapter + HPA sync).
+# Seconds from each Aegis scale-up to the pod the HPA created for it (metric mode: scrape + adapter + HPA sync).
 def metric_path_delays(records, changes):
     delays = []
     for record in records:
@@ -110,19 +110,20 @@ def run_once(folder, profile, mode, run_number, calibration):
     if mode == "metric":
         records = [r for r in cluster_records if r["time"] >= window_start]
         ndjson.write_text("".join(json.dumps(r) + "\n" for r in records))
+    pods = pod_times(window_start, window_end)
+    events = events_since(window_start)
     if mode == "aegis":
         changes = aegis_scale_changes(records)
     else:
-        changes = hpa_scale_changes(window_start)
+        changes = replica_changes(pods, events, window_start)
     write_run_csv(prefix + ".csv", profile, k6_start, buckets, records, changes, window_start, window_end)
-    pods = pod_times(window_start, window_end)
     summary = summarize(run_number, profile, mode, k6_start, buckets, logs, changes, calibration, pods, window_end)
     summary["calibration_measured_at"] = calibration["measured_at"]
     summary["load_scale"] = profile["scale"]
     if mode == "metric":
         summary["metric_path_delays_s"] = metric_path_delays(records, changes)
     Path(prefix + "-summary.json").write_text(json.dumps(summary, indent=2))
-    write_timeline(prefix + "-timeline.csv", profile, k6_start, records, events_since(window_start), pods, summary)
+    write_timeline(prefix + "-timeline.csv", profile, k6_start, records, events, pods, summary)
     say("run", run_number, "done: failed", summary["failed_percent"], "%, degraded", summary["degraded_seconds"],
         "s, 2nd pod Ready at", summary["second_pod_ready_s"], "s, traffic over C at", summary["crosses_c_s"], "s")
 
