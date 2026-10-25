@@ -1,5 +1,4 @@
-# HPA used with Aegis: Aegis decides through minReplicas. CPU at 95% is never reached (limit = request),
-# and there is no scale-down window because Aegis already waits 60 s of low risk.
+# Aegis decides through minReplicas; CPU 95% is never reached. No scale-down window: Aegis waits 60 s.
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
