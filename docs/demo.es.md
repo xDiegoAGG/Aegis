@@ -72,7 +72,7 @@ python3 -m aegis.calibrate
 cd ..
 ```
 
-Termina con `Saved in ConfigMap aegis-calibration: C=… req/s, T=… s`. Si dice `no degradation up to 80 req/s`, corre `scripts/setup.sh --pod-cpu 60m` y calibra de nuevo: los perfiles esperan un C entre 20 y 30 req/s.
+Termina con `Saved in ConfigMap aegis-calibration: C=… req/s, T=… s`. Los perfiles de tráfico esperan un C entre 20 y 30 req/s, y los tiempos de abajo son para C ≈ 24. Si C queda fuera de ese rango (o dice `no degradation up to 80 req/s`), cambia el CPU del pod con CPU nuevo ≈ CPU probado × (C buscado ÷ C medido), por ejemplo `scripts/setup.sh --pod-cpu 60m`, y calibra de nuevo. Un clúster nuevo arranca con 200m; este PC usa 200m (C = 24).
 
 ### 1.5 Dejarlo en reposo
 
@@ -100,6 +100,8 @@ python3 scripts/experiments/reset.py
 cd app
 python3 -m aegis.actuator
 ```
+
+Usa el modo `min_replicas`, que es el de siempre: Aegis sube `minReplicas` del HPA. El modo métrica es solo un experimento (prueba 8) y no se usa en la demo.
 
 Debes ver `Calibration from …: C=… req/s, T=… s` y después una línea cada 5 s:
 
@@ -146,7 +148,7 @@ kubectl logs -f job/load-linear
 | ~65–75 | T1 | `SCALE_UP 1 -> 2` con riesgo ≥ 70% | El tráfico todavía está bajo C; la proyección no |
 | ~80–90 | T2 | un segundo pod pasa de `0/1` a `1/1` | El pod nuevo está Ready cerca del segundo 81, cuando el tráfico pasa C |
 | ~110–150 | T1 | `SCALE_UP 2 -> 3` | Cerca de 50 req/s dos pods (2C ≈ 48) no alcanzan: pide un tercero |
-| 240 | T3 | resumen de k6: `http_req_failed` cerca de 1% o menos | Casi nadie notó la rampa |
+| 240 | T3 | resumen de k6: `http_req_failed` de unos pocos % como mucho (2.5% en promedio en la prueba 1) | Con el HPA solo, la misma rampa falla ~37% (prueba 3) |
 | ~285–330 | T1 | `SCALE_DOWN 3 -> 2`, luego `2 -> 1` | Un pod menos a la vez, cada uno tras 60 s de riesgo bajo |
 
 Cuando termine (Ctrl+C en la terminal 3; el Job guarda su pod 10 min, es normal):
@@ -159,7 +161,7 @@ Deja Aegis corriendo en la terminal 1.
 
 ## 4. Demo 2: tráfico fluctuante
 
-Dos olas: hasta 40 req/s (necesita 2 pods), 2 minutos en 8 req/s, hasta 55 req/s (necesita 3 pods, 2C ≈ 48), 2 minutos en 8 req/s.
+Dos olas que suben como la rampa, 560 s en total: 30 s en 5 req/s, una ola hasta 30 req/s (necesita 2 pods), 105 s en 5 req/s, una ola hasta 50 req/s (necesita 3 pods, 2C ≈ 48), 120 s en 5 req/s. Tiempos de la prueba 2.
 
 En la terminal 3:
 
@@ -170,12 +172,13 @@ kubectl logs -f job/load-fluctuating
 
 | Cuándo (s) | Qué ves | Qué decir |
 |---|---|---|
-| 30–90 | `SCALE_UP 1 -> 2` en la primera subida, quizás `2 -> 3` al final | Igual que en la demo 1 |
-| 90–135 | tráfico plano en 40 | Si pidió un 3er pod, ahora el riesgo con uno menos es bajo |
-| 150–230 | `SCALE_DOWN` hasta 1 pod mientras el tráfico está en 8 | **Aegis devuelve los pods** cuando no hacen falta, tras 60 s de riesgo bajo |
-| 255–300 | `SCALE_UP` otra vez, hasta 3 pods | La segunda ola es más alta que 2C: pide el tercer pod |
-| 345–480 | `SCALE_DOWN 3 -> 2`, luego `2 -> 1` | Vuelve a 1 pod, de a un paso |
-| 480 | resumen de k6 | Pocas o ninguna petición fallida |
+| ~75 | `SCALE_UP 1 -> 2` en la primera subida | Igual que en la demo 1: antes de que la ola pase C (~79 s) |
+| 95–140 | tráfico plano en 30, 2 pods | Dos pods alcanzan para esta ola |
+| ~215–220 | `SCALE_DOWN 2 -> 1` mientras el tráfico está en 5 | **Aegis devuelve el pod** cuando no hace falta, tras 60 s de riesgo bajo |
+| ~305 | `SCALE_UP 1 -> 2` en la segunda subida | Empieza la segunda ola: pide otra vez antes de C |
+| ~365 | `SCALE_UP 2 -> 3` | La segunda ola pasa 2C: pide el tercer pod |
+| ~500–570 | `SCALE_DOWN 3 -> 2`, luego `2 -> 1` | Vuelve a 1 pod, de a un paso |
+| 560 | T3: resumen de k6 | Menos de 1% de fallidas (0.32–0.97% en la prueba 2) |
 
 Cuando termine:
 
@@ -210,3 +213,4 @@ y al final `python3 scripts/experiments/reset.py` (vuelve a poner el HPA de Aegi
 | `kubectl apply` dice que el Job es inmutable | Quedó un Job anterior: `python3 scripts/experiments/reset.py` |
 | `/api/books` devuelve 500 | `scripts/setup.sh` (vuelve a llenar la tabla) |
 | Aegis arranca con más de 1 pod | Detenlo, `python3 scripts/experiments/reset.py`, arráncalo otra vez |
+| `Address already in use` (puerto 8080) | Sigue corriendo otro Aegis o un replay: `pkill -f aegis.replay` (o detén el otro Aegis), o arranca con `--port 8081` |
