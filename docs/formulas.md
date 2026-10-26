@@ -62,7 +62,7 @@ using the symmetry of the normal distribution. Φ is its cumulative distribution
 - The threshold has a meaning. Risk = 50% means p = C·N exactly. Risk ≥ 70% means p ≥ C·N + 0.52σ: the projection is over capacity with margin.
 - The same formula works for any number of pods: the decision engine asks for the risk with the pods already requested (scale up) and with one less (scale down).
 
-Example with C = 26 req/s, 1 pod, σ = 3: a projection of 26 gives 50%; 27.6 gives 70% (Aegis asks for a pod); 20 gives 2%.
+Example with C = 24 req/s, 1 pod, σ = 3: a projection of 24 gives 50%; 25.6 gives 70% (Aegis asks for a pod); 18 gives 2%.
 
 ## 5. sigma: learned from the projection's own errors
 
