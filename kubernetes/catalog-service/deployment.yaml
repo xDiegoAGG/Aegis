@@ -20,6 +20,8 @@ spec:
           ports:
             - containerPort: 3003
             - containerPort: 50053
+            - containerPort: 3004
+              name: health
           env:
             - name: HTTP_PORT
               value: "3003"
@@ -42,10 +44,12 @@ spec:
             limits:
               cpu: "200m"
               memory: "256Mi"
+          # /ready is served by a worker thread (src/health.js), outside the request queue: a saturated
+          # pod stays Ready instead of missing 3 probes and dropping out while the Deployment scales.
           readinessProbe:
             httpGet:
-              path: /health
-              port: 3003
+              path: /ready
+              port: 3004
             initialDelaySeconds: 3
             periodSeconds: 3
             timeoutSeconds: 5
