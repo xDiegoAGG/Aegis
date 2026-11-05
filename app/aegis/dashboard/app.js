@@ -1,4 +1,4 @@
-import { ChartGroup, LineChart } from "./plot.js";
+import { ChartGroup, LineChart, niceStep } from "./plot.js";
 
 const POLL_MS = 2000;
 // Colors follow the actor, never the order of selection: Aegis blue, HPA alone orange (style.css).
@@ -19,9 +19,9 @@ const TEXT = {
     waitingTitle: "Esperando el primer ciclo de Aegis",
     waitingBody: "Este panel lo sirve Aegis. Arráncalo en vivo o reproduce una corrida grabada:",
     versusTitle: "Aegis frente a los HPA, con la misma carga",
-    versusLead: "Con esta misma carga ({n} corridas de cada uno), con el HPA solo fallaron de media <b>{hpa} %</b> de las peticiones; con Aegis, <b>{aegis} %</b>.",
-    versusLead3: "Con esta misma carga ({n} corridas de cada uno), fallaron de media: con Aegis <b>{aegis} %</b> de las peticiones, con el HPA por defecto <b>{hpa} %</b> y con el HPA afinado <b>{tuned} %</b>.",
-    vsPanelOwn: "{who} · {f} % fallidas", vsPanelMedian: "{who} · {f} % fallidas",
+    versusLead: "Con esta misma carga ({n} corridas de cada uno), con el HPA solo fallaron de media <b>{hpa}</b> de las peticiones; con Aegis, <b>{aegis}</b>.",
+    versusLead3: "Con esta misma carga ({n} corridas de cada uno), fallaron de media: con Aegis <b>{aegis}</b> de las peticiones, con el HPA por defecto <b>{hpa}</b> y con el HPA afinado <b>{tuned}</b>.",
+    vsPanelOwn: "{who} · {f} fallidas", vsPanelMedian: "{who} · {f} fallidas",
     replayDesign: "Campaña de bloques aleatorizados: {desc}",
     vsMeanOf: "Media de {n} corridas", vsAskAt: "Pide el 2º pod a los",
     vsNote3: "Los paneles muestran esta corrida de Aegis y la corrida mediana de cada HPA (por peticiones fallidas), con la misma escala. En rojo, el tráfico enviado por el % que falló en cada intervalo de 5 s. La tabla son medias de todas las corridas; en negrita, la mejor.",
@@ -53,9 +53,9 @@ const TEXT = {
     pod: "pod", pods: "pods", podN: "Pod {n}", serveOne: "aguanta", serveMany: "aguantan",
     tankLoad: "al {v} %", tankStarting: "aún no listo", tankOff: "apagado",
     tankOverflow: "{v} req/s sin atender",
-    tankKey: "El agua es el tráfico que recibe cada pod (Traefik lo reparte por igual). La línea punteada oscura es el nivel esperado en {h} s. Un pod punteado no está listo: está arrancando, o está tan saturado que no responde a su chequeo de salud.",
+    tankKey: "El agua es el tráfico que recibe cada pod (Traefik lo reparte por igual). La línea punteada es el nivel esperado en {h} s. Un pod punteado no está listo: está arrancando, o está tan saturado que no responde a su chequeo de salud.",
     historyTitle: "Últimos minutos", decisionsTitle: "Qué hizo Aegis",
-    lTraffic: "tráfico", lCapacity: "capacidad con Aegis", lForecast: "en {h} s",
+    lTraffic: "tráfico", lCapacity: "capacidad con Aegis", lForecast: "en {h} s", lProjection: "proyección (zona sombreada: el horizonte)",
     upEvent: "Pidió el pod {n}", downEvent: "Apagó el pod {n}", downEventMany: "Apagó los pods {from} a {to}",
     upWhy: "En {h} s esperaba {p} req/s y {n} {podsWord} {serveVerb} {cap}. Probabilidad de no alcanzar: {risk}.",
     downWhy: "El tráfico bajó: con {n} {podsWord} la probabilidad de no alcanzar se quedó bajo {down} el tiempo de espera ({wait}), así que sobraban.",
@@ -67,9 +67,9 @@ const TEXT = {
     fForecast: "tráfico esperado", fCapacity: "lo que aguantan los pods pedidos", fError: "cuánto se equivoca la proyección",
     fRisk: "probabilidad de no alcanzar", fRule: "Pide un pod si pasa de {up}. Apaga pods si, con menos pods, se queda bajo {down} el tiempo de espera ({wait}).",
     chartForecast: "Qué tan bien predice", chartForecastNote: "Cada proyección dibujada en el momento al que apuntaba, junto al tráfico que de verdad llegó.",
-    chartRisk: "Probabilidad de no alcanzar en 35 s", chartRiskNote: "Sobre la línea de 70 % Aegis pide un pod. La línea gris es la misma cuenta con un pod menos: si se queda bajo 30 % el tiempo de espera, apaga uno.",
+    chartRisk: "Probabilidad de no alcanzar en {h} s", chartRiskNote: "Sobre la línea de {up} Aegis pide un pod. La línea gris es la misma cuenta con un pod menos: si se queda bajo {down} el tiempo de espera, apaga uno.",
     chartPods: "Pods", chartPodsNote: "Los que pidió Aegis, los que ya están listos y lo que hace el HPA.",
-    chartLatency: "Lentitud (P95)", chartLatencyNote: "El 95 % de las peticiones tarda menos que esto. Sobre 1 s el servicio se considera lento.",
+    chartLatency: "Lentitud (P95)", chartLatencyNote: "El 95 % de las peticiones tarda menos que esto. Sobre {l} s el servicio se considera lento.",
     chartSigma: "Error de la proyección (σ)", chartSigmaNote: "Cuánto se ha equivocado últimamente hacia arriba. Más error, más cautela.",
     chartSlope: "Tendencia (m)", chartSlopeNote: "Cuántas req/s sube o baja el tráfico por segundo.",
     sDemand: "llegó", sProjected: "había proyectado", sRisk: "con los pods pedidos", sRiskLess: "con un pod menos",
@@ -96,6 +96,7 @@ const TEXT = {
     basisHolm: " (Holm)", basisRanks: " (Holm, por rangos)", basisExploratory: " (exploratoria)",
     vsDefault: "frente al HPA por defecto", vsTuned: "frente al HPA afinado",
     blockLabel: "Bloque {b}",
+    tableView: "Ver como tabla", tLoad: "Carga", tActor: "Autoscaler", tMean: "Media", tRange: "Mín – máx", tRuns: "Corridas",
     octoberTitle: "Campaña preliminar de octubre de 2026 (un factor a la vez, sin aleatorizar)",
     runHint: "Las corridas se dibujan sobre el mismo eje: segundos desde que empezó la carga.",
     noTestsTitle: "No hay corridas grabadas",
@@ -118,9 +119,9 @@ const TEXT = {
     waitingTitle: "Waiting for the first Aegis cycle",
     waitingBody: "Aegis serves this page. Start it live or replay a recorded run:",
     versusTitle: "Aegis against the HPAs, same load",
-    versusLead: "With this same load ({n} runs each), the HPA alone let <b>{hpa} %</b> of requests fail on average; Aegis, <b>{aegis} %</b>.",
-    versusLead3: "With this same load ({n} runs each), failed requests on average: <b>{aegis} %</b> with Aegis, <b>{hpa} %</b> with the default HPA and <b>{tuned} %</b> with the tuned HPA.",
-    vsPanelOwn: "{who} · {f} % failed", vsPanelMedian: "{who} · {f} % failed",
+    versusLead: "With this same load ({n} runs each), the HPA alone let <b>{hpa}</b> of requests fail on average; Aegis, <b>{aegis}</b>.",
+    versusLead3: "With this same load ({n} runs each), failed requests on average: <b>{aegis}</b> with Aegis, <b>{hpa}</b> with the default HPA and <b>{tuned}</b> with the tuned HPA.",
+    vsPanelOwn: "{who} · {f} failed", vsPanelMedian: "{who} · {f} failed",
     replayDesign: "Randomized block campaign: {desc}",
     vsMeanOf: "Mean of {n} runs", vsAskAt: "Asks for the 2nd pod at",
     vsNote3: "The panels show this Aegis run and the median run of each HPA (by failed requests), on one scale. In red, the traffic sent times the % that failed in each 5 s interval. The table holds means of every run; the best in bold.",
@@ -152,9 +153,9 @@ const TEXT = {
     pod: "pod", pods: "pods", podN: "Pod {n}", serveOne: "serves", serveMany: "serve",
     tankLoad: "at {v} %", tankStarting: "not Ready yet", tankOff: "off",
     tankOverflow: "{v} req/s not served",
-    tankKey: "Water is the traffic each pod receives (Traefik splits it evenly). The dark line is the level expected in {h} s. A dashed pod is not Ready: it is starting, or so saturated that it misses its health check.",
+    tankKey: "Water is the traffic each pod receives (Traefik splits it evenly). The dashed line is the level expected in {h} s. A dashed pod is not Ready: it is starting, or so saturated that it misses its health check.",
     historyTitle: "Last minutes", decisionsTitle: "What Aegis did",
-    lTraffic: "traffic", lCapacity: "capacity with Aegis", lForecast: "in {h} s",
+    lTraffic: "traffic", lCapacity: "capacity with Aegis", lForecast: "in {h} s", lProjection: "projection (shaded: the horizon)",
     upEvent: "Asked for pod {n}", downEvent: "Turned off pod {n}", downEventMany: "Turned off pods {from} to {to}",
     upWhy: "In {h} s it expected {p} req/s and {n} {podsWord} {serveVerb} {cap}. Chance of falling short: {risk}.",
     downWhy: "Traffic dropped: with {n} {podsWord} the chance of falling short stayed under {down} for the wait ({wait}), so the rest were spare.",
@@ -166,9 +167,9 @@ const TEXT = {
     fForecast: "expected traffic", fCapacity: "what the requested pods serve", fError: "how wrong the projection is",
     fRisk: "chance of falling short", fRule: "It asks for a pod above {up}. It turns pods off if, with fewer pods, it stays under {down} for the wait ({wait}).",
     chartForecast: "How well it predicts", chartForecastNote: "Each projection drawn at the moment it was made for, next to the traffic that actually arrived.",
-    chartRisk: "Chance of falling short in 35 s", chartRiskNote: "Above the 70 % line Aegis asks for a pod. The grey line is the same with one pod less: if it stays under 30 % for the wait, one is turned off.",
+    chartRisk: "Chance of falling short in {h} s", chartRiskNote: "Above the {up} line Aegis asks for a pod. The grey line is the same with one pod less: if it stays under {down} for the wait, one is turned off.",
     chartPods: "Pods", chartPodsNote: "Requested by Aegis, already ready, and what the HPA does.",
-    chartLatency: "Slowness (P95)", chartLatencyNote: "95 % of requests take less than this. Above 1 s the service counts as slow.",
+    chartLatency: "Slowness (P95)", chartLatencyNote: "95 % of requests take less than this. Above {l} s the service counts as slow.",
     chartSigma: "Projection error (σ)", chartSigmaNote: "How far it has recently been too low. More error, more caution.",
     chartSlope: "Trend (m)", chartSlopeNote: "How many req/s the traffic rises or falls per second.",
     sDemand: "arrived", sProjected: "projected", sRisk: "with the requested pods", sRiskLess: "with one pod less",
@@ -195,6 +196,7 @@ const TEXT = {
     basisHolm: " (Holm)", basisRanks: " (Holm, on ranks)", basisExploratory: " (exploratory)",
     vsDefault: "against the default HPA", vsTuned: "against the tuned HPA",
     blockLabel: "Block {b}",
+    tableView: "Show as a table", tLoad: "Load", tActor: "Autoscaler", tMean: "Mean", tRange: "Min – max", tRuns: "Runs",
     octoberTitle: "Preliminary October 2026 campaign (one factor at a time, not randomized)",
     runHint: "Runs are drawn on one axis: seconds since the load started.",
     noTestsTitle: "No recorded runs",
@@ -245,6 +247,13 @@ const pct = (value, decimals = 1) => (value === null || value === undefined ? "�
 const clock = (unix) => new Date(unix * 1000).toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
 const clockShort = (unix) => new Date(unix * 1000).toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit", hour12: false });
 
+// A share of failed requests: never "0.0" for a value that is not zero (0.03 % stays 0.03 %).
+function failedPct(value) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "–";
+  const digits = value === 0 ? 0 : value < 0.1 ? 2 : 1;
+  return Number(value).toFixed(digits) + (lang === "es" ? " %" : "%");
+}
+
 // +1.23 / −1.23: the sign always shown, for slopes and z.
 function signed(value, decimals) {
   if (value === null || value === undefined) return "–";
@@ -277,8 +286,9 @@ function buildLiveCharts() {
     unit: "req/s", height: 300, marginRight: 150, yFormat: (v) => num(v, 0), valueFormat: (v) => num(v, 1) + " req/s",
     series: [
       { key: "rps", label: t("lTraffic"), endLabel: t("lTraffic"), color: "var(--traffic)", fill: true, width: 2, connect: true },
-      { key: "capacity", label: t("lCapacity") + " (" + t("sReady") + ")", endLabel: t("lCapacity"), color: "var(--aegis)", step: true, width: 3, connect: true },
+      { key: "capacity", label: t("lCapacity") + " (" + t("sReady") + ")", endLabel: t("lCapacity"), color: "var(--aegis)", step: true, width: 2.5, connect: true },
     ],
+    legendExtra: [{ label: t("lProjection"), color: "var(--forecast)", width: 2, dash: "5 4" }],
   }, timeOptions)));
 
   const container = document.getElementById("live-charts");
@@ -304,7 +314,7 @@ function buildLiveCharts() {
     series: [
       { key: "target", label: t("sTarget"), color: "var(--aegis)", step: true, width: 3 },
       { key: "ready", label: t("sReady"), color: "var(--ink)", step: true, width: 1.5 },
-      { key: "hpaDesired", label: t("sHpa"), color: "var(--hpa)", step: true, dash: "2 3", width: 1.5 },
+      { key: "hpaDesired", label: t("sHpa"), color: "var(--quiet)", step: true, dash: "2 3", width: 1.5 },
     ] });
   add("latency", { title: t("chartLatency"), note: t("chartLatencyNote"), unit: "s", height: 130, yMaxAtLeast: 0.5,
     yFormat: (v) => num(v, 1), valueFormat: (v) => num(v, 3) + " s",
@@ -421,6 +431,10 @@ function renderLive() {
   });
   const upPct = meta.scale_up_threshold * 100;
   const downPct = meta.scale_down_threshold * 100;
+  // Titles and notes from the running configuration, never from numbers written in the text.
+  live.charts.risk.setTitle(t("chartRisk", { h: num(horizon, 0) }));
+  live.charts.risk.setNote(t("chartRiskNote", { up: num(upPct, 0) + " %", down: num(downPct, 0) + " %" }));
+  live.charts.latency.setNote(t("chartLatencyNote", { l: meta.p95_threshold_seconds }));
   const base = { x, columns: cols, domain, markers };
   live.charts.forecast.setData({ x: forecastX, columns: forecast, domain, markers });
   live.charts.risk.setData(Object.assign({}, base, {
@@ -546,7 +560,7 @@ function renderVersusCharts(pair, C) {
   for (const panel of pair.panels) {
     panel.color = ACTOR_COLORS[panel.actor];
     panel.title = t(panel.own ? "vsPanelOwn" : "vsPanelMedian", { who: MODE_NAMES[lang][panel.actor],
-      f: num(panel.entry.summary.failed_percent, 1) });
+      f: failedPct(panel.entry.summary.failed_percent) });
     panel.x = panel.rows.map((r) => Number(r.seconds));
     panel.columns = {
       traffic: panel.rows.map((r) => value(r.planned_rps)),
@@ -599,7 +613,7 @@ function renderVersus(meta) {
     const v = pair.group[actor].map((e) => e.summary[key]).filter((x) => x !== null && x !== undefined);
     return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
   };
-  const failed = Object.fromEntries(actors.map((a) => [a, num(mean(a, "failed_percent"), 1)]));
+  const failed = Object.fromEntries(actors.map((a) => [a, failedPct(mean(a, "failed_percent"))]));
   lead.innerHTML = t(actors.includes("hpa-tuned") ? "versusLead3" : "versusLead", { n: pair.group.aegis.length,
     aegis: failed.aegis, hpa: failed.hpa, tuned: failed["hpa-tuned"] });
   const head = el("tr", "", el("thead", "", table));
@@ -612,7 +626,7 @@ function renderVersus(meta) {
   const body = el("tbody", "", table);
   const cost = pair.aegis.summary.pod_minutes_window !== undefined ? "pod_minutes_window" : "pod_minutes";
   const rows = [
-    [t("vsFailed"), "failed_percent", (v) => num(v, 1) + " %"],
+    [t("vsFailed"), "failed_percent", failedPct],
     [t("vsSlow"), "degraded_seconds", (v) => num(v, 0) + " s"],
     [t("vsAskAt"), "first_scale_up_s", (v) => num(v, 0) + " s"],
     [t("vsCost"), cost, (v) => num(v, 1)],
@@ -898,7 +912,12 @@ function renderResults() {
   const metric = RESULT_METRICS.find((m) => m.key === results.metric) || RESULT_METRICS[0];
   document.getElementById("metric-note").textContent = t(metric.note);
   document.getElementById("results-foot").textContent = t("resultsFoot");
-  drawStrips(metric, designValues(metric.key), design);
+  const metricValues = designValues(metric.key);
+  drawStrips(metric, metricValues, design);
+  const old = document.querySelector("#results .strip-table");
+  if (old) old.remove();
+  const fmt = metric.key === "failed_percent" ? failedPct : (v) => num(v, metric.digits) + metric.unit;
+  document.getElementById("results-foot").before(stripTable(metric, metricValues, fmt));
 }
 
 // One strip plot per load, the same y scale in all three: every run a dot, the mean a bar, the verdicts below.
@@ -907,8 +926,10 @@ function drawStrips(metric, values, design) {
   box.replaceChildren();
   const all = [];
   for (const load of Object.values(values)) for (const runs of Object.values(load)) for (const r of runs) all.push(r.value);
-  const top = niceTop(Math.max(1, ...all));
-  const fmt = (v) => num(v, metric.digits) + metric.unit;
+  // Round ticks: a nice step for ~4 intervals, the top a whole number of steps above the highest run.
+  const step = niceStep(Math.max(1, ...all) * 1.05, 4);
+  const top = Math.ceil((Math.max(1, ...all) * 1.05) / step) * step;
+  const fmt = metric.key === "failed_percent" ? failedPct : (v) => num(v, metric.digits) + metric.unit;
   const tooltip = el("div", "chart-tooltip strip-tooltip", box);
   tooltip.hidden = true;
   for (const [load, labelKey] of DESIGN_LOADS) {
@@ -930,9 +951,9 @@ function drawStrips(metric, values, design) {
     };
     const sy = (v) => height - m.bottom - (v / top) * (height - m.top - m.bottom);
     const column = (width - m.left - m.right) / DESIGN_ACTORS.length;
-    for (const tick of [0, top / 4, top / 2, (3 * top) / 4, top]) {
+    for (let tick = 0; tick <= top + 1e-9; tick += step) {
       add("line", { x1: m.left, x2: width - m.right, y1: sy(tick), y2: sy(tick), class: "strip-grid" });
-      add("text", { x: m.left - 6, y: sy(tick), class: "tick tick-y" }).textContent = num(tick, tick < 10 && top < 10 ? 1 : 0);
+      add("text", { x: m.left - 6, y: sy(tick), class: "tick tick-y" }).textContent = num(tick, step < 1 ? 1 : 0);
     }
     const described = [];
     DESIGN_ACTORS.forEach((actor, i) => {
@@ -946,22 +967,29 @@ function drawStrips(metric, values, design) {
       bar.style.stroke = ACTOR_COLORS[actor];
       add("text", { x: cx + 24, y: sy(mean), class: "strip-mean-label" }).textContent = fmt(mean);
       for (const r of runs) {
-        const dot = add("circle", { cx: cx + (r.block - 3.5) * 5, cy: sy(r.value), r: 4.5, class: "strip-dot", tabindex: 0 });
+        // A transparent 24 px hit area in front of each 9 px dot: nobody has to land on the dot itself.
+        const x = cx + (r.block - 3.5) * 5;
+        const hit = add("circle", { cx: x, cy: sy(r.value), r: 12, class: "strip-hit", tabindex: 0,
+          "aria-label": MODE_NAMES[lang][actor] + ", " + t("blockLabel", { b: r.block }) + ": " + fmt(r.value) });
+        const dot = add("circle", { cx: x, cy: sy(r.value), r: 4.5, class: "strip-dot" });
         dot.style.fill = ACTOR_COLORS[actor];
         const show = () => {
           tooltip.replaceChildren();
-          el("div", "tooltip-x", tooltip, t(labelKey) + " · " + MODE_NAMES[lang][actor]);
-          el("div", "", tooltip, t("blockLabel", { b: r.block }) + ": " + fmt(r.value));
+          // Value first, then what it is.
+          el("strong", "tooltip-value", tooltip, fmt(r.value));
+          el("div", "tooltip-x", tooltip, MODE_NAMES[lang][actor] + " · " + t(labelKey) + " · " + t("blockLabel", { b: r.block }));
           tooltip.hidden = false;
+          dot.classList.add("active");
           const rect = dot.getBoundingClientRect();
           const host = box.getBoundingClientRect();
           tooltip.style.left = Math.min(host.width - 170, rect.left - host.left + 12) + "px";
           tooltip.style.top = rect.top - host.top - 8 + "px";
         };
-        dot.addEventListener("pointerenter", show);
-        dot.addEventListener("focus", show);
-        dot.addEventListener("pointerleave", () => { tooltip.hidden = true; });
-        dot.addEventListener("blur", () => { tooltip.hidden = true; });
+        const hide = () => { tooltip.hidden = true; dot.classList.remove("active"); };
+        hit.addEventListener("pointerenter", show);
+        hit.addEventListener("focus", show);
+        hit.addEventListener("pointerleave", hide);
+        hit.addEventListener("blur", hide);
       }
     });
     svgNode.setAttribute("aria-label", t(labelKey) + ", " + t(metric.label) + ": " + described.join(", "));
@@ -983,6 +1011,30 @@ function drawStrips(metric, values, design) {
   }
 }
 
+// The accessible twin of the strip plots: every mean, range and run count in a table.
+function stripTable(metric, values, fmt) {
+  const details = el("details", "strip-table");
+  el("summary", "", details, t("tableView"));
+  const table = el("table", "", details);
+  const head = el("tr", "", el("thead", "", table));
+  for (const label of [t("tLoad"), t("tActor"), t("tMean"), t("tRange"), t("tRuns")]) el("th", "", head, label);
+  const body = el("tbody", "", table);
+  for (const [load, labelKey] of DESIGN_LOADS) {
+    for (const actor of DESIGN_ACTORS) {
+      const runs = (values[load] || {})[actor] || [];
+      if (!runs.length) continue;
+      const v = runs.map((r) => r.value);
+      const row = el("tr", "", body);
+      el("td", "", row, t(labelKey));
+      el("td", "", row, MODE_NAMES[lang][actor]);
+      el("td", "", row, fmt(v.reduce((a, b) => a + b, 0) / v.length));
+      el("td", "", row, fmt(Math.min(...v)) + " – " + fmt(Math.max(...v)));
+      el("td", "", row, String(v.length));
+    }
+  }
+  return details;
+}
+
 function verdictFor(design, metric, load, second) {
   if (!design) return null;
   const list = metric === "failed_percent" ? design.primary : design.secondary;
@@ -990,13 +1042,6 @@ function verdictFor(design, metric, load, second) {
 }
 
 const pValue = (p) => (p < 0.001 ? "< 0.001" : num(p, 3));
-
-// 1, 2, 2.5 or 5 times a power of ten, just above the highest value.
-function niceTop(max) {
-  const power = Math.pow(10, Math.floor(Math.log10(max)));
-  for (const f of [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (max * 1.05 <= f * power) return f * power;
-  return 10 * power;
-}
 
 // For every load run both with Aegis and with the HPA alone: the median run of each (by failed requests).
 function buildPresets() {
@@ -1171,11 +1216,12 @@ function renderSummary(entries) {
   }
   const seconds = (v) => (v === null || v === undefined ? "–" : num(v, 0) + " s");
   const rows = [
-    [t("mFailed"), "failed_percent", (v) => num(v, 1) + " %", "lower"],
+    [t("mFailed"), "failed_percent", failedPct, "lower"],
     [t("mSlow"), "degraded_seconds", seconds, "lower"],
     [t("mReady"), "second_pod_ready_s", seconds, "lower"],
     [t("mMaxPods"), "max_pods", (v) => String(v), null],
-    [t("mCost"), "pod_minutes", (v) => num(v, 1), "lower"],
+    // Pod-minutes in the common window (load + tail) when the run has it: the truncated count leaves out the tail.
+    [t("mCost"), "pod_minutes_window", (v) => num(v, 1), "lower"],
   ];
   const body = el("tbody", "", table);
   const askRow = el("tr", "", body);
@@ -1194,7 +1240,7 @@ function renderSummary(entries) {
   for (const [label, key, format, better] of rows) {
     const row = el("tr", "", body);
     el("td", "", row, label);
-    const values = entries.map((e) => e.summary[key]);
+    const values = entries.map((e) => e.summary[key] ?? (key === "pod_minutes_window" ? e.summary.pod_minutes : null));
     const valid = values.filter((v) => v !== null && v !== undefined);
     let best = null;
     if (better && entries.length > 1 && valid.length > 1) best = better === "lower" ? Math.min(...valid) : Math.max(...valid);

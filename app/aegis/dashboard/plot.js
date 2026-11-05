@@ -19,7 +19,7 @@ function html(tag, className, parent, text) {
 }
 
 // 1, 2, 2.5 or 5 times a power of ten, so that about `count` ticks fit in the range.
-function niceStep(range, count) {
+export function niceStep(range, count) {
   const raw = range / Math.max(1, count);
   const power = Math.pow(10, Math.floor(Math.log10(raw)));
   for (const factor of [1, 2, 2.5, 5, 10]) {
@@ -74,7 +74,8 @@ export class LineChart {
     this.titleNode = html("span", "chart-title", head, this.options.title || "");
     if (this.options.unit) html("span", "chart-unit", head, this.options.unit);
     this.legend = html("span", "chart-legend", head);
-    if (this.options.note) html("p", "chart-note", this.root, this.options.note);
+    this.noteNode = html("p", "chart-note", this.root, this.options.note || "");
+    this.noteNode.hidden = !this.options.note;
     this.plot = html("div", "chart-plot", this.root);
     this.plot.tabIndex = 0;
     this.plot.setAttribute("role", "img");
@@ -96,6 +97,11 @@ export class LineChart {
     this.titleNode.textContent = text;
   }
 
+  setNote(text) {
+    this.noteNode.textContent = text;
+    this.noteNode.hidden = !text;
+  }
+
   setSeries(series) {
     this.options.series = series;
     this.renderLegend();
@@ -103,7 +109,8 @@ export class LineChart {
 
   renderLegend() {
     this.legend.replaceChildren();
-    const series = (this.options.series || []).filter((s) => !s.hideInLegend && !s.endLabel);
+    // A legend whenever there are two or more series; end labels only supplement it.
+    const series = (this.options.series || []).filter((s) => !s.hideInLegend).concat(this.options.legendExtra || []);
     if (series.length < 2) return;
     for (const item of series) {
       const entry = html("span", "legend-item", this.legend);
@@ -253,7 +260,6 @@ export class LineChart {
       if (marker.x < x0 || marker.x > x1 || !marker.label) continue;
       const label = svg("text", { x: sx(marker.x) + 3, y: top + 9 + (marker.row || 0) * 14, class: "marker-label marker-" + marker.kind }, this.svg);
       label.textContent = marker.label;
-      if (marker.color) label.style.fill = marker.color;
     }
     // Labels in the right margin, at least 17 px apart.
     this.endLabels.sort((a, b) => a.y - b.y);
@@ -263,7 +269,6 @@ export class LineChart {
     for (const item of this.endLabels) {
       const label = svg("text", { x: right + 10, y: item.y, class: "end-label" + (item.strong ? " strong" : "") }, this.svg);
       label.textContent = item.text;
-      label.style.fill = item.color;
     }
     this.cursorLine = svg("line", { y1: top, y2: bottom, class: "cursor" }, this.svg);
     this.cursorLine.style.display = "none";
