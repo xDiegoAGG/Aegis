@@ -1,0 +1,1533 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: /scripts/test.js
+        output: csv (/results/requests.csv.gz)
+
+     scenarios: (100.00%) 1 scenario, 550 max VUs, 4m30s max duration (incl. graceful stop):
+              * load: Up to 46.00 iterations/s for 4m0s over 4 stages (maxVUs: 92-550, gracefulStop: 30s)
+
+
+running (0m01.0s), 000/092 VUs, 4 complete and 0 interrupted iterations
+load   [   0% ] 000/092 VUs  0m01.0s/4m0s  05.00 iters/s
+
+running (0m02.0s), 000/092 VUs, 9 complete and 0 interrupted iterations
+load   [   1% ] 000/092 VUs  0m02.0s/4m0s  05.00 iters/s
+
+running (0m03.0s), 000/092 VUs, 14 complete and 0 interrupted iterations
+load   [   1% ] 000/092 VUs  0m03.0s/4m0s  05.00 iters/s
+
+running (0m04.0s), 000/092 VUs, 19 complete and 0 interrupted iterations
+load   [   2% ] 000/092 VUs  0m04.0s/4m0s  05.00 iters/s
+
+running (0m05.0s), 000/092 VUs, 24 complete and 0 interrupted iterations
+load   [   2% ] 000/092 VUs  0m05.0s/4m0s  05.00 iters/s
+
+running (0m06.0s), 000/092 VUs, 29 complete and 0 interrupted iterations
+load   [   2% ] 000/092 VUs  0m06.0s/4m0s  05.00 iters/s
+
+running (0m07.0s), 000/092 VUs, 34 complete and 0 interrupted iterations
+load   [   3% ] 000/092 VUs  0m07.0s/4m0s  05.00 iters/s
+
+running (0m08.0s), 000/092 VUs, 39 complete and 0 interrupted iterations
+load   [   3% ] 000/092 VUs  0m08.0s/4m0s  05.00 iters/s
+
+running (0m09.0s), 000/092 VUs, 44 complete and 0 interrupted iterations
+load   [   4% ] 000/092 VUs  0m09.0s/4m0s  05.00 iters/s
+
+running (0m10.0s), 000/092 VUs, 49 complete and 0 interrupted iterations
+load   [   4% ] 000/092 VUs  0m10.0s/4m0s  05.00 iters/s
+
+running (0m11.0s), 000/092 VUs, 54 complete and 0 interrupted iterations
+load   [   5% ] 000/092 VUs  0m11.0s/4m0s  05.00 iters/s
+
+running (0m12.0s), 000/092 VUs, 59 complete and 0 interrupted iterations
+load   [   5% ] 000/092 VUs  0m12.0s/4m0s  05.00 iters/s
+
+running (0m13.0s), 000/092 VUs, 64 complete and 0 interrupted iterations
+load   [   5% ] 000/092 VUs  0m13.0s/4m0s  05.00 iters/s
+
+running (0m14.0s), 000/092 VUs, 69 complete and 0 interrupted iterations
+load   [   6% ] 000/092 VUs  0m14.0s/4m0s  05.00 iters/s
+
+running (0m15.0s), 000/092 VUs, 74 complete and 0 interrupted iterations
+load   [   6% ] 000/092 VUs  0m15.0s/4m0s  05.00 iters/s
+
+running (0m16.0s), 000/092 VUs, 79 complete and 0 interrupted iterations
+load   [   7% ] 000/092 VUs  0m16.0s/4m0s  05.00 iters/s
+
+running (0m17.0s), 000/092 VUs, 84 complete and 0 interrupted iterations
+load   [   7% ] 000/092 VUs  0m17.0s/4m0s  05.00 iters/s
+
+running (0m18.0s), 000/092 VUs, 89 complete and 0 interrupted iterations
+load   [   7% ] 000/092 VUs  0m18.0s/4m0s  05.00 iters/s
+
+running (0m19.0s), 000/092 VUs, 94 complete and 0 interrupted iterations
+load   [   8% ] 000/092 VUs  0m19.0s/4m0s  05.00 iters/s
+
+running (0m20.0s), 000/092 VUs, 99 complete and 0 interrupted iterations
+load   [   8% ] 000/092 VUs  0m20.0s/4m0s  05.00 iters/s
+
+running (0m21.0s), 000/092 VUs, 104 complete and 0 interrupted iterations
+load   [   9% ] 000/092 VUs  0m21.0s/4m0s  05.00 iters/s
+
+running (0m22.0s), 000/092 VUs, 109 complete and 0 interrupted iterations
+load   [   9% ] 000/092 VUs  0m22.0s/4m0s  05.00 iters/s
+
+running (0m23.0s), 000/092 VUs, 114 complete and 0 interrupted iterations
+load   [  10% ] 000/092 VUs  0m23.0s/4m0s  05.00 iters/s
+
+running (0m24.0s), 000/092 VUs, 119 complete and 0 interrupted iterations
+load   [  10% ] 000/092 VUs  0m24.0s/4m0s  05.00 iters/s
+
+running (0m25.0s), 000/092 VUs, 124 complete and 0 interrupted iterations
+load   [  10% ] 000/092 VUs  0m25.0s/4m0s  05.00 iters/s
+
+running (0m26.0s), 000/092 VUs, 129 complete and 0 interrupted iterations
+load   [  11% ] 000/092 VUs  0m26.0s/4m0s  05.00 iters/s
+
+running (0m27.0s), 000/092 VUs, 134 complete and 0 interrupted iterations
+load   [  11% ] 000/092 VUs  0m27.0s/4m0s  05.00 iters/s
+
+running (0m28.0s), 000/092 VUs, 139 complete and 0 interrupted iterations
+load   [  12% ] 000/092 VUs  0m28.0s/4m0s  05.00 iters/s
+
+running (0m29.0s), 000/092 VUs, 144 complete and 0 interrupted iterations
+load   [  12% ] 000/092 VUs  0m29.0s/4m0s  05.00 iters/s
+
+running (0m30.0s), 000/092 VUs, 149 complete and 0 interrupted iterations
+load   [  12% ] 000/092 VUs  0m30.0s/4m0s  05.00 iters/s
+
+running (0m31.0s), 000/092 VUs, 155 complete and 0 interrupted iterations
+load   [  13% ] 000/092 VUs  0m31.0s/4m0s  05.36 iters/s
+
+running (0m32.0s), 000/092 VUs, 160 complete and 0 interrupted iterations
+load   [  13% ] 000/092 VUs  0m32.0s/4m0s  05.67 iters/s
+
+running (0m33.0s), 000/092 VUs, 166 complete and 0 interrupted iterations
+load   [  14% ] 000/092 VUs  0m33.0s/4m0s  06.02 iters/s
+
+running (0m34.0s), 000/092 VUs, 172 complete and 0 interrupted iterations
+load   [  14% ] 000/092 VUs  0m34.0s/4m0s  06.35 iters/s
+
+running (0m35.0s), 000/092 VUs, 179 complete and 0 interrupted iterations
+load   [  15% ] 000/092 VUs  0m35.0s/4m0s  06.72 iters/s
+
+running (0m36.0s), 000/092 VUs, 186 complete and 0 interrupted iterations
+load   [  15% ] 000/092 VUs  0m36.0s/4m0s  07.07 iters/s
+
+running (0m37.0s), 000/092 VUs, 193 complete and 0 interrupted iterations
+load   [  15% ] 000/092 VUs  0m37.0s/4m0s  07.40 iters/s
+
+running (0m38.0s), 000/092 VUs, 200 complete and 0 interrupted iterations
+load   [  16% ] 000/092 VUs  0m38.0s/4m0s  07.71 iters/s
+
+running (0m39.0s), 000/092 VUs, 208 complete and 0 interrupted iterations
+load   [  16% ] 000/092 VUs  0m39.0s/4m0s  08.06 iters/s
+
+running (0m40.0s), 001/092 VUs, 216 complete and 0 interrupted iterations
+load   [  17% ] 001/092 VUs  0m40.0s/4m0s  08.43 iters/s
+
+running (0m41.0s), 000/092 VUs, 225 complete and 0 interrupted iterations
+load   [  17% ] 000/092 VUs  0m41.0s/4m0s  08.75 iters/s
+
+running (0m42.0s), 000/092 VUs, 234 complete and 0 interrupted iterations
+load   [  17% ] 000/092 VUs  0m42.0s/4m0s  09.10 iters/s
+
+running (0m43.0s), 000/092 VUs, 243 complete and 0 interrupted iterations
+load   [  18% ] 000/092 VUs  0m43.0s/4m0s  09.43 iters/s
+
+running (0m44.0s), 000/092 VUs, 253 complete and 0 interrupted iterations
+load   [  18% ] 000/092 VUs  0m44.0s/4m0s  09.78 iters/s
+
+running (0m45.0s), 000/092 VUs, 263 complete and 0 interrupted iterations
+load   [  19% ] 000/092 VUs  0m45.0s/4m0s  10.13 iters/s
+
+running (0m46.0s), 000/092 VUs, 273 complete and 0 interrupted iterations
+load   [  19% ] 000/092 VUs  0m46.0s/4m0s  10.46 iters/s
+
+running (0m47.0s), 000/092 VUs, 284 complete and 0 interrupted iterations
+load   [  20% ] 000/092 VUs  0m47.0s/4m0s  10.81 iters/s
+
+running (0m48.0s), 000/092 VUs, 295 complete and 0 interrupted iterations
+load   [  20% ] 000/092 VUs  0m48.0s/4m0s  11.15 iters/s
+
+running (0m49.0s), 000/092 VUs, 306 complete and 0 interrupted iterations
+load   [  20% ] 000/092 VUs  0m49.0s/4m0s  11.49 iters/s
+
+running (0m50.0s), 000/092 VUs, 318 complete and 0 interrupted iterations
+load   [  21% ] 000/092 VUs  0m50.0s/4m0s  11.84 iters/s
+
+running (0m51.0s), 000/092 VUs, 330 complete and 0 interrupted iterations
+load   [  21% ] 000/092 VUs  0m51.0s/4m0s  12.18 iters/s
+
+running (0m52.0s), 000/092 VUs, 342 complete and 0 interrupted iterations
+load   [  22% ] 000/092 VUs  0m52.0s/4m0s  12.51 iters/s
+
+running (0m53.0s), 000/092 VUs, 355 complete and 0 interrupted iterations
+load   [  22% ] 000/092 VUs  0m53.0s/4m0s  12.86 iters/s
+
+running (0m54.0s), 000/092 VUs, 368 complete and 0 interrupted iterations
+load   [  22% ] 000/092 VUs  0m54.0s/4m0s  13.20 iters/s
+
+running (0m55.0s), 000/092 VUs, 381 complete and 0 interrupted iterations
+load   [  23% ] 000/092 VUs  0m55.0s/4m0s  13.53 iters/s
+
+running (0m56.0s), 000/092 VUs, 395 complete and 0 interrupted iterations
+load   [  23% ] 000/092 VUs  0m56.0s/4m0s  13.88 iters/s
+
+running (0m57.0s), 000/092 VUs, 409 complete and 0 interrupted iterations
+load   [  24% ] 000/092 VUs  0m57.0s/4m0s  14.22 iters/s
+
+running (0m58.0s), 000/092 VUs, 423 complete and 0 interrupted iterations
+load   [  24% ] 000/092 VUs  0m58.0s/4m0s  14.56 iters/s
+
+running (0m59.0s), 000/092 VUs, 438 complete and 0 interrupted iterations
+load   [  25% ] 000/092 VUs  0m59.0s/4m0s  14.90 iters/s
+
+running (1m00.0s), 000/092 VUs, 453 complete and 0 interrupted iterations
+load   [  25% ] 000/092 VUs  1m00.0s/4m0s  15.24 iters/s
+
+running (1m01.0s), 001/092 VUs, 468 complete and 0 interrupted iterations
+load   [  25% ] 001/092 VUs  1m01.0s/4m0s  15.60 iters/s
+
+running (1m02.0s), 000/092 VUs, 484 complete and 0 interrupted iterations
+load   [  26% ] 000/092 VUs  1m02.0s/4m0s  15.92 iters/s
+
+running (1m03.0s), 000/092 VUs, 500 complete and 0 interrupted iterations
+load   [  26% ] 000/092 VUs  1m03.0s/4m0s  16.26 iters/s
+
+running (1m04.0s), 000/092 VUs, 517 complete and 0 interrupted iterations
+load   [  27% ] 000/092 VUs  1m04.0s/4m0s  16.62 iters/s
+
+running (1m05.0s), 000/092 VUs, 534 complete and 0 interrupted iterations
+load   [  27% ] 000/092 VUs  1m05.0s/4m0s  16.96 iters/s
+
+running (1m06.0s), 000/092 VUs, 551 complete and 0 interrupted iterations
+load   [  27% ] 000/092 VUs  1m06.0s/4m0s  17.30 iters/s
+
+running (1m07.0s), 000/092 VUs, 568 complete and 0 interrupted iterations
+load   [  28% ] 000/092 VUs  1m07.0s/4m0s  17.63 iters/s
+
+running (1m08.0s), 000/092 VUs, 586 complete and 0 interrupted iterations
+load   [  28% ] 000/092 VUs  1m08.0s/4m0s  17.98 iters/s
+
+running (1m09.0s), 000/092 VUs, 604 complete and 0 interrupted iterations
+load   [  29% ] 000/092 VUs  1m09.0s/4m0s  18.32 iters/s
+
+running (1m10.0s), 000/092 VUs, 623 complete and 0 interrupted iterations
+load   [  29% ] 000/092 VUs  1m10.0s/4m0s  18.67 iters/s
+
+running (1m11.0s), 001/092 VUs, 641 complete and 0 interrupted iterations
+load   [  30% ] 001/092 VUs  1m11.0s/4m0s  19.01 iters/s
+
+running (1m12.0s), 000/092 VUs, 661 complete and 0 interrupted iterations
+load   [  30% ] 000/092 VUs  1m12.0s/4m0s  19.35 iters/s
+
+running (1m13.0s), 000/092 VUs, 680 complete and 0 interrupted iterations
+load   [  30% ] 000/092 VUs  1m13.0s/4m0s  19.69 iters/s
+
+running (1m14.0s), 000/092 VUs, 700 complete and 0 interrupted iterations
+load   [  31% ] 000/092 VUs  1m14.0s/4m0s  20.03 iters/s
+
+running (1m15.0s), 000/092 VUs, 720 complete and 0 interrupted iterations
+load   [  31% ] 000/092 VUs  1m15.0s/4m0s  20.37 iters/s
+
+running (1m16.0s), 000/092 VUs, 741 complete and 0 interrupted iterations
+load   [  32% ] 000/092 VUs  1m16.0s/4m0s  20.72 iters/s
+
+running (1m17.0s), 000/092 VUs, 762 complete and 0 interrupted iterations
+load   [  32% ] 000/092 VUs  1m17.0s/4m0s  21.06 iters/s
+
+running (1m18.0s), 000/092 VUs, 783 complete and 0 interrupted iterations
+load   [  32% ] 000/092 VUs  1m18.0s/4m0s  21.40 iters/s
+
+running (1m19.0s), 000/092 VUs, 804 complete and 0 interrupted iterations
+load   [  33% ] 000/092 VUs  1m19.0s/4m0s  21.75 iters/s
+
+running (1m20.0s), 006/092 VUs, 820 complete and 0 interrupted iterations
+load   [  33% ] 006/092 VUs  1m20.0s/4m0s  22.07 iters/s
+
+running (1m21.0s), 000/092 VUs, 849 complete and 0 interrupted iterations
+load   [  34% ] 000/092 VUs  1m21.0s/4m0s  22.43 iters/s
+
+running (1m22.0s), 000/092 VUs, 871 complete and 0 interrupted iterations
+load   [  34% ] 000/092 VUs  1m22.0s/4m0s  22.76 iters/s
+
+running (1m23.0s), 000/092 VUs, 894 complete and 0 interrupted iterations
+load   [  35% ] 000/092 VUs  1m23.0s/4m0s  23.10 iters/s
+
+running (1m24.0s), 000/092 VUs, 917 complete and 0 interrupted iterations
+load   [  35% ] 000/092 VUs  1m24.0s/4m0s  23.44 iters/s
+
+running (1m25.0s), 001/092 VUs, 940 complete and 0 interrupted iterations
+load   [  35% ] 001/092 VUs  1m25.0s/4m0s  23.79 iters/s
+
+running (1m26.0s), 000/092 VUs, 965 complete and 0 interrupted iterations
+load   [  36% ] 000/092 VUs  1m26.0s/4m0s  24.13 iters/s
+
+running (1m27.0s), 000/092 VUs, 989 complete and 0 interrupted iterations
+load   [  36% ] 000/092 VUs  1m27.0s/4m0s  24.47 iters/s
+
+running (1m28.0s), 000/092 VUs, 1014 complete and 0 interrupted iterations
+load   [  37% ] 000/092 VUs  1m28.0s/4m0s  24.81 iters/s
+
+running (1m29.0s), 000/092 VUs, 1039 complete and 0 interrupted iterations
+load   [  37% ] 000/092 VUs  1m29.0s/4m0s  25.16 iters/s
+
+running (1m30.0s), 000/092 VUs, 1064 complete and 0 interrupted iterations
+load   [  37% ] 000/092 VUs  1m30.0s/4m0s  25.49 iters/s
+
+running (1m31.0s), 000/092 VUs, 1090 complete and 0 interrupted iterations
+load   [  38% ] 000/092 VUs  1m31.0s/4m0s  25.84 iters/s
+
+running (1m32.0s), 000/092 VUs, 1116 complete and 0 interrupted iterations
+load   [  38% ] 000/092 VUs  1m32.0s/4m0s  26.18 iters/s
+
+running (1m33.0s), 010/092 VUs, 1132 complete and 0 interrupted iterations
+load   [  39% ] 010/092 VUs  1m33.0s/4m0s  26.52 iters/s
+
+running (1m34.0s), 000/092 VUs, 1169 complete and 0 interrupted iterations
+load   [  39% ] 000/092 VUs  1m34.0s/4m0s  26.86 iters/s
+
+running (1m35.0s), 000/092 VUs, 1196 complete and 0 interrupted iterations
+load   [  40% ] 000/092 VUs  1m35.0s/4m0s  27.20 iters/s
+
+running (1m36.0s), 000/092 VUs, 1223 complete and 0 interrupted iterations
+load   [  40% ] 000/092 VUs  1m36.0s/4m0s  27.54 iters/s
+
+running (1m37.0s), 000/092 VUs, 1251 complete and 0 interrupted iterations
+load   [  40% ] 000/092 VUs  1m37.0s/4m0s  27.89 iters/s
+
+running (1m38.0s), 000/092 VUs, 1279 complete and 0 interrupted iterations
+load   [  41% ] 000/092 VUs  1m38.0s/4m0s  28.23 iters/s
+
+running (1m39.0s), 000/092 VUs, 1308 complete and 0 interrupted iterations
+load   [  41% ] 000/092 VUs  1m39.0s/4m0s  28.58 iters/s
+
+running (1m40.0s), 012/092 VUs, 1324 complete and 0 interrupted iterations
+load   [  42% ] 012/092 VUs  1m40.0s/4m0s  28.91 iters/s
+
+running (1m41.0s), 017/092 VUs, 1348 complete and 0 interrupted iterations
+load   [  42% ] 017/092 VUs  1m41.0s/4m0s  29.25 iters/s
+
+running (1m42.0s), 014/092 VUs, 1381 complete and 0 interrupted iterations
+load   [  42% ] 014/092 VUs  1m42.0s/4m0s  29.60 iters/s
+
+running (1m43.0s), 015/092 VUs, 1410 complete and 0 interrupted iterations
+load   [  43% ] 015/092 VUs  1m43.0s/4m0s  29.94 iters/s
+
+running (1m44.0s), 007/092 VUs, 1448 complete and 0 interrupted iterations
+load   [  43% ] 007/092 VUs  1m44.0s/4m0s  30.28 iters/s
+
+running (1m45.0s), 023/092 VUs, 1462 complete and 0 interrupted iterations
+load   [  44% ] 023/092 VUs  1m45.0s/4m0s  30.62 iters/s
+
+running (1m46.0s), 024/092 VUs, 1492 complete and 0 interrupted iterations
+load   [  44% ] 024/092 VUs  1m46.0s/4m0s  30.96 iters/s
+
+running (1m47.0s), 015/092 VUs, 1532 complete and 0 interrupted iterations
+load   [  45% ] 015/092 VUs  1m47.0s/4m0s  31.30 iters/s
+
+running (1m48.0s), 024/092 VUs, 1555 complete and 0 interrupted iterations
+load   [  45% ] 024/092 VUs  1m48.0s/4m0s  31.65 iters/s
+
+running (1m49.0s), 019/092 VUs, 1591 complete and 0 interrupted iterations
+load   [  45% ] 019/092 VUs  1m49.0s/4m0s  31.98 iters/s
+
+running (1m50.0s), 021/092 VUs, 1622 complete and 0 interrupted iterations
+load   [  46% ] 021/092 VUs  1m50.0s/4m0s  32.34 iters/s
+
+running (1m51.0s), 035/092 VUs, 1640 complete and 0 interrupted iterations
+load   [  46% ] 035/092 VUs  1m51.0s/4m0s  32.67 iters/s
+
+running (1m52.0s), 040/092 VUs, 1668 complete and 0 interrupted iterations
+load   [  47% ] 040/092 VUs  1m52.0s/4m0s  33.01 iters/s
+
+running (1m53.0s), 039/092 VUs, 1702 complete and 0 interrupted iterations
+load   [  47% ] 039/092 VUs  1m53.0s/4m0s  33.35 iters/s
+
+running (1m54.0s), 048/092 VUs, 1727 complete and 0 interrupted iterations
+load   [  47% ] 048/092 VUs  1m54.0s/4m0s  33.70 iters/s
+
+running (1m55.0s), 046/092 VUs, 1762 complete and 0 interrupted iterations
+load   [  48% ] 046/092 VUs  1m55.0s/4m0s  34.03 iters/s
+
+running (1m56.0s), 056/092 VUs, 1787 complete and 0 interrupted iterations
+load   [  48% ] 056/092 VUs  1m56.0s/4m0s  34.38 iters/s
+
+running (1m57.0s), 070/092 VUs, 1807 complete and 0 interrupted iterations
+load   [  49% ] 070/092 VUs  1m57.0s/4m0s  34.72 iters/s
+
+running (1m58.0s), 064/092 VUs, 1848 complete and 0 interrupted iterations
+load   [  49% ] 064/092 VUs  1m58.0s/4m0s  35.06 iters/s
+
+running (1m59.0s), 069/092 VUs, 1878 complete and 0 interrupted iterations
+load   [  50% ] 069/092 VUs  1m59.0s/4m0s  35.40 iters/s
+
+running (2m00.0s), 087/092 VUs, 1896 complete and 0 interrupted iterations
+load   [  50% ] 087/092 VUs  2m00.0s/4m0s  35.75 iters/s
+
+running (2m01.0s), 088/092 VUs, 1931 complete and 0 interrupted iterations
+load   [  50% ] 088/092 VUs  2m01.0s/4m0s  36.09 iters/s
+
+running (2m02.0s), 093/096 VUs, 1958 complete and 0 interrupted iterations
+load   [  51% ] 093/096 VUs  2m02.0s/4m0s  36.43 iters/s
+
+running (2m03.0s), 103/104 VUs, 1977 complete and 0 interrupted iterations
+load   [  51% ] 103/104 VUs  2m03.0s/4m0s  36.77 iters/s
+
+running (2m04.0s), 092/104 VUs, 2025 complete and 0 interrupted iterations
+load   [  52% ] 092/104 VUs  2m04.0s/4m0s  37.12 iters/s
+time="2026-11-05T11:38:36Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:36Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m05.0s), 097/104 VUs, 2057 complete and 0 interrupted iterations
+load   [  52% ] 097/104 VUs  2m05.0s/4m0s  37.46 iters/s
+time="2026-11-05T11:38:37Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:37Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:37Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m06.0s), 112/112 VUs, 2072 complete and 0 interrupted iterations
+load   [  52% ] 112/112 VUs  2m06.0s/4m0s  37.80 iters/s
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m07.0s), 092/112 VUs, 2130 complete and 0 interrupted iterations
+load   [  53% ] 092/112 VUs  2m07.0s/4m0s  38.14 iters/s
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:39Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m08.0s), 095/112 VUs, 2165 complete and 0 interrupted iterations
+load   [  53% ] 095/112 VUs  2m08.0s/4m0s  38.48 iters/s
+time="2026-11-05T11:38:40Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m09.0s), 105/113 VUs, 2193 complete and 0 interrupted iterations
+load   [  54% ] 105/113 VUs  2m09.0s/4m0s  38.83 iters/s
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m10.0s), 097/115 VUs, 2237 complete and 0 interrupted iterations
+load   [  54% ] 097/115 VUs  2m10.0s/4m0s  39.16 iters/s
+time="2026-11-05T11:38:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m11.0s), 097/115 VUs, 2277 complete and 0 interrupted iterations
+load   [  55% ] 097/115 VUs  2m11.0s/4m0s  39.51 iters/s
+time="2026-11-05T11:38:42Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:42Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:43Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:43Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:43Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:43Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:43Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m12.0s), 105/118 VUs, 2305 complete and 0 interrupted iterations
+load   [  55% ] 106/118 VUs  2m12.0s/4m0s  39.85 iters/s
+time="2026-11-05T11:38:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m13.0s), 109/119 VUs, 2341 complete and 0 interrupted iterations
+load   [  55% ] 109/119 VUs  2m13.0s/4m0s  40.19 iters/s
+time="2026-11-05T11:38:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m14.0s), 120/121 VUs, 2368 complete and 0 interrupted iterations
+load   [  56% ] 120/121 VUs  2m14.0s/4m0s  40.53 iters/s
+
+running (2m15.0s), 116/125 VUs, 2409 complete and 0 interrupted iterations
+load   [  56% ] 116/125 VUs  2m15.0s/4m0s  40.88 iters/s
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m16.0s), 112/127 VUs, 2452 complete and 0 interrupted iterations
+load   [  57% ] 112/127 VUs  2m16.0s/4m0s  41.22 iters/s
+time="2026-11-05T11:38:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m17.0s), 121/133 VUs, 2478 complete and 0 interrupted iterations
+load   [  57% ] 121/133 VUs  2m17.0s/4m0s  41.56 iters/s
+time="2026-11-05T11:38:49Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:49Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:49Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:49Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:49Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m18.0s), 130/133 VUs, 2511 complete and 0 interrupted iterations
+load   [  57% ] 130/133 VUs  2m18.0s/4m0s  41.90 iters/s
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m19.0s), 133/133 VUs, 2550 complete and 0 interrupted iterations
+load   [  58% ] 133/133 VUs  2m19.0s/4m0s  42.24 iters/s
+time="2026-11-05T11:38:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m20.0s), 140/146 VUs, 2572 complete and 0 interrupted iterations
+load   [  58% ] 140/146 VUs  2m20.0s/4m0s  42.58 iters/s
+
+running (2m21.0s), 149/149 VUs, 2603 complete and 0 interrupted iterations
+load   [  59% ] 149/149 VUs  2m21.0s/4m0s  42.92 iters/s
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m22.0s), 138/152 VUs, 2654 complete and 0 interrupted iterations
+load   [  59% ] 138/152 VUs  2m22.0s/4m0s  43.26 iters/s
+time="2026-11-05T11:38:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m23.0s), 155/155 VUs, 2677 complete and 0 interrupted iterations
+load   [  60% ] 155/155 VUs  2m23.0s/4m0s  43.61 iters/s
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m24.0s), 155/163 VUs, 2713 complete and 0 interrupted iterations
+load   [  60% ] 155/163 VUs  2m24.0s/4m0s  43.94 iters/s
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:56Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:56Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m25.0s), 155/163 VUs, 2757 complete and 0 interrupted iterations
+load   [  60% ] 155/163 VUs  2m25.0s/4m0s  44.29 iters/s
+time="2026-11-05T11:38:57Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:57Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:57Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:57Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m26.0s), 174/174 VUs, 2772 complete and 0 interrupted iterations
+load   [  61% ] 174/174 VUs  2m26.0s/4m0s  44.63 iters/s
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:58Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m27.0s), 156/176 VUs, 2833 complete and 0 interrupted iterations
+load   [  61% ] 156/176 VUs  2m27.0s/4m0s  44.97 iters/s
+time="2026-11-05T11:38:59Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:38:59Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m28.0s), 167/178 VUs, 2865 complete and 0 interrupted iterations
+load   [  62% ] 167/178 VUs  2m28.0s/4m0s  45.32 iters/s
+time="2026-11-05T11:38:59Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m29.0s), 174/185 VUs, 2896 complete and 0 interrupted iterations
+load   [  62% ] 174/185 VUs  2m29.0s/4m0s  45.65 iters/s
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m30.0s), 164/185 VUs, 2952 complete and 0 interrupted iterations
+load   [  62% ] 164/185 VUs  2m30.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:02Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:02Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:02Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m31.0s), 181/185 VUs, 2981 complete and 0 interrupted iterations
+load   [  63% ] 181/185 VUs  2m31.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:02Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:02Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:03Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:03Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:03Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:03Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:03Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:03Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:03Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:03Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:03Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:03Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m32.0s), 184/191 VUs, 3018 complete and 0 interrupted iterations
+load   [  63% ] 184/191 VUs  2m32.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m33.0s), 185/193 VUs, 3061 complete and 0 interrupted iterations
+load   [  64% ] 185/193 VUs  2m33.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m34.0s), 193/194 VUs, 3098 complete and 0 interrupted iterations
+load   [  64% ] 193/194 VUs  2m34.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:06Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:06Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:06Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:06Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:06Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:06Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:06Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:06Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:06Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:06Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m35.0s), 196/201 VUs, 3134 complete and 0 interrupted iterations
+load   [  65% ] 196/201 VUs  2m35.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m36.0s), 193/201 VUs, 3183 complete and 0 interrupted iterations
+load   [  65% ] 193/201 VUs  2m36.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:08Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:08Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:08Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m37.0s), 205/207 VUs, 3211 complete and 0 interrupted iterations
+load   [  65% ] 205/207 VUs  2m37.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m38.0s), 188/211 VUs, 3270 complete and 0 interrupted iterations
+load   [  66% ] 188/211 VUs  2m38.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:10Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m39.0s), 175/211 VUs, 3329 complete and 0 interrupted iterations
+load   [  66% ] 175/211 VUs  2m39.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:11Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:11Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m40.0s), 195/211 VUs, 3355 complete and 0 interrupted iterations
+load   [  67% ] 195/211 VUs  2m40.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:11Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:11Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m41.0s), 176/211 VUs, 3420 complete and 0 interrupted iterations
+load   [  67% ] 176/211 VUs  2m41.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m42.0s), 164/211 VUs, 3478 complete and 0 interrupted iterations
+load   [  67% ] 164/211 VUs  2m42.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m43.0s), 148/211 VUs, 3540 complete and 0 interrupted iterations
+load   [  68% ] 148/211 VUs  2m43.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m44.0s), 133/211 VUs, 3601 complete and 0 interrupted iterations
+load   [  68% ] 133/211 VUs  2m44.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m45.0s), 119/211 VUs, 3661 complete and 0 interrupted iterations
+load   [  69% ] 119/211 VUs  2m45.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:16Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m46.0s), 120/211 VUs, 3706 complete and 0 interrupted iterations
+load   [  69% ] 120/211 VUs  2m46.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m47.0s), 121/211 VUs, 3751 complete and 0 interrupted iterations
+load   [  70% ] 121/211 VUs  2m47.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:18Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:19Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:19Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:19Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:19Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:19Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:19Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m48.0s), 102/211 VUs, 3816 complete and 0 interrupted iterations
+load   [  70% ] 102/211 VUs  2m48.0s/4m0s  46.00 iters/s
+
+running (2m49.0s), 106/211 VUs, 3858 complete and 0 interrupted iterations
+load   [  70% ] 106/211 VUs  2m49.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m50.0s), 101/211 VUs, 3909 complete and 0 interrupted iterations
+load   [  71% ] 101/211 VUs  2m50.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:21Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:22Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:22Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:22Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:22Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:22Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:22Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:22Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:22Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:22Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:22Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:22Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m51.0s), 104/211 VUs, 3952 complete and 0 interrupted iterations
+load   [  71% ] 104/211 VUs  2m51.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:23Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:23Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:23Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:23Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:23Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:23Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m52.0s), 099/211 VUs, 4003 complete and 0 interrupted iterations
+load   [  72% ] 099/211 VUs  2m52.0s/4m0s  46.00 iters/s
+
+running (2m53.0s), 114/211 VUs, 4034 complete and 0 interrupted iterations
+load   [  72% ] 114/211 VUs  2m53.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:25Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:25Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:25Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:25Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m54.0s), 116/211 VUs, 4078 complete and 0 interrupted iterations
+load   [  72% ] 116/211 VUs  2m54.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:26Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:26Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:26Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:26Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:26Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:26Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:26Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m55.0s), 114/211 VUs, 4126 complete and 0 interrupted iterations
+load   [  73% ] 114/211 VUs  2m55.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:26Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:26Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:26Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:27Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m56.0s), 113/211 VUs, 4173 complete and 0 interrupted iterations
+load   [  73% ] 113/211 VUs  2m56.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:28Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:28Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:28Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:28Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:28Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:28Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:28Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m57.0s), 102/211 VUs, 4230 complete and 0 interrupted iterations
+load   [  74% ] 102/211 VUs  2m57.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:29Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:29Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:29Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:29Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m58.0s), 106/211 VUs, 4272 complete and 0 interrupted iterations
+load   [  74% ] 106/211 VUs  2m58.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:30Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:30Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:30Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:30Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:30Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:30Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (2m59.0s), 112/211 VUs, 4312 complete and 0 interrupted iterations
+load   [  75% ] 112/211 VUs  2m59.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:31Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:31Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:31Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:31Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:31Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m00.0s), 117/211 VUs, 4353 complete and 0 interrupted iterations
+load   [  75% ] 117/211 VUs  3m00.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:31Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:31Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m01.0s), 109/211 VUs, 4407 complete and 0 interrupted iterations
+load   [  75% ] 109/211 VUs  3m01.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:32Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:33Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:33Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:33Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m02.0s), 104/211 VUs, 4458 complete and 0 interrupted iterations
+load   [  76% ] 104/211 VUs  3m02.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:33Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:33Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:34Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:34Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:34Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:34Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:34Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:34Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m03.0s), 109/211 VUs, 4499 complete and 0 interrupted iterations
+load   [  76% ] 109/211 VUs  3m03.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:34Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:34Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:34Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:35Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m04.0s), 091/211 VUs, 4563 complete and 0 interrupted iterations
+load   [  77% ] 091/211 VUs  3m04.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:36Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:36Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:36Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m05.0s), 095/211 VUs, 4605 complete and 0 interrupted iterations
+load   [  77% ] 095/211 VUs  3m05.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:37Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:37Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:37Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:37Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:37Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:37Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:37Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m06.0s), 102/211 VUs, 4644 complete and 0 interrupted iterations
+load   [  77% ] 102/211 VUs  3m06.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:38Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m07.0s), 113/211 VUs, 4679 complete and 0 interrupted iterations
+load   [  78% ] 113/211 VUs  3m07.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:39Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:39Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:39Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:39Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:39Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:39Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:39Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m08.0s), 104/211 VUs, 4734 complete and 0 interrupted iterations
+load   [  78% ] 104/211 VUs  3m08.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:39Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:39Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:39Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:40Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:40Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:40Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:40Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:40Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:40Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:40Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m09.0s), 095/211 VUs, 4789 complete and 0 interrupted iterations
+load   [  79% ] 095/211 VUs  3m09.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:40Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:40Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:41Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m10.0s), 106/211 VUs, 4824 complete and 0 interrupted iterations
+load   [  79% ] 106/211 VUs  3m10.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:42Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:42Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:42Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:42Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:42Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:42Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:42Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m11.0s), 101/211 VUs, 4875 complete and 0 interrupted iterations
+load   [  80% ] 101/211 VUs  3m11.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:43Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:43Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:43Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:43Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:43Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m12.0s), 103/211 VUs, 4919 complete and 0 interrupted iterations
+load   [  80% ] 103/211 VUs  3m12.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:44Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m13.0s), 106/211 VUs, 4962 complete and 0 interrupted iterations
+load   [  80% ] 106/211 VUs  3m13.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:45Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:45Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:45Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m14.0s), 113/211 VUs, 5001 complete and 0 interrupted iterations
+load   [  81% ] 113/211 VUs  3m14.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:45Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:46Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:46Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:46Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:46Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:46Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:46Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:46Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m15.0s), 112/211 VUs, 5048 complete and 0 interrupted iterations
+load   [  81% ] 112/211 VUs  3m15.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:46Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:46Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m16.0s), 101/211 VUs, 5105 complete and 0 interrupted iterations
+load   [  82% ] 101/211 VUs  3m16.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:47Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m17.0s), 098/211 VUs, 5154 complete and 0 interrupted iterations
+load   [  82% ] 098/211 VUs  3m17.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:48Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:49Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:49Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:49Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:49Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:49Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:49Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m18.0s), 089/211 VUs, 5209 complete and 0 interrupted iterations
+load   [  82% ] 089/211 VUs  3m18.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:50Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m19.0s), 098/211 VUs, 5246 complete and 0 interrupted iterations
+load   [  83% ] 098/211 VUs  3m19.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m20.0s), 097/211 VUs, 5293 complete and 0 interrupted iterations
+load   [  83% ] 097/211 VUs  3m20.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:51Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:52Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m21.0s), 084/211 VUs, 5352 complete and 0 interrupted iterations
+load   [  84% ] 084/211 VUs  3m21.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m22.0s), 080/211 VUs, 5402 complete and 0 interrupted iterations
+load   [  84% ] 080/211 VUs  3m22.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:53Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:54Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m23.0s), 075/211 VUs, 5453 complete and 0 interrupted iterations
+load   [  85% ] 075/211 VUs  3m23.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m24.0s), 087/211 VUs, 5487 complete and 0 interrupted iterations
+load   [  85% ] 087/211 VUs  3m24.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:55Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:56Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:56Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:56Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:56Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:56Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m25.0s), 071/211 VUs, 5549 complete and 0 interrupted iterations
+load   [  85% ] 071/211 VUs  3m25.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:56Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:56Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:57Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:57Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:57Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m26.0s), 071/211 VUs, 5595 complete and 0 interrupted iterations
+load   [  86% ] 071/211 VUs  3m26.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:57Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:57Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:57Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m27.0s), 076/211 VUs, 5636 complete and 0 interrupted iterations
+load   [  86% ] 076/211 VUs  3m27.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:59Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:59Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:59Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:59Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:59Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m28.0s), 076/211 VUs, 5682 complete and 0 interrupted iterations
+load   [  87% ] 076/211 VUs  3m28.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:39:59Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:39:59Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m29.0s), 058/211 VUs, 5746 complete and 0 interrupted iterations
+load   [  87% ] 058/211 VUs  3m29.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:40:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:00Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:01Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m30.0s), 052/211 VUs, 5798 complete and 0 interrupted iterations
+load   [  87% ] 052/211 VUs  3m30.0s/4m0s  46.00 iters/s
+time="2026-11-05T11:40:02Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:02Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m31.0s), 072/211 VUs, 5823 complete and 0 interrupted iterations
+load   [  88% ] 072/211 VUs  3m31.0s/4m0s  44.66 iters/s
+
+running (3m32.0s), 071/211 VUs, 5868 complete and 0 interrupted iterations
+load   [  88% ] 071/211 VUs  3m32.0s/4m0s  43.29 iters/s
+time="2026-11-05T11:40:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m33.0s), 066/211 VUs, 5916 complete and 0 interrupted iterations
+load   [  89% ] 066/211 VUs  3m33.0s/4m0s  41.91 iters/s
+time="2026-11-05T11:40:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:04Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:05Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m34.0s), 059/211 VUs, 5964 complete and 0 interrupted iterations
+load   [  89% ] 059/211 VUs  3m34.0s/4m0s  40.55 iters/s
+
+running (3m35.0s), 058/211 VUs, 6005 complete and 0 interrupted iterations
+load   [  90% ] 058/211 VUs  3m35.0s/4m0s  39.18 iters/s
+time="2026-11-05T11:40:07Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m36.0s), 060/211 VUs, 6042 complete and 0 interrupted iterations
+load   [  90% ] 060/211 VUs  3m36.0s/4m0s  37.80 iters/s
+time="2026-11-05T11:40:08Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:08Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:08Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:08Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:08Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m37.0s), 048/211 VUs, 6091 complete and 0 interrupted iterations
+load   [  90% ] 048/211 VUs  3m37.0s/4m0s  36.43 iters/s
+time="2026-11-05T11:40:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:09Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m38.0s), 043/211 VUs, 6131 complete and 0 interrupted iterations
+load   [  91% ] 043/211 VUs  3m38.0s/4m0s  35.10 iters/s
+
+running (3m39.0s), 042/211 VUs, 6167 complete and 0 interrupted iterations
+load   [  91% ] 042/211 VUs  3m39.0s/4m0s  33.71 iters/s
+
+running (3m40.0s), 043/211 VUs, 6199 complete and 0 interrupted iterations
+load   [  92% ] 043/211 VUs  3m40.0s/4m0s  32.34 iters/s
+time="2026-11-05T11:40:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:12Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m41.0s), 038/211 VUs, 6236 complete and 0 interrupted iterations
+load   [  92% ] 038/211 VUs  3m41.0s/4m0s  30.96 iters/s
+time="2026-11-05T11:40:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:13Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m42.0s), 016/211 VUs, 6288 complete and 0 interrupted iterations
+load   [  92% ] 016/211 VUs  3m42.0s/4m0s  29.60 iters/s
+
+running (3m43.0s), 012/211 VUs, 6321 complete and 0 interrupted iterations
+load   [  93% ] 012/211 VUs  3m43.0s/4m0s  28.23 iters/s
+time="2026-11-05T11:40:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:14Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:15Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m44.0s), 006/211 VUs, 6354 complete and 0 interrupted iterations
+load   [  93% ] 006/211 VUs  3m44.0s/4m0s  26.90 iters/s
+
+running (3m45.0s), 007/211 VUs, 6380 complete and 0 interrupted iterations
+load   [  94% ] 007/211 VUs  3m45.0s/4m0s  25.49 iters/s
+time="2026-11-05T11:40:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+time="2026-11-05T11:40:17Z" level=warning msg="Request Failed" error="Get \"http://traefik.traefik.svc.cluster.local/api/books\": request timeout"
+
+running (3m46.0s), 003/211 VUs, 6408 complete and 0 interrupted iterations
+load   [  94% ] 003/211 VUs  3m46.0s/4m0s  24.17 iters/s
+
+running (3m47.0s), 007/211 VUs, 6428 complete and 0 interrupted iterations
+load   [  95% ] 007/211 VUs  3m47.0s/4m0s  22.77 iters/s
+
+running (3m48.0s), 002/211 VUs, 6455 complete and 0 interrupted iterations
+load   [  95% ] 002/211 VUs  3m48.0s/4m0s  21.41 iters/s
+
+running (3m49.0s), 002/211 VUs, 6476 complete and 0 interrupted iterations
+load   [  95% ] 002/211 VUs  3m49.0s/4m0s  20.02 iters/s
+
+running (3m50.0s), 004/211 VUs, 6493 complete and 0 interrupted iterations
+load   [  96% ] 004/211 VUs  3m50.0s/4m0s  18.68 iters/s
+
+running (3m51.0s), 005/211 VUs, 6510 complete and 0 interrupted iterations
+load   [  96% ] 005/211 VUs  3m51.0s/4m0s  17.31 iters/s
+
+running (3m52.0s), 001/211 VUs, 6531 complete and 0 interrupted iterations
+load   [  97% ] 001/211 VUs  3m52.0s/4m0s  15.91 iters/s
+
+running (3m53.0s), 002/211 VUs, 6545 complete and 0 interrupted iterations
+load   [  97% ] 002/211 VUs  3m53.0s/4m0s  14.57 iters/s
+
+running (3m54.0s), 001/211 VUs, 6560 complete and 0 interrupted iterations
+load   [  97% ] 001/211 VUs  3m54.0s/4m0s  13.19 iters/s
+
+running (3m55.0s), 003/211 VUs, 6570 complete and 0 interrupted iterations
+load   [  98% ] 003/211 VUs  3m55.0s/4m0s  11.88 iters/s
+
+running (3m56.0s), 000/211 VUs, 6584 complete and 0 interrupted iterations
+load   [  98% ] 000/211 VUs  3m56.0s/4m0s  10.54 iters/s
+
+running (3m57.0s), 001/211 VUs, 6593 complete and 0 interrupted iterations
+load   [  99% ] 001/211 VUs  3m57.0s/4m0s  09.15 iters/s
+
+running (3m58.0s), 001/211 VUs, 6602 complete and 0 interrupted iterations
+load   [  99% ] 001/211 VUs  3m58.0s/4m0s  07.69 iters/s
+
+running (3m59.0s), 000/211 VUs, 6610 complete and 0 interrupted iterations
+load   [ 100% ] 000/211 VUs  3m59.0s/4m0s  06.33 iters/s
+
+running (4m00.0s), 001/211 VUs, 6614 complete and 0 interrupted iterations
+load   [ 100% ] 001/211 VUs  4m00.0s/4m0s  05.13 iters/s
+
+
+  █ TOTAL RESULTS 
+
+    HTTP
+    http_req_duration..............: avg=1.83s    min=2.27ms med=769.61ms max=10s   p(90)=9.99s p(95)=10s  
+      { expected_response:true }...: avg=762.39ms min=2.27ms med=565.29ms max=9.99s p(90)=1.81s p(95)=2.05s
+    http_req_failed................: 11.65% 771 out of 6616
+    http_reqs......................: 6616   27.558494/s
+
+    EXECUTION
+    dropped_iterations.............: 119    0.495686/s
+    iteration_duration.............: avg=1.83s    min=2.53ms med=769.94ms max=10s   p(90)=10s   p(95)=10s  
+    iterations.....................: 6616   27.558494/s
+    vus............................: 1      min=0           max=205
+    vus_max........................: 211    min=92          max=211
+
+    NETWORK
+    data_received..................: 66 MB  275 kB/s
+    data_sent......................: 774 kB 3.2 kB/s
+
+
+
+
+running (4m00.1s), 000/211 VUs, 6616 complete and 0 interrupted iterations
+load ✓ [ 100% ] 000/211 VUs  4m0s  05.13 iters/s
+K6_FINISHED

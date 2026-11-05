@@ -1,5 +1,7 @@
 # Pruebas
 
+> **Estas son las corridas preliminares de octubre de 2026** (un factor a la vez, sin aleatorizar). La evaluación formal es el diseño de bloques aleatorizados de [../experiments/design.es.md](../experiments/design.es.md); **sus resultados están en [../experiments/results.es.md](../experiments/results.es.md)** (análisis generado: [design-results.md](design-results.md)). Por qué se reemplazó el diseño de octubre: [design.es.md, sección 2](../experiments/design.es.md#2-por-qué-se-reemplazó-la-campaña-de-octubre).
+
 32 corridas en minikube, 2026-10-25. Calibración (`calibration.json`, pod de 60m de CPU): **C = 22 req/s**, **T = 15 s**. Degradado = P95 del cliente > 1 s o > 1% de fallos, durante 15 s. Las cargas están escritas para C = 24 y se escalan por C / 24.
 
 | Prueba | Tráfico | Modo | Corridas | Fallidas (media, mín–máx) |
@@ -37,8 +39,9 @@ Compara los momentos en que se pide el pod, no los de Ready: Traefik manda tráf
 ```bash
 cd scripts/experiments
 python3 preflight.py       # qué falta y cuánto tarda
-./run_all.sh               # todas las pruebas (~3 h, se puede retomar), luego gráficas, comparación, capacidad y pronóstico
-python3 run.py test1-linear-ramp --runs 5
+python3 campaign.py --plan        # el diseño: 9 combinaciones x 6 bloques en orden aleatorio (../experiments/design.es.md)
+python3 campaign.py --blocks 1-2  # bloques completos por sesión (~134 min cada uno), se puede retomar; luego design_analysis.py
+python3 run.py test1-linear-ramp --runs 5   # pruebas de octubre de 2026, se conservan para reproducirlas
 python3 report.py && python3 compare.py && python3 forecast_accuracy.py
 ```
 

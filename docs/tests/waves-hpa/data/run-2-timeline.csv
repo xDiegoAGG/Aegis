@@ -1,0 +1,38 @@
+seconds,time_utc,source,event,detail
+-13726.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-13700.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+-1.0,08:40:34,kubernetes,Scheduled,Pod/load-fluctuating-ncck8: Successfully assigned default/load-fluctuating-ncck8 to minikube
+-1.0,08:40:34,kubernetes,SuccessfulCreate,Job/load-fluctuating: Created pod: load-fluctuating-ncck8
+0,08:40:35,k6,load started,fluctuating
+0.0,08:40:35,kubernetes,Pulled,"Pod/load-fluctuating-ncck8: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,08:40:35,kubernetes,Created,Pod/load-fluctuating-ncck8: Container created
+0.0,08:40:35,kubernetes,Started,Pod/load-fluctuating-ncck8: Container started
+78.5,08:41:53,k6,planned traffic passes C,22.0 req/s
+135.0,08:42:50,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-kt2kn: Successfully assigned default/catalog-service-79cd8fffdf-kt2kn to minikube
+135.0,08:42:50,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-kt2kn
+135.0,08:42:50,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+135.0,08:42:50,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: cpu resource utilization (percentage of request) above target
+135.0,08:42:50,pod,created,catalog-service-79cd8fffdf-kt2kn
+136.0,08:42:51,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-kt2kn: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+136.0,08:42:51,kubernetes,Created,Pod/catalog-service-79cd8fffdf-kt2kn: Container created
+136.0,08:42:51,kubernetes,Started,Pod/catalog-service-79cd8fffdf-kt2kn: Container started
+142.0,08:42:57,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-kt2kn: Readiness probe failed: Get ""http://10.244.0.78:3004/ready"": dial tcp 10.244.0.78:3004: connect: connection refused"
+145.0,08:43:00,pod,ready,catalog-service-79cd8fffdf-kt2kn
+435.0,08:47:50,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-gr7zx: Successfully assigned default/catalog-service-79cd8fffdf-gr7zx to minikube
+435.0,08:47:50,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-gr7zx
+435.0,08:47:50,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 2 to 3
+435.0,08:47:50,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 3; reason: cpu resource utilization (percentage of request) above target
+435.0,08:47:50,pod,created,catalog-service-79cd8fffdf-gr7zx
+436.0,08:47:51,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-gr7zx: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+436.0,08:47:51,kubernetes,Created,Pod/catalog-service-79cd8fffdf-gr7zx: Container created
+436.0,08:47:51,kubernetes,Started,Pod/catalog-service-79cd8fffdf-gr7zx: Container started
+442.0,08:47:57,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-gr7zx: Readiness probe failed: Get ""http://10.244.0.79:3004/ready"": dial tcp 10.244.0.79:3004: connect: connection refused"
+445.0,08:48:00,pod,ready,catalog-service-79cd8fffdf-gr7zx
+560.0,08:49:55,k6,load finished,
+780.0,08:53:35,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-gr7zx: Stopping container catalog-service
+780.0,08:53:35,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-kt2kn: Stopping container catalog-service
+780.0,08:53:35,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-kt2kn
+780.0,08:53:35,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-gr7zx
+780.0,08:53:35,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-79cd8fffdf from 3 to 1
+780.0,08:53:35,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 1; reason: All metrics below target
+924.0,08:55:59,kubernetes,Killing,Pod/load-fluctuating-ncck8: Stopping container k6

@@ -5,7 +5,7 @@ Preventive horizontal scaling for Kubernetes services.
 The HPA reacts once the CPU is high, and a new pod still needs seconds to be Ready. Aegis projects the traffic, computes the probability of exceeding the pods' capacity, and raises the HPA's `minReplicas` **before** that happens; it lowers it when traffic drops. Every 5 s:
 
 ```
-Prometheus ──► demand r ──► projection p = r + m·(T + lag) ──► risk = Φ((p − C·N) / σ) ──► 70% up / 30% for 60 s down ──► HPA minReplicas
+Prometheus ──► demand r ──► projection p = r + m·(T + lag) ──► risk = Φ((p − C·N) / σ) ──► 70% up / 30% for 15–60 s down ──► HPA minReplicas
 ```
 
 - **C** (req/s per pod) and **T** (time until a requested pod is Ready) are measured by calibration; **σ** is learned from the projection errors.
@@ -58,12 +58,30 @@ python3 -m aegis.actuator        # Aegis, with its dashboard on http://localhost
 ```bash
 cd scripts/experiments
 python3 preflight.py               # checks everything is in place, and how long the missing runs take
-./run_all.sh                       # the whole campaign (~3 h, unattended): 8 tests with 3-5 runs each; resumable
-python3 run.py test1-linear-ramp   # or one test only (--runs 5 for repetitions)
+python3 campaign.py --plan         # the randomized order of the 6 blocks (docs/experiments/design.md)
+python3 campaign.py --blocks 1-2   # run whole blocks per session (~134 min each); resumable
+python3 design_analysis.py         # the pre-registered analysis: docs/tests/design-results.md
+python3 run.py ramp-aegis          # or one cell only
 python3 report.py                  # charts and tables again from the saved data
-python3 compare.py                 # Aegis vs HPA only for each load: docs/tests/comparison.md
+python3 compare.py                 # October 2026 campaign: Aegis vs HPA only, docs/tests/comparison.md
 python3 forecast_accuracy.py       # the projection against other forecasters: docs/tests/forecast.md
 ```
+
+### Results
+
+Randomized complete block design, 2026-11-05: 3 autoscalers × 3 loads × 6 blocks = 54 runs in a random order registered before the first run ([design](docs/experiments/design.md), [results](docs/experiments/results.md)). Failed requests, mean of 6 runs:
+
+| Load | Aegis | Default HPA (CPU 70%) | Tuned HPA (CPU 50%, 60 s down) |
+|---|---|---|---|
+| Ramp | **1.9%** | 16.9% ✓ | 15.4% ✓ |
+| Spike | **5.6%** | 26.7% ✓ | 24.9% ✓ |
+| Waves | **1.4%** | 3.7% (not significant) | 7.1% ✓ |
+
+✓ = Aegis lower, Holm-corrected p < 0.05 (5 of 6 pre-registered contrasts). Aegis was degraded half the time or less on ramps and spikes and used the same or fewer pod-minutes, except on the spike against the tuned HPA. The advantage on the spike, with no trend to anticipate, is as large as on the ramp: Aegis also wins by reacting every 5 s to the request rate instead of to averaged CPU.
+
+### Preliminary campaign (October 2026)
+
+One factor at a time, not randomized ([why it was replaced](docs/experiments/design.md#2-why-the-october-campaign-was-replaced)). Its HPA numbers predate the readiness-probe fix and should not be quoted as the HPA's failure rate today.
 
 ![Aegis vs HPA, same traffic](docs/tests/evidence.png)
 

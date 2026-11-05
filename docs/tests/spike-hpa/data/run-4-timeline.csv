@@ -1,0 +1,31 @@
+seconds,time_utc,source,event,detail
+-22677.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-22651.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+-92.0,11:08:14,pod,created,catalog-service-79cd8fffdf-8wdf9
+-92.0,11:08:14,pod,created,catalog-service-79cd8fffdf-gkqth
+-81.0,11:08:25,pod,ready,catalog-service-79cd8fffdf-8wdf9
+-81.0,11:08:25,pod,ready,catalog-service-79cd8fffdf-gkqth
+-1.0,11:09:45,kubernetes,Scheduled,Pod/load-spike-jwpfg: Successfully assigned default/load-spike-jwpfg to minikube
+-1.0,11:09:45,kubernetes,Pulled,"Pod/load-spike-jwpfg: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+-1.0,11:09:45,kubernetes,Created,Pod/load-spike-jwpfg: Container created
+-1.0,11:09:45,kubernetes,Started,Pod/load-spike-jwpfg: Container started
+-1.0,11:09:45,kubernetes,SuccessfulCreate,Job/load-spike: Created pod: load-spike-jwpfg
+0,11:09:46,k6,load started,spike
+32.5,11:10:18,k6,planned traffic passes C,22.0 req/s
+34,11:10:20,client,degraded,P95 above L or over 1% failed for T_d
+129.0,11:11:55,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-v8lmc: Successfully assigned default/catalog-service-79cd8fffdf-v8lmc to minikube
+129.0,11:11:55,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-v8lmc: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+129.0,11:11:55,kubernetes,Created,Pod/catalog-service-79cd8fffdf-v8lmc: Container created
+129.0,11:11:55,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-v8lmc
+129.0,11:11:55,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+129.0,11:11:55,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: cpu resource utilization (percentage of request) above target
+129.0,11:11:55,pod,created,catalog-service-79cd8fffdf-v8lmc
+130.0,11:11:56,kubernetes,Started,Pod/catalog-service-79cd8fffdf-v8lmc: Container started
+136.0,11:12:02,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-v8lmc: Readiness probe failed: Get ""http://10.244.0.109:3004/ready"": dial tcp 10.244.0.109:3004: connect: connection refused"
+139.0,11:12:05,pod,ready,catalog-service-79cd8fffdf-v8lmc
+190.0,11:12:56,k6,load finished,
+534.0,11:18:40,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-v8lmc: Stopping container catalog-service
+534.0,11:18:40,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-v8lmc
+534.0,11:18:40,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-79cd8fffdf from 2 to 1
+534.0,11:18:40,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 1; reason: All metrics below target
+551.0,11:18:57,kubernetes,Killing,Pod/load-spike-jwpfg: Stopping container k6

@@ -1,0 +1,40 @@
+seconds,time_utc,source,event,detail
+-44934.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-44908.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+0,17:20:43,k6,load started,spike
+0.0,17:20:43,kubernetes,Scheduled,Pod/load-spike-vgkfh: Successfully assigned default/load-spike-vgkfh to minikube
+0.0,17:20:43,kubernetes,Pulled,"Pod/load-spike-vgkfh: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,17:20:43,kubernetes,Created,Pod/load-spike-vgkfh: Container created
+0.0,17:20:43,kubernetes,Started,Pod/load-spike-vgkfh: Container started
+0.0,17:20:43,kubernetes,SuccessfulCreate,Job/load-spike: Created pod: load-spike-vgkfh
+32.5,17:21:15,k6,planned traffic passes C,22.0 req/s
+37,17:21:20,client,degraded,P95 above L or over 1% failed for T_d
+44.0,17:21:27,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-464vv: Successfully assigned default/catalog-service-79cd8fffdf-464vv to minikube
+44.0,17:21:27,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-464vv: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+44.0,17:21:27,kubernetes,Created,Pod/catalog-service-79cd8fffdf-464vv: Container created
+44.0,17:21:27,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-464vv
+44.0,17:21:27,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+44.0,17:21:27,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: Current number of replicas below Spec.MinReplicas
+44.0,17:21:27,pod,created,catalog-service-79cd8fffdf-464vv
+44.1,17:21:27,aegis,scale_up 1->2,risk 0.7088: risk with 1 pod(s) 70.9% >= 70.0%
+45.0,17:21:28,kubernetes,Started,Pod/catalog-service-79cd8fffdf-464vv: Container started
+51.0,17:21:34,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-464vv: Readiness probe failed: Get ""http://10.244.0.183:3004/ready"": dial tcp 10.244.0.183:3004: connect: connection refused"
+54.0,17:21:37,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-wh9v4: Successfully assigned default/catalog-service-79cd8fffdf-wh9v4 to minikube
+54.0,17:21:37,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-wh9v4: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+54.0,17:21:37,kubernetes,Created,Pod/catalog-service-79cd8fffdf-wh9v4: Container created
+54.0,17:21:37,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-wh9v4
+54.0,17:21:37,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 3; reason: Current number of replicas below Spec.MinReplicas
+54.0,17:21:37,pod,ready,catalog-service-79cd8fffdf-464vv
+54.0,17:21:37,pod,created,catalog-service-79cd8fffdf-wh9v4
+54.1,17:21:37,aegis,scale_up 2->3,risk 0.7573: risk with 2 pod(s) 75.7% >= 70.0%
+55.0,17:21:38,kubernetes,Started,Pod/catalog-service-79cd8fffdf-wh9v4: Container started
+61.0,17:21:44,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-wh9v4: Readiness probe failed: Get ""http://10.244.0.184:3004/ready"": dial tcp 10.244.0.184:3004: connect: connection refused"
+64.0,17:21:47,pod,ready,catalog-service-79cd8fffdf-wh9v4
+184.1,17:23:47,aegis,scale_down 3->1,risk 0.0: risk with 1 pod(s) 5.7% < 30.0% for 40 s (wait 37 s)
+190.0,17:23:53,k6,load finished,
+202.0,17:24:05,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-464vv: Stopping container catalog-service
+202.0,17:24:05,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-wh9v4: Stopping container catalog-service
+202.0,17:24:05,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-wh9v4
+202.0,17:24:05,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-79cd8fffdf from 3 to 1
+202.0,17:24:05,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 1; reason: All metrics below target
+552.0,17:29:55,kubernetes,Killing,Pod/load-spike-vgkfh: Stopping container k6

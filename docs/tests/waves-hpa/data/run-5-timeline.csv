@@ -1,0 +1,26 @@
+seconds,time_utc,source,event,detail
+-36504.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-36478.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+0,15:00:13,k6,load started,fluctuating
+0.0,15:00:13,kubernetes,Scheduled,Pod/load-fluctuating-8k75k: Successfully assigned default/load-fluctuating-8k75k to minikube
+0.0,15:00:13,kubernetes,Pulled,"Pod/load-fluctuating-8k75k: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,15:00:13,kubernetes,Created,Pod/load-fluctuating-8k75k: Container created
+0.0,15:00:13,kubernetes,Started,Pod/load-fluctuating-8k75k: Container started
+0.0,15:00:13,kubernetes,SuccessfulCreate,Job/load-fluctuating: Created pod: load-fluctuating-8k75k
+78.5,15:01:31,k6,planned traffic passes C,22.0 req/s
+165.0,15:02:58,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-vljc5: Successfully assigned default/catalog-service-79cd8fffdf-vljc5 to minikube
+165.0,15:02:58,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-vljc5: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+165.0,15:02:58,kubernetes,Created,Pod/catalog-service-79cd8fffdf-vljc5: Container created
+165.0,15:02:58,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-vljc5
+165.0,15:02:58,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+165.0,15:02:58,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: cpu resource utilization (percentage of request) above target
+165.0,15:02:58,pod,created,catalog-service-79cd8fffdf-vljc5
+166.0,15:02:59,kubernetes,Started,Pod/catalog-service-79cd8fffdf-vljc5: Container started
+172.0,15:03:05,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-vljc5: Readiness probe failed: Get ""http://10.244.0.152:3004/ready"": dial tcp 10.244.0.152:3004: connect: connection refused"
+175.0,15:03:08,pod,ready,catalog-service-79cd8fffdf-vljc5
+560.0,15:09:33,k6,load finished,
+810.0,15:13:43,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-vljc5: Stopping container catalog-service
+810.0,15:13:43,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-vljc5
+810.0,15:13:43,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-79cd8fffdf from 2 to 1
+810.0,15:13:43,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 1; reason: All metrics below target
+925.0,15:15:38,kubernetes,Killing,Pod/load-fluctuating-8k75k: Stopping container k6

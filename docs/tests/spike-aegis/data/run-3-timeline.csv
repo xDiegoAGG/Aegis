@@ -1,0 +1,41 @@
+seconds,time_utc,source,event,detail
+-19289.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-19263.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+0,10:13:18,k6,load started,spike
+0.0,10:13:18,kubernetes,Scheduled,Pod/load-spike-x4hm2: Successfully assigned default/load-spike-x4hm2 to minikube
+0.0,10:13:18,kubernetes,Pulled,"Pod/load-spike-x4hm2: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,10:13:18,kubernetes,Created,Pod/load-spike-x4hm2: Container created
+0.0,10:13:18,kubernetes,Started,Pod/load-spike-x4hm2: Container started
+0.0,10:13:18,kubernetes,SuccessfulCreate,Job/load-spike: Created pod: load-spike-x4hm2
+32.5,10:13:50,k6,planned traffic passes C,22.0 req/s
+37,10:13:55,client,degraded,P95 above L or over 1% failed for T_d
+44.0,10:14:02,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-fftbc: Successfully assigned default/catalog-service-79cd8fffdf-fftbc to minikube
+44.0,10:14:02,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-fftbc
+44.0,10:14:02,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+44.0,10:14:02,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: Current number of replicas below Spec.MinReplicas
+44.0,10:14:02,pod,created,catalog-service-79cd8fffdf-fftbc
+44.4,10:14:02,aegis,scale_up 1->2,risk 0.7051: risk with 1 pod(s) 70.5% >= 70.0%
+45.0,10:14:03,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-fftbc: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+45.0,10:14:03,kubernetes,Created,Pod/catalog-service-79cd8fffdf-fftbc: Container created
+45.0,10:14:03,kubernetes,Started,Pod/catalog-service-79cd8fffdf-fftbc: Container started
+51.0,10:14:09,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-fftbc: Readiness probe failed: Get ""http://10.244.0.95:3004/ready"": dial tcp 10.244.0.95:3004: connect: connection refused"
+54.0,10:14:12,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-drzf4: Successfully assigned default/catalog-service-79cd8fffdf-drzf4 to minikube
+54.0,10:14:12,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-drzf4
+54.0,10:14:12,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 2 to 3
+54.0,10:14:12,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 3; reason: Current number of replicas below Spec.MinReplicas
+54.0,10:14:12,pod,created,catalog-service-79cd8fffdf-drzf4
+54.0,10:14:12,pod,ready,catalog-service-79cd8fffdf-fftbc
+54.4,10:14:12,aegis,scale_up 2->3,risk 0.8572: risk with 2 pod(s) 85.7% >= 70.0%
+55.0,10:14:13,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-drzf4: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+55.0,10:14:13,kubernetes,Created,Pod/catalog-service-79cd8fffdf-drzf4: Container created
+55.0,10:14:13,kubernetes,Started,Pod/catalog-service-79cd8fffdf-drzf4: Container started
+61.0,10:14:19,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-drzf4: Readiness probe failed: Get ""http://10.244.0.96:3004/ready"": dial tcp 10.244.0.96:3004: connect: connection refused"
+64.0,10:14:22,pod,ready,catalog-service-79cd8fffdf-drzf4
+169.0,10:16:07,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-fftbc: Stopping container catalog-service
+169.0,10:16:07,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: All metrics below target
+169.4,10:16:07,aegis,scale_down 3->2,risk 0.0: risk with 2 pod(s) 0.0% < 30.0% for 29 s (wait 26 s)
+190.0,10:16:28,k6,load finished,
+209.0,10:16:47,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-drzf4: Stopping container catalog-service
+209.0,10:16:47,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 1; reason: All metrics below target
+209.4,10:16:47,aegis,scale_down 2->1,risk 0.0002: risk with 1 pod(s) 3.2% < 30.0% for 34 s (wait 30 s)
+552.0,10:22:30,kubernetes,Killing,Pod/load-spike-x4hm2: Stopping container k6

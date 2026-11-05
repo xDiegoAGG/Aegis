@@ -1,0 +1,37 @@
+seconds,time_utc,source,event,detail
+-23300.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-23274.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+0,11:20:09,k6,load started,fluctuating
+0.0,11:20:09,kubernetes,Scheduled,Pod/load-fluctuating-27khc: Successfully assigned default/load-fluctuating-27khc to minikube
+0.0,11:20:09,kubernetes,Pulled,"Pod/load-fluctuating-27khc: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,11:20:09,kubernetes,Created,Pod/load-fluctuating-27khc: Container created
+0.0,11:20:09,kubernetes,Started,Pod/load-fluctuating-27khc: Container started
+0.0,11:20:09,kubernetes,SuccessfulCreate,Job/load-fluctuating: Created pod: load-fluctuating-27khc
+78.5,11:21:27,k6,planned traffic passes C,22.0 req/s
+109.0,11:21:58,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-ldj9n: Successfully assigned default/catalog-service-79cd8fffdf-ldj9n to minikube
+109.0,11:21:58,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-ldj9n
+109.0,11:21:58,pod,created,catalog-service-79cd8fffdf-ldj9n
+110.0,11:21:59,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-ldj9n: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+110.0,11:21:59,kubernetes,Created,Pod/catalog-service-79cd8fffdf-ldj9n: Container created
+110.0,11:21:59,kubernetes,Started,Pod/catalog-service-79cd8fffdf-ldj9n: Container started
+116.0,11:22:05,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-ldj9n: Readiness probe failed: Get ""http://10.244.0.111:3004/ready"": dial tcp 10.244.0.111:3004: connect: connection refused"
+119.0,11:22:08,pod,ready,catalog-service-79cd8fffdf-ldj9n
+274.0,11:24:43,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-ldj9n: Stopping container catalog-service
+274.0,11:24:43,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-ldj9n
+336,11:25:45,client,degraded,P95 above L or over 1% failed for T_d
+409.0,11:26:58,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-7j5xk: Successfully assigned default/catalog-service-79cd8fffdf-7j5xk to minikube
+409.0,11:26:58,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-7j5xk
+409.0,11:26:58,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+409.0,11:26:58,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: cpu resource utilization (percentage of request) above target
+409.0,11:26:58,pod,created,catalog-service-79cd8fffdf-7j5xk
+410.0,11:26:59,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-7j5xk: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+410.0,11:26:59,kubernetes,Created,Pod/catalog-service-79cd8fffdf-7j5xk: Container created
+410.0,11:26:59,kubernetes,Started,Pod/catalog-service-79cd8fffdf-7j5xk: Container started
+417.0,11:27:06,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-7j5xk: Readiness probe failed: Get ""http://10.244.0.112:3004/ready"": dial tcp 10.244.0.112:3004: connect: connection refused"
+420.0,11:27:09,pod,ready,catalog-service-79cd8fffdf-7j5xk
+560.0,11:29:29,k6,load finished,
+574.0,11:29:43,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-7j5xk: Stopping container catalog-service
+574.0,11:29:43,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-7j5xk
+574.0,11:29:43,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-79cd8fffdf from 2 to 1
+574.0,11:29:43,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 1; reason: All metrics below target
+925.0,11:35:34,kubernetes,Killing,Pod/load-fluctuating-27khc: Stopping container k6

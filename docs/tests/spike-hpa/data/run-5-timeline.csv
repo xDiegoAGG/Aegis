@@ -1,0 +1,27 @@
+seconds,time_utc,source,event,detail
+-37486.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-37460.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+0,15:16:35,k6,load started,spike
+0.0,15:16:35,kubernetes,Scheduled,Pod/load-spike-b92cm: Successfully assigned default/load-spike-b92cm to minikube
+0.0,15:16:35,kubernetes,Pulled,"Pod/load-spike-b92cm: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,15:16:35,kubernetes,Created,Pod/load-spike-b92cm: Container created
+0.0,15:16:35,kubernetes,Started,Pod/load-spike-b92cm: Container started
+0.0,15:16:35,kubernetes,SuccessfulCreate,Job/load-spike: Created pod: load-spike-b92cm
+32.5,15:17:07,k6,planned traffic passes C,22.0 req/s
+35,15:17:10,client,degraded,P95 above L or over 1% failed for T_d
+143.0,15:18:58,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-xl29x: Successfully assigned default/catalog-service-79cd8fffdf-xl29x to minikube
+143.0,15:18:58,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-xl29x
+143.0,15:18:58,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+143.0,15:18:58,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: cpu resource utilization (percentage of request) above target
+143.0,15:18:58,pod,created,catalog-service-79cd8fffdf-xl29x
+144.0,15:18:59,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-xl29x: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+144.0,15:18:59,kubernetes,Created,Pod/catalog-service-79cd8fffdf-xl29x: Container created
+144.0,15:18:59,kubernetes,Started,Pod/catalog-service-79cd8fffdf-xl29x: Container started
+150.0,15:19:05,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-xl29x: Readiness probe failed: Get ""http://10.244.0.154:3004/ready"": dial tcp 10.244.0.154:3004: connect: connection refused"
+153.0,15:19:08,pod,ready,catalog-service-79cd8fffdf-xl29x
+190.0,15:19:45,k6,load finished,
+488.0,15:24:43,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-xl29x: Stopping container catalog-service
+488.0,15:24:43,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-xl29x
+488.0,15:24:43,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-79cd8fffdf from 2 to 1
+488.0,15:24:43,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 1; reason: All metrics below target
+552.0,15:25:47,kubernetes,Killing,Pod/load-spike-b92cm: Stopping container k6

@@ -1,0 +1,39 @@
+seconds,time_utc,source,event,detail
+-43269.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-43243.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+-1.0,16:52:57,kubernetes,Scheduled,Pod/load-linear-p9qwc: Successfully assigned default/load-linear-p9qwc to minikube
+-1.0,16:52:57,kubernetes,SuccessfulCreate,Job/load-linear: Created pod: load-linear-p9qwc
+0,16:52:58,k6,load started,linear
+0.0,16:52:58,kubernetes,Pulled,"Pod/load-linear-p9qwc: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,16:52:58,kubernetes,Created,Pod/load-linear-p9qwc: Container created
+0.0,16:52:58,kubernetes,Started,Pod/load-linear-p9qwc: Container started
+79.0,16:54:17,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-wlhvc: Successfully assigned default/catalog-service-79cd8fffdf-wlhvc to minikube
+79.0,16:54:17,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-wlhvc: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+79.0,16:54:17,kubernetes,Created,Pod/catalog-service-79cd8fffdf-wlhvc: Container created
+79.0,16:54:17,kubernetes,Started,Pod/catalog-service-79cd8fffdf-wlhvc: Container started
+79.0,16:54:17,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-wlhvc
+79.0,16:54:17,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+79.0,16:54:17,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: Current number of replicas below Spec.MinReplicas
+79.0,16:54:17,pod,created,catalog-service-79cd8fffdf-wlhvc
+79.1,16:54:17,aegis,scale_up 1->2,risk 0.8004: risk with 1 pod(s) 80.0% >= 70.0%
+80.0,16:54:18,k6,planned traffic passes C,22.0 req/s
+86.0,16:54:24,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-wlhvc: Readiness probe failed: Get ""http://10.244.0.176:3004/ready"": dial tcp 10.244.0.176:3004: connect: connection refused"
+89.0,16:54:27,pod,ready,catalog-service-79cd8fffdf-wlhvc
+117,16:54:55,client,degraded,P95 above L or over 1% failed for T_d
+139.0,16:55:17,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-jzbdg: Successfully assigned default/catalog-service-79cd8fffdf-jzbdg to minikube
+139.0,16:55:17,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-jzbdg: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+139.0,16:55:17,kubernetes,Created,Pod/catalog-service-79cd8fffdf-jzbdg: Container created
+139.0,16:55:17,kubernetes,Started,Pod/catalog-service-79cd8fffdf-jzbdg: Container started
+139.0,16:55:17,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 2 to 3
+139.0,16:55:17,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 3; reason: Current number of replicas below Spec.MinReplicas
+139.0,16:55:17,pod,created,catalog-service-79cd8fffdf-jzbdg
+139.1,16:55:17,aegis,scale_up 2->3,risk 0.7739: risk with 2 pod(s) 77.4% >= 70.0%
+146.0,16:55:24,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-jzbdg: Readiness probe failed: Get ""http://10.244.0.177:3004/ready"": dial tcp 10.244.0.177:3004: connect: connection refused"
+149.0,16:55:27,pod,ready,catalog-service-79cd8fffdf-jzbdg
+240.0,16:56:58,k6,load finished,
+259.1,16:57:17,aegis,scale_down 3->1,risk 0.0: risk with 1 pod(s) 0.0% < 30.0% for 20 s (wait 15 s)
+306.0,16:58:04,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-jzbdg: Stopping container catalog-service
+306.0,16:58:04,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-wlhvc: Stopping container catalog-service
+306.0,16:58:04,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-79cd8fffdf from 3 to 1
+306.0,16:58:04,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 1; reason: All metrics below target
+602.0,17:03:00,kubernetes,Killing,Pod/load-linear-p9qwc: Stopping container k6

@@ -1,0 +1,71 @@
+{
+  "run": 6,
+  "profile": "fluctuating",
+  "mode": "hpa-tuned",
+  "date_utc": "2026-11-05",
+  "k6_start_utc": "15:47:13",
+  "end_utc": "16:02:35",
+  "capacity_rps": 22.0,
+  "startup_time_seconds": 12,
+  "requests": 9351,
+  "failed_percent": 3.89,
+  "client_p95_s": 2.173,
+  "client_max_s": 10.001,
+  "dropped_iterations": 16,
+  "degraded_seconds": 110,
+  "first_degraded_s": 132,
+  "crosses_c_s": 78.5,
+  "first_scale_up_s": 166.0,
+  "second_pod_ready_s": 176.0,
+  "lead_s": -97.5,
+  "scale_ups": [
+    {
+      "s": 166.0,
+      "from": 1,
+      "to": 2
+    },
+    {
+      "s": 346.0,
+      "from": 1,
+      "to": 2
+    },
+    {
+      "s": 466.0,
+      "from": 2,
+      "to": 3
+    }
+  ],
+  "scale_downs": [
+    {
+      "s": 271.0,
+      "from": 2,
+      "to": 1
+    },
+    {
+      "s": 571.0,
+      "from": 3,
+      "to": 2
+    },
+    {
+      "s": 571.0,
+      "from": 2,
+      "to": 1
+    }
+  ],
+  "max_pods": 3,
+  "pod_minutes": 16.22,
+  "pod_minutes_window": 22.58,
+  "cost_window_s": 920.0,
+  "reasks": 1,
+  "p95_excess_s2": 728.0,
+  "degraded_to_ready_s": 44.0,
+  "false_scale_ups": 2,
+  "needed_pod_minutes": 13.33,
+  "extra_pod_minutes": 2.89,
+  "block": 6,
+  "order_in_block": 2,
+  "design_seed": 20261104,
+  "power_profile": "performance/throughput-performance",
+  "calibration_measured_at": "2026-11-05T05:07:20Z",
+  "load_scale": 0.917
+}
