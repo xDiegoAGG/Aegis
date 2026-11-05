@@ -189,6 +189,11 @@ class TestCatalog:
             calibration = json.loads(path.read_text())
         return {"tests": tests, "calibration": calibration}
 
+    # The analysis of the experiment design (scripts/experiments/design_analysis.py), if it was run.
+    def design(self):
+        path = self.tests_dir / "design-results.json"
+        return json.loads(path.read_text()) if path.exists() else None
+
     def run(self, name, number):
         folder = self.folders().get(name)
         if folder is None:
@@ -248,6 +253,8 @@ def make_handler(state, catalog):
                     self.send_json(200, {"tests": [], "calibration": None})
                 else:
                     self.send_json(200, catalog.listing())
+            elif path == "/api/design":
+                self.send_json(200, {"results": None if catalog is None else catalog.design()})
             elif path.startswith("/api/tests/"):
                 self.serve_test(path)
             else:

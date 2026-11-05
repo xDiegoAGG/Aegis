@@ -85,6 +85,22 @@ class HttpTest(unittest.TestCase):
         self.assertEqual(self.get("/healthz")[0], 200)
         self.assertEqual(self.get("/readyz")[0], 200)
 
+    # Without a tests folder the analysis of the design is simply absent.
+    def test_design_without_catalog(self):
+        status, body = self.get("/api/design")
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body), {"results": None})
+
+    def test_design_from_catalog(self):
+        import tempfile
+        from pathlib import Path
+        from aegis.server import TestCatalog
+        with tempfile.TemporaryDirectory() as folder:
+            catalog = TestCatalog(folder)
+            self.assertIsNone(catalog.design())
+            (Path(folder) / "design-results.json").write_text(json.dumps({"primary": []}))
+            self.assertEqual(catalog.design(), {"primary": []})
+
     def test_dashboard_and_no_traversal(self):
         status, body = self.get("/")
         self.assertIn("Aegis", body)

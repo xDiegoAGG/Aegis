@@ -11,10 +11,17 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_RUN = TESTS_DIR / "test1-linear-ramp" / "data" / "run-4-aegis.ndjson"
+# The ramp with Aegis of the experiment design, block 3: the median of its 6 runs by failed requests.
+DEFAULT_RUN = TESTS_DIR / "ramp-aegis" / "data" / "run-3-aegis.ndjson"
 
 
 # The same parameters a live Aegis shows, from config.yaml and the calibration the run used.
+# True when the log was written by the risk-based scale-down rule (or has no scale-down to tell).
+def risk_based_wait(records):
+    downs = [r.get("reason") or "" for r in records if r.get("action") == "scale_down"]
+    return not downs or any("(wait " in reason for reason in downs)
+
+
 def build_meta(config, records, calibration, source, speed):
     thresholds = config["risk_thresholds"]
     sampling = config["sampling"]
@@ -48,9 +55,26 @@ def build_meta(config, records, calibration, source, speed):
         "scale_up_threshold": thresholds["scale_up"],
         "scale_down_threshold": thresholds["scale_down"],
         "scale_down_sustained_seconds": thresholds["scale_down_sustained_seconds"],
+        # Runs recorded before the risk-based wait (no "(wait N s)" in their scale-down reasons) used a fixed wait.
+        "scale_down_min_wait_seconds": (thresholds.get("scale_down_min_wait_seconds", thresholds["scale_down_sustained_seconds"])
+                                        if risk_based_wait(records) else thresholds["scale_down_sustained_seconds"]),
         "calibrated_at": calibrated_at,
         "started_at": time.time(),
     }
+
+
+# The calibration a saved run used: the docs/tests/calibration*.json whose measured_at matches its summary
+# (calibration.json is the current one; older campaigns keep theirs, e.g. calibration-2026-10-25.json).
+def calibration_for(path, default):
+    summary = path.parent / path.name.replace("-aegis.ndjson", "-summary.json")
+    if not summary.is_file():
+        return default
+    measured = json.loads(summary.read_text()).get("calibration_measured_at")
+    for candidate in sorted(TESTS_DIR.glob("calibration*.json")):
+        calibration = json.loads(candidate.read_text())
+        if calibration.get("measured_at") == measured:
+            return calibration
+    return default
 
 
 # Plays recorded runs on the dashboard at `speed` times their real pace; the dashboard can switch the run.
@@ -67,7 +91,7 @@ class Replayer:
 
     # Only runs saved under docs/tests with an Aegis log can be chosen.
     def select(self, test, run):
-        if not re.fullmatch(r"test[\w-]+", test) or run < 1:
+        if not re.fullmatch(r"[a-z0-9][\w-]*", test) or run < 1:
             return "unknown run"
         path = TESTS_DIR / test / "data" / ("run-" + str(run) + "-aegis.ndjson")
         if not path.is_file():
@@ -83,7 +107,7 @@ class Replayer:
         with self.lock:
             self.generation += 1
             generation = self.generation
-        meta = build_meta(self.config, records, self.calibration, source, self.speed)
+        meta = build_meta(self.config, records, calibration_for(path, self.calibration), source, self.speed)
         logger.info("Replaying %s cycles of %s at x%s", len(records), source, self.speed)
         threading.Thread(target=self.feed, args=(records, meta, generation), daemon=True).start()
 
@@ -133,6 +157,7 @@ def main():
     calibration = None
     if Path(args.calibration).exists():
         calibration = json.loads(Path(args.calibration).read_text())
+    calibration = calibration_for(path, calibration)
     source = path.name
     if path.parent.name == "data":
         source = path.parent.parent.name + "/" + path.name

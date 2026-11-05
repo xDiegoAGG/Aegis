@@ -50,6 +50,7 @@ python3 -m aegis.replay --speed 5  # recorded run</pre>
       <section class="versus" id="versus" hidden aria-labelledby="versus-title">
         <h2 id="versus-title" data-i18n="versusTitle"></h2>
         <p class="versus-lead" id="versus-lead"></p>
+        <div class="instruments versus-charts" id="versus-charts"></div>
         <div class="table-scroll"><table class="versus-table" id="versus-table"></table></div>
         <p class="quiet" id="versus-note"></p>
       </section>
@@ -96,10 +97,20 @@ python3 -m aegis.replay --speed 5  # recorded run</pre>
         <h1 data-i18n="noTestsTitle"></h1>
         <p data-i18n="noTestsBody"></p>
       </div>
+      <section class="results" id="results" hidden aria-labelledby="results-title">
+        <h1 id="results-title" data-i18n="resultsTitle"></h1>
+        <p class="results-lead" id="results-lead"></p>
+        <div class="metric-picker" id="metric-picker" role="group" aria-label="Metric"></div>
+        <p class="quiet" id="metric-note"></p>
+        <div class="strips" id="strips"></div>
+        <p class="quiet results-foot" id="results-foot"></p>
+      </section>
+
       <div class="compare">
         <div>
           <h1 data-i18n="experimentsTitle"></h1>
           <p class="quiet" data-i18n="runHint"></p>
+          <p class="quiet" data-i18n="eLegend"></p>
           <div id="run-picker" class="runs" role="group"></div>
         </div>
         <div class="table-scroll"><table id="summary-table" class="summary"></table></div>
