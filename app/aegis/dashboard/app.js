@@ -4,8 +4,8 @@ const POLL_MS = 2000;
 // Colors follow the actor, never the order of selection: Aegis blue, HPA alone orange (style.css).
 const ACTOR_COLORS = { aegis: "var(--aegis)", hpa: "var(--hpa)", "hpa-tuned": "var(--hpa-tuned)" };
 const actorOf = (mode) => (mode === "hpa" || mode === "hpa-tuned" ? mode : "aegis");
-const MODE_NAMES = { es: { hpa: "HPA", "hpa-tuned": "HPA afinado", metric: "Aegis (metric)", aegis: "Aegis" },
-  en: { hpa: "HPA", "hpa-tuned": "Tuned HPA", metric: "Aegis (metric)", aegis: "Aegis" } };
+const MODE_NAMES = { es: { hpa: "HPA por defecto", "hpa-tuned": "HPA afinado", metric: "Aegis (metric)", aegis: "Aegis" },
+  en: { hpa: "Default HPA", "hpa-tuned": "Tuned HPA", metric: "Aegis (metric)", aegis: "Aegis" } };
 // Runs of the experiment design are named <load>-<autoscaler>; the October 2026 ones test<N>-<...>.
 const isDesign = (test) => !/^test\d+-/.test(test);
 // Prefer the design runs when there are any, so a comparison never mixes the two campaigns.
@@ -15,7 +15,7 @@ const MAX_RUNS = 3;
 
 const TEXT = {
   es: {
-    tabLive: "En vivo", tabExperiments: "Experimentos", all: "Todo",
+    tabLive: "Una corrida", tabLiveNow: "En vivo", tabExperiments: "Resultados", all: "Todo",
     waitingTitle: "Esperando el primer ciclo de Aegis",
     waitingBody: "Este panel lo sirve Aegis. Arráncalo en vivo o reproduce una corrida grabada:",
     versusTitle: "Aegis frente a los HPA, con la misma carga",
@@ -45,6 +45,7 @@ const TEXT = {
     testOther: "una corrida guardada.",
     stateLive: "En vivo", stateReplay: "Reproduciendo", stateDry: "Dry-run, sin aplicar", stateOffline: "Sin conexión con Aegis",
     lastCycle: "último ciclo hace {s} s", speed: "a ×{v}",
+    nowReplay: "En este momento de la repetición ({clock})", nowLive: "Ahora ({clock})",
     vOverflow: "Los pods no alcanzan.", vScale: "En {h} s no alcanzarían: Aegis pide otro pod.",
     vShrink: "Sobra un pod: Aegis lo apaga.", vNear: "Alcanzan, pero están cerca del límite.", vWaiting: "Al límite hasta que el pod {n} esté listo.", vCalm: "Los pods alcanzan con holgura.",
     vNoData: "Sin datos de tráfico en este ciclo.",
@@ -83,16 +84,26 @@ const TEXT = {
     colTime: "hora", colAction: "pods", colReason: "motivo",
     experimentsTitle: "Explorar las corridas",
     resultsTitle: "Resultados de la campaña",
-    resultsLead: "Aegis tuvo menos peticiones fallidas que el HPA en <b>{n} de {total}</b> comparaciones registradas de antemano. 54 corridas: 3 autoscalers × 3 cargas × 6 bloques, en orden aleatorio.",
-    resultsH2: "La ventaja no depende solo de anticipar: en el pico, donde no hay tendencia, es tan grande como en la rampa (diferencia {d} puntos, p = {p}).",
-    resultsFoot: "Cada punto es una corrida (un bloque); la raya es la media de los 6 bloques. Misma escala en los tres paneles. Análisis completo: docs/tests/design-results.md · plan: docs/experiments/design.md.",
+    headline: "Con el mismo tráfico, con Aegis fallaron entre {min} y {max} veces menos peticiones que con el HPA.",
+    headlineScope: "Así fue en {n} de las {total} comparaciones fijadas antes de correr.",
+    headlineException: "La excepción: {list}, donde no se demostró diferencia.",
+    exceptionItem: "{load} frente al {who}", theLoad: "el {load}",
+    resultsFoot: "Cada punto es una corrida; la raya vertical y el número en negrita, la media de las 6. Todas las filas comparten la escala de abajo. Análisis completo en docs/tests/design-results.md; el plan, en docs/experiments/design.md.",
+    loadRampHint: "el tráfico sube de forma gradual", loadSpikeHint: "salto brusco, sin tendencia previa", loadWavesHint: "sube y baja dos veces",
+    vFailTimes: "fallan {r} veces más peticiones que con Aegis", vFailMore: "fallan más peticiones que con Aegis", vNoDiff: "diferencia con Aegis no demostrada",
+    vDegradedMore: "{v} más degradado que Aegis", vDegradedLess: "{v} menos degradado que Aegis",
+    vPodMore: "gasta {v} pods-minuto más que Aegis", vPodLess: "gasta {v} pods-minuto menos que Aegis",
+    vAskLater: "pide el 2º pod {v} después que Aegis", vAskEarlier: "pide el 2º pod {v} antes que Aegis",
+    findTrendTitle: "No solo anticipa.", findTrend: "En el pico no hay tendencia que anticipar y aun así Aegis pide el 2º pod a los {aegis} s; los HPA, a los {lo}–{hi} s. Su ventaja ahí es tan grande como en la rampa (la diferencia entre ambas no es significativa, p = {p}): reacciona antes porque mira las peticiones por segundo cada 5 s, no la CPU promediada.",
+    findCostTitle: "No gasta más.", findCost: "Con la regla de bajada de 15–60 s usa menos pods-minuto que el HPA en {n} de las 6 comparaciones",
+    findCostExcept: "; solo gasta más en {list}, que ahorra pods a cambio de fallar más.",
+    findCostNone: "en ninguna gasta más.", findMethodTitle: "Cómo se midió.", findMethod: "54 corridas: los 3 autoscalers en las 3 cargas, repetidos en 6 bloques con el orden sorteado. El plan y el análisis se fijaron antes de la primera corrida.",
     mFailedPct: "Peticiones fallidas", mDegraded: "Segundos degradado", mPodMin: "Pods-minuto", mAsk2: "Pide el 2º pod",
-    noteFailed: "Métrica principal. Lo que nota el usuario, medido por k6. Menos es mejor.",
+    noteFailed: "Métrica principal: el % de peticiones que el usuario vio fallar (medido por k6). Menos es mejor.",
     noteDegraded: "Secundaria. Segundos con P95 > 1 s o > 1 % de fallos durante 15 s. Menos es mejor.",
     notePodMin: "Secundaria. Costo: pods pedidos × tiempo, en la misma ventana para todos (carga + 6 min). Menos es mejor.",
     noteAsk2: "Secundaria. Segundos desde el inicio de la carga hasta pedir el 2º pod. Antes es mejor.",
     loadRamp: "Rampa", loadSpike: "Pico", loadWaves: "Olas",
-    verdictYes: "Aegis menor, significativo", verdictNo: "No se demostró diferencia", verdictWorse: "Aegis mayor",
     basisHolm: " (Holm)", basisRanks: " (Holm, por rangos)", basisExploratory: " (exploratoria)",
     vsDefault: "frente al HPA por defecto", vsTuned: "frente al HPA afinado",
     blockLabel: "Bloque {b}",
@@ -115,7 +126,7 @@ const TEXT = {
     langButton: "EN",
   },
   en: {
-    tabLive: "Live", tabExperiments: "Experiments", all: "All",
+    tabLive: "One run", tabLiveNow: "Live", tabExperiments: "Results", all: "All",
     waitingTitle: "Waiting for the first Aegis cycle",
     waitingBody: "Aegis serves this page. Start it live or replay a recorded run:",
     versusTitle: "Aegis against the HPAs, same load",
@@ -145,6 +156,7 @@ const TEXT = {
     testOther: "a saved run.",
     stateLive: "Live", stateReplay: "Replaying", stateDry: "Dry-run, not applying", stateOffline: "Aegis is not answering",
     lastCycle: "last cycle {s} s ago", speed: "at ×{v}",
+    nowReplay: "At this moment of the replay ({clock})", nowLive: "Now ({clock})",
     vOverflow: "The pods are not enough.", vScale: "In {h} s they would not be enough: Aegis asks for another pod.",
     vShrink: "One pod is spare: Aegis turns it off.", vNear: "The pods are enough, but close to the limit.", vWaiting: "At the limit until pod {n} is Ready.", vCalm: "The pods are comfortably enough.",
     vNoData: "No traffic data this cycle.",
@@ -183,16 +195,26 @@ const TEXT = {
     colTime: "time", colAction: "pods", colReason: "reason",
     experimentsTitle: "Explore the runs",
     resultsTitle: "Campaign results",
-    resultsLead: "Aegis had fewer failed requests than the HPA in <b>{n} of {total}</b> comparisons registered in advance. 54 runs: 3 autoscalers × 3 loads × 6 blocks, in random order.",
-    resultsH2: "The advantage does not only come from anticipating: on the spike, with no trend, it is as large as on the ramp (difference {d} points, p = {p}).",
-    resultsFoot: "Each dot is one run (one block); the bar is the mean of the 6 blocks. Same scale in the three panels. Full analysis: docs/tests/design-results.md · plan: docs/experiments/design.md.",
+    headline: "With the same traffic, {min} to {max} times fewer requests failed with Aegis than with the HPA.",
+    headlineScope: "That held in {n} of the {total} comparisons fixed before the runs.",
+    headlineException: "The exception: {list}, where no difference was shown.",
+    exceptionItem: "{load} against the {who}", theLoad: "the {load}",
+    resultsFoot: "Each dot is one run; the vertical tick and the bold number are the mean of the 6. Every row shares the scale below. Full analysis in docs/tests/design-results.md; the plan in docs/experiments/design.md.",
+    loadRampHint: "traffic rises gradually", loadSpikeHint: "a sudden jump, no trend before it", loadWavesHint: "rises and falls twice",
+    vFailTimes: "{r} times more requests fail than with Aegis", vFailMore: "more requests fail than with Aegis", vNoDiff: "no difference with Aegis shown",
+    vDegradedMore: "{v} longer degraded than Aegis", vDegradedLess: "{v} shorter degraded than Aegis",
+    vPodMore: "uses {v} pod-minutes more than Aegis", vPodLess: "uses {v} pod-minutes less than Aegis",
+    vAskLater: "asks for the 2nd pod {v} after Aegis", vAskEarlier: "asks for the 2nd pod {v} before Aegis",
+    findTrendTitle: "It does not only anticipate.", findTrend: "On the spike there is no trend to anticipate, yet Aegis asks for the 2nd pod at {aegis} s; the HPAs at {lo}–{hi} s. Its advantage there is as large as on the ramp (the difference between them is not significant, p = {p}): it reacts sooner because it watches requests per second every 5 s, not averaged CPU.",
+    findCostTitle: "It does not cost more.", findCost: "With the 15–60 s scale-down rule it uses fewer pod-minutes than the HPA in {n} of the 6 comparisons",
+    findCostExcept: "; it only uses more on {list}, which saves pods while failing more.",
+    findCostNone: "it uses more in none.", findMethodTitle: "How it was measured.", findMethod: "54 runs: the 3 autoscalers on the 3 loads, repeated in 6 blocks in a drawn order. The plan and the analysis were fixed before the first run.",
     mFailedPct: "Failed requests", mDegraded: "Seconds degraded", mPodMin: "Pod-minutes", mAsk2: "Asks for the 2nd pod",
-    noteFailed: "Primary metric. What users notice, measured by k6. Lower is better.",
+    noteFailed: "Primary metric: the % of requests users saw fail (measured by k6). Lower is better.",
     noteDegraded: "Secondary. Seconds with P95 > 1 s or > 1% failed for 15 s. Lower is better.",
     notePodMin: "Secondary. Cost: requested pods × time, same window for all (load + 6 min). Lower is better.",
     noteAsk2: "Secondary. Seconds from the start of the load to asking for the 2nd pod. Earlier is better.",
     loadRamp: "Ramp", loadSpike: "Spike", loadWaves: "Waves",
-    verdictYes: "Aegis lower, significant", verdictNo: "No difference shown", verdictWorse: "Aegis higher",
     basisHolm: " (Holm)", basisRanks: " (Holm, on ranks)", basisExploratory: " (exploratory)",
     vsDefault: "against the default HPA", vsTuned: "against the tuned HPA",
     blockLabel: "Block {b}",
@@ -358,6 +380,7 @@ function renderStatus() {
   const mode = !live.online || !meta ? "offline" : meta.mode;
   const labels = { live: t("stateLive"), replay: t("stateReplay"), "dry-run": t("stateDry"), offline: t("stateOffline") };
   el("span", "state " + mode, line, labels[mode]);
+  document.querySelector('.tabs [data-tab="live"]').textContent = t(mode === "live" ? "tabLiveNow" : "tabLive");
   if (mode === "offline") return;
   const parts = [];
   if (mode === "replay") {
@@ -659,6 +682,7 @@ function renderReplayNote(meta) {
 }
 
 function renderVerdict(r, meta) {
+  document.getElementById("now-title").textContent = t(meta.mode === "replay" ? "nowReplay" : "nowLive", { clock: clock(r.time) });
   const title = document.getElementById("verdict");
   const detail = document.getElementById("verdict-detail");
   const C = meta.pod_capacity_rps;
@@ -845,6 +869,8 @@ async function loadExperiments() {
     for (const summary of test.runs) experiments.runs.push({ id: runId(test.name, summary.run), test: test.name, summary });
   }
   document.getElementById("empty-experiments").hidden = experiments.runs.length > 0;
+  // No recorded runs (a cluster without docs/tests): the live view is the useful one.
+  if (!experiments.runs.length && !location.hash) selectTab("live");
   try {
     experiments.design = (await (await fetch("api/design", { cache: "no-store" })).json()).results;
   } catch {
@@ -861,16 +887,17 @@ async function loadExperiments() {
 
 /* ------------------------------------------------- campaign results (design) */
 
-// The responses shown, in the order of the plan: the primary first. All of them: lower is better.
+// The responses, in the order of the plan: the primary first. For every one of them lower is better.
+// verdict: how an HPA row reads against Aegis, worse (more) or better (less); {v} is the gap.
 const RESULT_METRICS = [
   { key: "failed_percent", label: "mFailedPct", note: "noteFailed", unit: "%", digits: 1 },
-  { key: "degraded_seconds", label: "mDegraded", note: "noteDegraded", unit: " s", digits: 0 },
-  { key: "pod_minutes_window", label: "mPodMin", note: "notePodMin", unit: "", digits: 1 },
-  { key: "first_scale_up_s", label: "mAsk2", note: "noteAsk2", unit: " s", digits: 0 },
+  { key: "degraded_seconds", label: "mDegraded", note: "noteDegraded", unit: " s", digits: 0, more: "vDegradedMore", less: "vDegradedLess" },
+  { key: "pod_minutes_window", label: "mPodMin", note: "notePodMin", unit: "", digits: 1, more: "vPodMore", less: "vPodLess" },
+  { key: "first_scale_up_s", label: "mAsk2", note: "noteAsk2", unit: " s", digits: 0, more: "vAskLater", less: "vAskEarlier" },
 ];
-const DESIGN_LOADS = [["ramp", "loadRamp"], ["spike", "loadSpike"], ["waves", "loadWaves"]];
+const DESIGN_LOADS = [["ramp", "loadRamp", "loadRampHint"], ["spike", "loadSpike", "loadSpikeHint"], ["waves", "loadWaves", "loadWavesHint"]];
 const DESIGN_ACTORS = ["aegis", "hpa", "hpa-tuned"];
-const results = { metric: readPreference("aegis-result-metric") || "failed_percent" };
+const results = { metric: readPreference("aegis-result-metric") || "failed_percent", observer: null };
 
 // {load: {actor: [{block, value}]}} from the summaries of the design runs.
 function designValues(metric) {
@@ -885,18 +912,59 @@ function designValues(metric) {
   return out;
 }
 
+// An autoscaler name inside a sentence: "the default HPA", not "the Default HPA".
+const nameInText = (actor) => (lang === "en" ? MODE_NAMES.en[actor].replace(/^(Default|Tuned)/, (w) => w.toLowerCase()) : MODE_NAMES[lang][actor]);
+const meanOf = (runs) => (runs && runs.length ? runs.reduce((a, r) => a + r.value, 0) / runs.length : null);
+const loadName = (load) => t((DESIGN_LOADS.find((l) => l[0] === load) || [])[1] || load);
+const ratioText = (r) => (r >= 10 ? num(r, 0) : num(r, 1));
+
+// The answer in one sentence, from the registered verdicts: how many times fewer requests failed with Aegis.
+function resultsHeadline(design, failed) {
+  const rows = design ? design.primary : [];
+  if (!rows.length) return ["", ""];
+  const ratios = rows.filter((r) => r.significant && r.mean_first > 0).map((r) => r.mean_second / r.mean_first);
+  const missing = rows.filter((r) => !r.significant)
+    .map((r) => t("exceptionItem", { load: loadName(r.load).toLowerCase(), who: nameInText(r.second) }));
+  const text = t("headline", { min: ratioText(Math.min(...ratios)), max: ratioText(Math.max(...ratios)) });
+  let scope = t("headlineScope", { n: ratios.length, total: rows.length });
+  if (missing.length) scope += " " + t("headlineException", { list: missing.join(", ") });
+  return [text, scope];
+}
+
+// Three findings in plain words, each computed from the runs and the analysis.
+function resultsFindings(design) {
+  const list = document.getElementById("findings");
+  list.replaceChildren();
+  if (!design) return;
+  const item = (title, body) => {
+    const li = el("li", "", list);
+    el("b", "", li, title + " ");
+    li.appendChild(document.createTextNode(body));
+  };
+  const ask = designValues("first_scale_up_s").spike || {};
+  const hpaAsks = ["hpa", "hpa-tuned"].map((a) => meanOf(ask[a])).filter((v) => v !== null);
+  if (design.interaction && ask.aegis && hpaAsks.length) {
+    item(t("findTrendTitle"), t("findTrend", { aegis: num(meanOf(ask.aegis), 0), lo: num(Math.min(...hpaAsks), 0),
+      hi: num(Math.max(...hpaAsks), 0), d: signed(design.interaction.mean, 1), p: num(design.interaction.p, 2) }));
+  }
+  const dearer = design.secondary.filter((r) => r.metric === "pod_minutes_window" && r.p < 0.05 && r.diff > 0);
+  const cheaper = design.secondary.filter((r) => r.metric === "pod_minutes_window" && r.p < 0.05 && r.diff < 0);
+  item(t("findCostTitle"), t("findCost", { n: cheaper.length }) + (dearer.length
+    ? t("findCostExcept", { list: dearer.map((r) => t("exceptionItem", { load: t("theLoad", { load: loadName(r.load).toLowerCase() }), who: nameInText(r.second) })).join(", ") })
+    : "; " + t("findCostNone")));
+  item(t("findMethodTitle"), t("findMethod"));
+}
+
 function renderResults() {
   const box = document.getElementById("results");
-  const values = designValues("failed_percent");
-  box.hidden = !Object.keys(values).length;
+  const failed = designValues("failed_percent");
+  box.hidden = !Object.keys(failed).length;
   if (box.hidden) return;
   const design = experiments.design;
-  const primary = design ? design.primary : [];
-  const lead = document.getElementById("results-lead");
-  lead.innerHTML = primary.length ? t("resultsLead", { n: primary.filter((r) => r.significant).length, total: primary.length }) : "";
-  if (design && design.interaction) {
-    el("span", "results-h2", lead, " " + t("resultsH2", { d: signed(design.interaction.mean, 1), p: num(design.interaction.p, 2) }));
-  }
+  // The answer is the heading; the exception, if any, goes right under it.
+  const [answer, exception] = resultsHeadline(design, failed);
+  document.getElementById("results-title").textContent = answer || t("resultsTitle");
+  document.getElementById("results-lead").textContent = exception;
   const picker = document.getElementById("metric-picker");
   picker.replaceChildren();
   for (const metric of RESULT_METRICS) {
@@ -913,102 +981,141 @@ function renderResults() {
   document.getElementById("metric-note").textContent = t(metric.note);
   document.getElementById("results-foot").textContent = t("resultsFoot");
   const metricValues = designValues(metric.key);
-  drawStrips(metric, metricValues, design);
+  drawRows(metric, metricValues, design);
   const old = document.querySelector("#results .strip-table");
   if (old) old.remove();
-  const fmt = metric.key === "failed_percent" ? failedPct : (v) => num(v, metric.digits) + metric.unit;
-  document.getElementById("results-foot").before(stripTable(metric, metricValues, fmt));
+  document.getElementById("results-foot").before(stripTable(metric, metricValues, formatFor(metric)));
+  resultsFindings(design);
+  // Redraw the rows when their width changes (the dots are placed in pixels).
+  if (!results.observer) {
+    let width = 0;
+    results.observer = new ResizeObserver(() => {
+      const now = document.getElementById("strips").clientWidth;
+      if (now && now !== width) {
+        width = now;
+        requestAnimationFrame(() => drawRows(currentMetric(), designValues(currentMetric().key), experiments.design));
+      }
+    });
+    results.observer.observe(document.getElementById("strips"));
+  }
 }
 
-// One strip plot per load, the same y scale in all three: every run a dot, the mean a bar, the verdicts below.
-function drawStrips(metric, values, design) {
+const currentMetric = () => RESULT_METRICS.find((m) => m.key === results.metric) || RESULT_METRICS[0];
+const formatFor = (metric) => (metric.key === "failed_percent" ? failedPct : (v) => num(v, metric.digits) + metric.unit);
+
+// One row per autoscaler, grouped by load, on one shared x scale: the 6 runs as dots, the mean as a tick and
+// a bold number, and on each HPA row the registered verdict against Aegis in words.
+function drawRows(metric, values, design) {
   const box = document.getElementById("strips");
   box.replaceChildren();
   const all = [];
   for (const load of Object.values(values)) for (const runs of Object.values(load)) for (const r of runs) all.push(r.value);
-  // Round ticks: a nice step for ~4 intervals, the top a whole number of steps above the highest run.
-  const step = niceStep(Math.max(1, ...all) * 1.05, 4);
-  const top = Math.ceil((Math.max(1, ...all) * 1.05) / step) * step;
-  const fmt = metric.key === "failed_percent" ? failedPct : (v) => num(v, metric.digits) + metric.unit;
+  if (!all.length) return;
+  const highest = Math.max(1, ...all) * 1.04;
+  const step = niceStep(highest, 5);
+  const top = Math.ceil(highest / step) * step;
+  const fmt = formatFor(metric);
   const tooltip = el("div", "chart-tooltip strip-tooltip", box);
   tooltip.hidden = true;
-  for (const [load, labelKey] of DESIGN_LOADS) {
-    const panel = el("figure", "strip", box);
-    el("figcaption", "strip-title", panel, t(labelKey));
-    const width = 300;
-    const height = 230;
-    const m = { top: 12, right: 40, bottom: 30, left: 44 };
-    const svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svgNode.setAttribute("viewBox", "0 0 " + width + " " + height);
-    svgNode.setAttribute("class", "strip-svg");
-    svgNode.setAttribute("role", "img");
-    panel.appendChild(svgNode);
-    const add = (tag, attrs, parent = svgNode) => {
-      const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
-      for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
-      parent.appendChild(node);
-      return node;
-    };
-    const sy = (v) => height - m.bottom - (v / top) * (height - m.top - m.bottom);
-    const column = (width - m.left - m.right) / DESIGN_ACTORS.length;
-    for (let tick = 0; tick <= top + 1e-9; tick += step) {
-      add("line", { x1: m.left, x2: width - m.right, y1: sy(tick), y2: sy(tick), class: "strip-grid" });
-      add("text", { x: m.left - 6, y: sy(tick), class: "tick tick-y" }).textContent = num(tick, step < 1 ? 1 : 0);
+  const ns = "http://www.w3.org/2000/svg";
+  const add = (tag, attrs, parent) => {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    parent.appendChild(node);
+    return node;
+  };
+  const plots = [];
+  for (const [load, labelKey, hintKey] of DESIGN_LOADS) {
+    if (!values[load]) continue;
+    const group = el("section", "row-group", box);
+    const head = el("h3", "row-group-title", group, t(labelKey));
+    el("span", "row-group-hint", head, " " + t(hintKey));
+    for (const actor of DESIGN_ACTORS) {
+      const runs = values[load][actor] || [];
+      if (!runs.length) continue;
+      const row = el("div", "row" + (actor === "aegis" ? " is-aegis" : ""), group);
+      const name = el("div", "row-name", row);
+      name.appendChild(lineKey(ACTOR_COLORS[actor], null, "row-key"));
+      name.appendChild(document.createTextNode(MODE_NAMES[lang][actor]));
+      const cell = el("div", "row-plot", row);
+      const mean = meanOf(runs);
+      el("div", "row-value", row, fmt(mean));
+      const verdict = el("div", "row-verdict", row);
+      if (actor !== "aegis") fillVerdict(verdict, metric, design, load, actor, meanOf(values[load].aegis), mean);
+      plots.push({ cell, runs, actor, mean, load, labelKey });
     }
-    const described = [];
-    DESIGN_ACTORS.forEach((actor, i) => {
-      const runs = (values[load] || {})[actor] || [];
-      const cx = m.left + column * (i + 0.5);
-      add("text", { x: cx, y: height - 10, class: "tick tick-x strip-actor" }).textContent = MODE_NAMES[lang][actor];
-      if (!runs.length) return;
-      const mean = runs.reduce((a, r) => a + r.value, 0) / runs.length;
-      described.push(MODE_NAMES[lang][actor] + " " + fmt(mean));
-      const bar = add("line", { x1: cx - 20, x2: cx + 20, y1: sy(mean), y2: sy(mean), class: "strip-mean" });
-      bar.style.stroke = ACTOR_COLORS[actor];
-      add("text", { x: cx + 24, y: sy(mean), class: "strip-mean-label" }).textContent = fmt(mean);
-      for (const r of runs) {
-        // A transparent 24 px hit area in front of each 9 px dot: nobody has to land on the dot itself.
-        const x = cx + (r.block - 3.5) * 5;
-        const hit = add("circle", { cx: x, cy: sy(r.value), r: 12, class: "strip-hit", tabindex: 0,
-          "aria-label": MODE_NAMES[lang][actor] + ", " + t("blockLabel", { b: r.block }) + ": " + fmt(r.value) });
-        const dot = add("circle", { cx: x, cy: sy(r.value), r: 4.5, class: "strip-dot" });
-        dot.style.fill = ACTOR_COLORS[actor];
-        const show = () => {
-          tooltip.replaceChildren();
-          // Value first, then what it is.
-          el("strong", "tooltip-value", tooltip, fmt(r.value));
-          el("div", "tooltip-x", tooltip, MODE_NAMES[lang][actor] + " · " + t(labelKey) + " · " + t("blockLabel", { b: r.block }));
-          tooltip.hidden = false;
-          dot.classList.add("active");
-          const rect = dot.getBoundingClientRect();
-          const host = box.getBoundingClientRect();
-          tooltip.style.left = Math.min(host.width - 170, rect.left - host.left + 12) + "px";
-          tooltip.style.top = rect.top - host.top - 8 + "px";
-        };
-        const hide = () => { tooltip.hidden = true; dot.classList.remove("active"); };
-        hit.addEventListener("pointerenter", show);
-        hit.addEventListener("focus", show);
-        hit.addEventListener("pointerleave", hide);
-        hit.addEventListener("blur", hide);
+    plots.push({ axis: el("div", "row-axis", el("div", "row axis-row", group)) });
+  }
+  // Every plot cell has the same width: lay them out, then draw in pixels.
+  for (const p of plots) {
+    const target = p.axis || p.cell;
+    const width = target.clientWidth;
+    if (!width) continue;
+    const height = p.axis ? 22 : 34;
+    const sx = (v) => 6 + (v / top) * (width - 12);
+    const svgNode = add("svg", { width, height, viewBox: "0 0 " + width + " " + height, class: "row-svg" }, target);
+    if (p.axis) {
+      for (let tick = 0; tick <= top + 1e-9; tick += step) {
+        // The last tick ends at the edge instead of centering on it, so it is never cut off.
+        const last = tick + step > top + 1e-9;
+        const label = add("text", { x: sx(tick), y: 14, class: "tick tick-x" + (last ? " tick-last" : "") }, svgNode);
+        label.textContent = num(tick, step < 1 ? 1 : 0) + (last && metric.unit.trim() ? " " + metric.unit.trim() : "");
       }
-    });
-    svgNode.setAttribute("aria-label", t(labelKey) + ", " + t(metric.label) + ": " + described.join(", "));
-    const verdicts = el("ul", "verdicts", panel);
-    for (const [second, vsKey] of [["hpa", "vsDefault"], ["hpa-tuned", "vsTuned"]]) {
-      const row = verdictFor(design, metric.key, load, second);
-      if (!row) continue;
-      const better = row.diff < 0;
-      const primary = metric.key === "failed_percent";
-      const significant = primary ? row.significant : row.p < 0.05;
-      const kind = significant ? (better ? "yes" : "worse") : "no";
-      const li = el("li", "verdict " + kind, verdicts);
-      el("span", "verdict-icon", li, kind === "yes" ? "✓" : kind === "worse" ? "▲" : "–");
-      const basis = !primary ? t("basisExploratory") : row.decided_on === "ranks" ? t("basisRanks") : t("basisHolm");
-      el("span", "", li, t(vsKey) + ": " + signed(row.diff, metric.digits) + " [" + signed(row.ci[0], metric.digits) + ", "
-        + signed(row.ci[1], metric.digits) + "] · p " + pValue(primary ? row.p_decision : row.p) + basis);
-      li.title = t(kind === "yes" ? "verdictYes" : kind === "worse" ? "verdictWorse" : "verdictNo");
+      continue;
+    }
+    svgNode.setAttribute("role", "img");
+    svgNode.setAttribute("aria-label", MODE_NAMES[lang][p.actor] + ", " + t(p.labelKey) + ": " + p.runs.map((r) => fmt(r.value)).join(", "));
+    for (let tick = 0; tick <= top + 1e-9; tick += step) {
+      add("line", { x1: sx(tick), x2: sx(tick), y1: 3, y2: height - 3, class: "row-grid" }, svgNode);
+    }
+    const tickLine = add("line", { x1: sx(p.mean), x2: sx(p.mean), y1: 4, y2: height - 4, class: "row-mean" }, svgNode);
+    tickLine.style.stroke = ACTOR_COLORS[p.actor];
+    for (const r of p.runs) {
+      const x = sx(r.value);
+      const y = height / 2 + (r.block - 3.5) * 2.2;
+      const hit = add("circle", { cx: x, cy: y, r: 12, class: "strip-hit", tabindex: 0,
+        "aria-label": MODE_NAMES[lang][p.actor] + ", " + t("blockLabel", { b: r.block }) + ": " + fmt(r.value) }, svgNode);
+      const dot = add("circle", { cx: x, cy: y, r: 5, class: "strip-dot" }, svgNode);
+      dot.style.fill = ACTOR_COLORS[p.actor];
+      const show = () => {
+        tooltip.replaceChildren();
+        el("strong", "tooltip-value", tooltip, fmt(r.value));
+        el("div", "tooltip-x", tooltip, MODE_NAMES[lang][p.actor] + ", " + t(p.labelKey).toLowerCase() + ", " + t("blockLabel", { b: r.block }).toLowerCase());
+        tooltip.hidden = false;
+        dot.classList.add("active");
+        const rect = dot.getBoundingClientRect();
+        const host = box.getBoundingClientRect();
+        tooltip.style.left = Math.max(0, Math.min(host.width - 200, rect.left - host.left + 14)) + "px";
+        tooltip.style.top = rect.top - host.top - 12 + "px";
+      };
+      const hide = () => { tooltip.hidden = true; dot.classList.remove("active"); };
+      hit.addEventListener("pointerenter", show);
+      hit.addEventListener("focus", show);
+      hit.addEventListener("pointerleave", hide);
+      hit.addEventListener("blur", hide);
     }
   }
+}
+
+// The verdict of one HPA against Aegis, in words: icon, the gap and the p-value it rests on.
+function fillVerdict(node, metric, design, load, actor, aegisMean, mean) {
+  const row = verdictFor(design, metric.key, load, actor);
+  if (!row) return;
+  const primary = metric.key === "failed_percent";
+  const p = primary ? row.p_decision : row.p;
+  const significant = primary ? row.significant : p < 0.05;
+  // diff is Aegis minus this HPA: negative means the HPA had more (worse for every metric here).
+  const hpaWorse = row.diff < 0;
+  const kind = !significant ? "no" : hpaWorse ? "yes" : "worse";
+  node.classList.add("verdict", kind);
+  el("span", "verdict-icon", node, kind === "yes" ? "✓" : kind === "worse" ? "▲" : "–");
+  let text;
+  if (!significant) text = t("vNoDiff");
+  else if (primary) text = aegisMean > 0 ? t("vFailTimes", { r: ratioText(mean / aegisMean) }) : t("vFailMore");
+  else text = t(hpaWorse ? metric.more : metric.less, { v: num(Math.abs(row.diff), metric.digits) + metric.unit });
+  const basis = !primary ? t("basisExploratory") : row.decided_on === "ranks" ? t("basisRanks") : t("basisHolm");
+  el("span", "verdict-text", node, text);
+  el("span", "verdict-p", node, "p " + (p < 0.001 ? "" : "= ") + pValue(p) + basis);
 }
 
 // The accessible twin of the strip plots: every mean, range and run count in a table.
@@ -1325,7 +1432,9 @@ function selectTab(name) {
   document.getElementById("tab-live").hidden = name !== "live";
   document.getElementById("tab-experiments").hidden = name !== "experiments";
   if (name === "experiments") loadExperiments();
-  if (name === "experiments" || location.hash === "#experiments") location.hash = name === "live" ? "" : name;
+  // Results are the default page; the run view keeps its own address so it can be linked.
+  const hash = name === "live" ? (location.hash === "#how" ? "#how" : "#live") : "";
+  if (location.hash !== hash) history.replaceState(null, "", location.pathname + location.search + hash);
 }
 
 function setWindow(seconds) {
@@ -1375,7 +1484,8 @@ function init() {
   document.getElementById("tech").addEventListener("toggle", () => renderLive());
   document.getElementById("replay-run").addEventListener("change", (event) => switchReplay(event.target.value));
   setWindow(live.windowSeconds);
-  selectTab(location.hash === "#experiments" ? "experiments" : "live");
+  const runTab = location.hash === "#live" || location.hash === "#how";
+  selectTab(runTab ? "live" : "experiments");
   if (location.hash === "#how") document.getElementById("tech").open = true;
   poll();
   setInterval(poll, POLL_MS);
