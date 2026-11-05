@@ -93,7 +93,25 @@ def second_pod_ready(pods, k6_start):
 
 
 # The numbers of one run that go into the tables.
-def summarize(run_number, profile, mode, k6_start, buckets, logs, changes, calibration, pods, window_end):
+# Scale-ups less than REASK_SECONDS after a scale-down: the pod given back was needed again.
+REASK_SECONDS = 120
+
+
+def reasks(ups, downs):
+    count = 0
+    for up in ups:
+        if any(0 <= up["s"] - down["s"] < REASK_SECONDS for down in downs):
+            count += 1
+    return count
+
+
+# Pods requested from k6 start to the end of the load plus `tail` seconds: the same window for every
+# autoscaler, long enough for all of them to be back at 1 pod, so the cost of the tail is counted.
+def window_pod_minutes(changes, k6_start, seconds):
+    return round(sum(requested_at(changes, k6_start + second) for second in range(int(seconds))) / 60, 2)
+
+
+def summarize(run_number, profile, mode, k6_start, buckets, logs, changes, calibration, pods, window_end, tail=None):
     capacity = float(calibration["capacity_rps"])
     durations = []
     requests = 0
@@ -155,6 +173,9 @@ def summarize(run_number, profile, mode, k6_start, buckets, logs, changes, calib
         "scale_downs": downs,
         "max_pods": max_pods,
         "pod_minutes": round(pod_seconds / 60, 2),
+        "pod_minutes_window": None if tail is None else window_pod_minutes(changes, k6_start, total_duration(profile) + tail),
+        "cost_window_s": None if tail is None else total_duration(profile) + tail,
+        "reasks": reasks(ups, downs),
         "p95_excess_s2": p95_excess_area(buckets),
         "degraded_to_ready_s": degraded_to_ready,
         "false_scale_ups": false_alarms(ups, profile, capacity),

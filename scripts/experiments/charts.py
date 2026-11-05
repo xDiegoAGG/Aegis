@@ -7,6 +7,7 @@ from settings import L_SECONDS, MAX_FAILED_RATIO, STEP, SUSTAINED_BUCKETS
 # One color per role, the same in every chart.
 AEGIS = "#2a78d6"
 HPA = "#eb6834"
+HPA_TUNED = "#1baf7a"  # third validated slot (aqua): the tuned HPA of the design
 TRAFFIC = "#3a3a38"
 PLANNED = "#898781"
 DEFICIT = "#d03b3b"
@@ -42,7 +43,7 @@ TEXT = {
         "ev_ready": "{s} s  pod 2 Ready",
         "ev_degraded": "{s} s  users see the service degraded",
         "title_run": "{title} · run {run} · {date}: {failed}% failed, {degraded} s degraded",
-        "aegis": "Aegis", "hpa": "HPA only (CPU 70%)",
+        "aegis": "Aegis", "hpa": "HPA only (CPU 70%)", "hpa-tuned": "Tuned HPA (CPU 50%, 60 s down)",
         "evidence_title": "Same traffic: Aegis asks for the 2nd pod {a} s before one pod is exceeded, the HPA {h} s after",
         "column": "{name}: {failed}% failed · {degraded} s degraded",
         "pod2": "pod 2 asked at {asked} s, Ready at {ready} s\ntraffic passes C at {c} s",
@@ -82,7 +83,7 @@ TEXT = {
         "ev_ready": "{s} s  pod 2 Ready",
         "ev_degraded": "{s} s  los usuarios ven el servicio degradado",
         "title_run": "{title} · corrida {run} · {date}: {failed}% fallidas, {degraded} s degradado",
-        "aegis": "Aegis", "hpa": "Solo HPA (CPU 70%)",
+        "aegis": "Aegis", "hpa": "Solo HPA (CPU 70%)", "hpa-tuned": "HPA afinado (CPU 50%, baja en 60 s)",
         "evidence_title": "Mismo tráfico: Aegis pide el 2º pod {a} s antes de que se supere un pod, el HPA {h} s después",
         "column": "{name}: {failed}% fallidas · {degraded} s degradado",
         "pod2": "pod 2 pedido en {asked} s, Ready en {ready} s\nel tráfico supera C en {c} s",
@@ -298,8 +299,8 @@ def mark_events(axes, summary, mode_name, t):
 # Chart of one run: traffic vs capacity in service, latency, failures, Aegis risk (if on) and pods.
 def plot_run(path, title, summary, rows, lang="en", timeline=None):
     t = TEXT[lang]
-    aegis = summary["mode"] != "hpa"
-    color = AEGIS if aegis else HPA
+    aegis = summary["mode"] in ("aegis", "metric")
+    color = AEGIS if aegis else (HPA_TUNED if summary["mode"] == "hpa-tuned" else HPA)
     heights = [3.2, 2.0, 1.4] + ([1.6] if aegis else []) + [1.4]
     fig = Figure(figsize=(12, sum(heights) * 1.1 + 1.4))
     axes = fig.subplots(len(heights), 1, sharex=True, gridspec_kw={"height_ratios": heights})
@@ -333,7 +334,7 @@ def plot_run(path, title, summary, rows, lang="en", timeline=None):
     panel_title(ax, t["panel_pods"])
     for item in axes:
         style(item)
-    mark_events(axes, summary, t["aegis"] if aegis else "HPA", t)
+    mark_events(axes, summary, t["aegis"] if aegis else t.get(summary["mode"], "HPA"), t)
     shown = TITLES_ES.get(title, title) if lang == "es" else title
     fig.suptitle(t["title_run"].format(title=shown, run=summary["run"], date=summary["date_utc"],
                                        failed=summary["failed_percent"], degraded=summary["degraded_seconds"]),

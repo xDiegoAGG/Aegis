@@ -1,0 +1,24 @@
+# The HPA tuned a priori, the stronger baseline of the design (docs/experiments/design.md): a lower CPU
+# target leaves headroom before a pod saturates, and a 60 s scale-down window (Aegis waits 15-60 s)
+# instead of the default 300 s. Fixed before any run, never adjusted to the results.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: catalog-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: catalog-service
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 60

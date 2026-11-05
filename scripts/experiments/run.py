@@ -9,7 +9,8 @@ from cluster import (cluster_aegis_records, events_since, kubectl, pod_times, ra
 from load import client_buckets, percentile, planned_rate, read_profile, start_load, total_duration, wait_k6
 from metrics import requested_at, summarize, utc
 from pathlib import Path
-from settings import AFTER_SECONDS, BEFORE_SECONDS, CONFIG, COOLDOWN_SECONDS, RUNS_PER_TEST, STEP, TESTS, TESTS_DIR
+from settings import (AFTER_SECONDS, BEFORE_SECONDS, CONFIG, COOLDOWN_SECONDS, DESIGN_TESTS, RUNS_PER_TEST, STEP,
+                      TAIL_SECONDS, TESTS, TESTS_DIR)
 from timeline import write_timeline
 
 QUERY_SERVED_PODS = 'sum(rate(http_request_duration_seconds_count{route="/"}[30s]))'
@@ -72,7 +73,8 @@ def metric_path_delays(records, changes):
 
 
 # One full run: reset, Aegis on or off, load, then the data from k6, Prometheus and Aegis.
-def run_once(folder, profile, mode, run_number, calibration):
+# tail: seconds recorded after k6 ends. extra: fields added to the summary (design block and order).
+def run_once(folder, profile, mode, run_number, calibration, tail, extra=None):
     data_dir = folder / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
     prefix = str(data_dir / ("run-" + str(run_number)))
@@ -94,8 +96,8 @@ def run_once(folder, profile, mode, run_number, calibration):
         say("run", run_number, "started:", profile["name"], "load,", mode)
         pod, logs = wait_k6(profile)
         k6_start, buckets = client_buckets(pod)
-        say("k6 finished, watching", AFTER_SECONDS[mode], "s more")
-        time.sleep(AFTER_SECONDS[mode])
+        say("k6 finished, watching", tail, "s more")
+        time.sleep(tail)
     finally:
         if process is not None:
             stop_aegis(process, console)
@@ -117,7 +119,8 @@ def run_once(folder, profile, mode, run_number, calibration):
     else:
         changes = replica_changes(pods, events, window_start)
     write_run_csv(prefix + ".csv", profile, k6_start, buckets, records, changes, window_start, window_end)
-    summary = summarize(run_number, profile, mode, k6_start, buckets, logs, changes, calibration, pods, window_end)
+    summary = summarize(run_number, profile, mode, k6_start, buckets, logs, changes, calibration, pods, window_end, tail)
+    summary.update(extra or {})
     summary["calibration_measured_at"] = calibration["measured_at"]
     summary["load_scale"] = profile["scale"]
     if mode == "metric":
@@ -156,7 +159,12 @@ def check_calibration(name, folder, calibration, archive):
 
 
 # Runs the missing runs of a test; a run that fails is tried once more.
-def run_test(name, runs, first_run, archive=False):
+# Design tests record TAIL_SECONDS after k6 for every autoscaler; October tests kept their own tails.
+def tail_for(name, mode):
+    return TAIL_SECONDS if name in DESIGN_TESTS else AFTER_SECONDS[mode]
+
+
+def run_test(name, runs, first_run, archive=False, extra=None):
     profile_name, mode, title = TESTS[name]
     folder = TESTS_DIR / name
     calibration = read_calibration()
@@ -171,7 +179,7 @@ def run_test(name, runs, first_run, archive=False):
             continue
         for attempt in (1, 2):
             try:
-                run_once(folder, profile, mode, run_number, calibration)
+                run_once(folder, profile, mode, run_number, calibration, tail_for(name, mode), extra)
                 break
             except Exception as error:
                 say(name, "run", run_number, "attempt", attempt, "failed:", error)

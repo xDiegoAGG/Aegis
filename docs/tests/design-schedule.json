@@ -1,0 +1,89 @@
+{
+ "seed": 20261104,
+ "blocks": [
+  {
+   "block": 1,
+   "order": [
+    "waves-aegis",
+    "spike-hpa",
+    "ramp-hpa",
+    "spike-aegis",
+    "ramp-hpa-tuned",
+    "waves-hpa-tuned",
+    "waves-hpa",
+    "spike-hpa-tuned",
+    "ramp-aegis"
+   ]
+  },
+  {
+   "block": 2,
+   "order": [
+    "ramp-hpa-tuned",
+    "waves-aegis",
+    "ramp-aegis",
+    "spike-hpa-tuned",
+    "ramp-hpa",
+    "spike-aegis",
+    "waves-hpa-tuned",
+    "spike-hpa",
+    "waves-hpa"
+   ]
+  },
+  {
+   "block": 3,
+   "order": [
+    "spike-hpa-tuned",
+    "spike-hpa",
+    "waves-hpa-tuned",
+    "waves-hpa",
+    "ramp-aegis",
+    "ramp-hpa",
+    "spike-aegis",
+    "ramp-hpa-tuned",
+    "waves-aegis"
+   ]
+  },
+  {
+   "block": 4,
+   "order": [
+    "spike-hpa",
+    "waves-hpa-tuned",
+    "ramp-hpa-tuned",
+    "waves-aegis",
+    "spike-aegis",
+    "ramp-hpa",
+    "spike-hpa-tuned",
+    "ramp-aegis",
+    "waves-hpa"
+   ]
+  },
+  {
+   "block": 5,
+   "order": [
+    "spike-hpa-tuned",
+    "ramp-hpa",
+    "waves-aegis",
+    "ramp-aegis",
+    "waves-hpa-tuned",
+    "ramp-hpa-tuned",
+    "waves-hpa",
+    "spike-hpa",
+    "spike-aegis"
+   ]
+  },
+  {
+   "block": 6,
+   "order": [
+    "spike-hpa",
+    "waves-hpa-tuned",
+    "spike-hpa-tuned",
+    "ramp-hpa",
+    "ramp-hpa-tuned",
+    "waves-hpa",
+    "ramp-aegis",
+    "waves-aegis",
+    "spike-aegis"
+   ]
+  }
+ ]
+}

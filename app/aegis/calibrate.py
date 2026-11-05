@@ -353,7 +353,7 @@ def summarize_steps(stats):
 
 
 # Full calibration: capacity runs on 1 pod, then T; the HPA is always restored.
-def run(config, repetitions):
+def run(config, repetitions, save=True, output=None):
     settings = config["calibration"]
     kubernetes = config["kubernetes"]
     calibrator = Calibrator(config)
@@ -401,6 +401,15 @@ def run(config, repetitions):
         "capacity_runs": capacity_runs,
         "startup_measurements": startup,
     }
+    if output:
+        with open(output, "w") as out:
+            json.dump(calibration, out, indent=2)
+        logger.info("Written to %s", output)
+    if not save:
+        # Drift check of the experiment design: measure C again without changing the C the runs use.
+        logger.info("Not saved (--check-only): C=%s req/s (runs: %s), T=%s s", calibration["capacity_rps"],
+                    capacities, calibration["startup_time_seconds"])
+        return
     write_calibration(settings["configmap_name"], kubernetes["namespace"], calibration)
     logger.info("Saved in ConfigMap %s: C=%s req/s (runs: %s), T=%s s", settings["configmap_name"],
                 calibration["capacity_rps"], capacities, calibration["startup_time_seconds"])
@@ -413,6 +422,8 @@ def stop(signum, frame):
 def main():
     parser = argparse.ArgumentParser(description="Measure C (capacity of one pod) and T (startup time)")
     parser.add_argument("--repetitions", type=int, help="capacity runs; C is the lowest (default: config)")
+    parser.add_argument("--check-only", action="store_true", help="measure but keep the saved calibration (drift check)")
+    parser.add_argument("--output", help="also write the measurement to this JSON file")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     signal.signal(signal.SIGTERM, stop)
@@ -423,7 +434,7 @@ def main():
         repetitions = config["calibration"]["repetitions"]
     logger.info("Calibrating. Aegis must NOT be running: this pins the HPA to 1 replica for a while.")
     try:
-        run(config, repetitions)
+        run(config, repetitions, save=not args.check_only, output=args.output)
     except KeyboardInterrupt:
         logger.warning("Calibration interrupted: HPA restored and load stopped, nothing was saved")
     except RuntimeError as error:
