@@ -16,9 +16,11 @@ def read(path):
 
 # The engine fed with the demand Aegis saw in a recorded run must take the same decisions again.
 class RecordedTraceTest(unittest.TestCase):
-    def replay(self, name):
-        calibration = json.loads((TESTS_DIR / "calibration.json").read_text())
+    def replay(self, name, min_wait=60):
+        # The October 2026 runs were recorded with this calibration (calibration.json is the current one).
+        calibration = json.loads((TESTS_DIR / "calibration-2026-10-25.json").read_text())
         config = load_config()
+        config["risk_thresholds"]["scale_down_min_wait_seconds"] = min_wait
         config["capacity_rps"] = float(calibration["capacity_rps"])
         config["startup_time_seconds"] = float(calibration["startup_time_seconds"])
         records = read(TESTS_DIR / name / "data" / "run-1-aegis.ndjson")
@@ -30,7 +32,8 @@ class RecordedTraceTest(unittest.TestCase):
             decided.append((result, engine.decide(result, record["time"])))
         return records, decided
 
-    # The log rounds the demand, so a risk near 70% may cross it one cycle later.
+    # With the rule the runs were recorded with (fixed 60 s wait). The log rounds the demand, so a risk
+    # near 70% may cross it one cycle later.
     def test_same_decisions(self):
         for name in TRACES:
             with self.subTest(name):
@@ -40,6 +43,20 @@ class RecordedTraceTest(unittest.TestCase):
                 self.assertEqual([c[1:] for c in recorded], [c[1:] for c in replayed])
                 for (i, _, _), (j, _, _) in zip(recorded, replayed):
                     self.assertLessEqual(abs(i - j), 1)
+
+    # The risk-based wait (15-60 s) asks for pods at the same moments and gives them back sooner.
+    def test_risk_based_wait_saves_pods_without_changing_scale_ups(self):
+        for name in TRACES:
+            with self.subTest(name):
+                _, fixed = self.replay(name, min_wait=60)
+                _, adaptive = self.replay(name, min_wait=15)
+                ups = lambda run: [i for i, (_, d) in enumerate(run) if d.action == "scale_up"]
+                self.assertEqual(ups(fixed), ups(adaptive))
+                pods = lambda run: sum(d.target for _, d in run)
+                self.assertLess(pods(adaptive), pods(fixed))
+                for (_, a), (_, f) in zip(adaptive, fixed):
+                    self.assertLessEqual(a.target, f.target)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,4 +1,5 @@
 import unittest
+from statistics import NormalDist
 from aegis.decision import HOLD, SCALE_DOWN, SCALE_UP, DecisionEngine
 from aegis.risk import RiskResult
 from tests.helpers import config
@@ -35,22 +36,61 @@ class DecisionTest(unittest.TestCase):
         self.assertEqual(decision.action, HOLD)
         self.assertIsNone(decision.risk)
 
-    # Scale-in only after the risk with one pod less stays low for 60 s (flapping suppression).
-    def test_scale_down_waits_sustained_low_risk(self):
+    # Risk with one pod less ~0%: the shortest wait, 15 s.
+    def test_scale_down_fast_when_one_less_is_clearly_safe(self):
         engine = self.engine(initial=2)
-        for second in range(0, 60, 5):
+        for second in range(0, 15, 5):
             self.assertEqual(engine.decide(result(5), second).action, HOLD)
-        decision = engine.decide(result(5), 60)
+        decision = engine.decide(result(5), 15)
         self.assertEqual(decision.action, SCALE_DOWN)
         self.assertEqual(decision.target, 1)
+
+    # Risk with one pod less 25% (just under 30%): wait 15 + 45 * 25/30 = 52.5 s.
+    def test_scale_down_waits_longer_near_the_threshold(self):
+        engine = self.engine(initial=2)
+        projected = 24 + 2 * NormalDist().inv_cdf(0.25)
+        for second in range(0, 55, 5):
+            self.assertEqual(engine.decide(result(projected), second).action, HOLD, second)
+        self.assertEqual(engine.decide(result(projected), 55).action, SCALE_DOWN)
+
+    # The wait follows the highest risk seen while low, not only the current one.
+    def test_wait_uses_the_highest_risk_while_low(self):
+        engine = self.engine(initial=2)
+        engine.decide(result(24 + 2 * NormalDist().inv_cdf(0.25)), 0)
+        for second in range(5, 55, 5):
+            self.assertEqual(engine.decide(result(5), second).action, HOLD, second)
+        self.assertEqual(engine.decide(result(5), 55).action, SCALE_DOWN)
+
+    def test_drops_several_pods_at_once(self):
+        engine = self.engine(initial=3)
+        for second in range(0, 15, 5):
+            engine.decide(result(5), second)
+        decision = engine.decide(result(5), 15)
+        self.assertEqual((decision.action, decision.previous_target, decision.target), (SCALE_DOWN, 3, 1))
+
+    def test_keeps_the_pods_still_needed(self):
+        engine = self.engine(initial=3)
+        for second in range(0, 200, 5):
+            decision = engine.decide(result(30), second)
+        self.assertEqual(engine.target, 2)
 
     def test_a_risky_cycle_restarts_the_wait(self):
         engine = self.engine(initial=2)
         engine.decide(result(5), 0)
-        engine.decide(result(5), 30)
-        engine.decide(result(23), 35)
-        self.assertEqual(engine.decide(result(5), 90).action, HOLD)
-        self.assertEqual(engine.decide(result(5), 150).action, SCALE_DOWN)
+        engine.decide(result(5), 5)
+        engine.decide(result(23), 10)  # risk with 1 pod 31%
+        self.assertEqual(engine.decide(result(5), 15).action, HOLD)
+        self.assertEqual(engine.decide(result(5), 25).action, HOLD)
+        self.assertEqual(engine.decide(result(5), 30).action, SCALE_DOWN)
+
+    # A config without the minimum wait keeps a fixed wait (the rule of the October 2026 runs).
+    def test_without_min_wait_the_wait_is_fixed(self):
+        settings = config()
+        del settings["risk_thresholds"]["scale_down_min_wait_seconds"]
+        engine = DecisionEngine.from_config(settings, 2)
+        for second in range(0, 60, 5):
+            self.assertEqual(engine.decide(result(5), second).action, HOLD)
+        self.assertEqual(engine.decide(result(5), 60).action, SCALE_DOWN)
 
     def test_no_scale_down_when_one_less_would_be_risky(self):
         engine = self.engine(initial=2)

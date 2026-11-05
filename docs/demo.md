@@ -147,7 +147,7 @@ kubectl logs -f job/load-linear
 | ~80–90 | T2 | a second pod goes from `0/1` to `1/1` | The new pod is Ready around second 81, when the traffic passes C |
 | ~110–150 | T1 | `SCALE_UP 2 -> 3` | Near 50 req/s two pods (2C ≈ 48) are not enough: it asks for a third one |
 | 240 | T3 | k6 summary: `http_req_failed` around 1% or less | Almost nobody noticed the ramp |
-| ~285–330 | T1 | `SCALE_DOWN 3 -> 2`, then `2 -> 1` | One pod less at a time, each after 60 s of low risk |
+| ~285–330 | T1 | `SCALE_DOWN 3 -> 2`, then `2 -> 1` | Recorded with the fixed 60 s wait; with the current 15–60 s wait it goes 3 -> 1 in one step, sooner |
 
 When it ends (Ctrl+C in terminal 3; the Job keeps its pod 10 min, that is normal):
 
@@ -172,7 +172,7 @@ kubectl logs -f job/load-fluctuating
 |---|---|---|
 | 30–90 | `SCALE_UP 1 -> 2` during the first climb, maybe `2 -> 3` near its end | Same as demo 1 |
 | 90–135 | traffic flat at 40 | If it asked for a 3rd pod, the risk with one less is now low |
-| 150–230 | `SCALE_DOWN` down to 1 pod while traffic is at 8 | **Aegis gives the pods back** when they are not needed, after 60 s of low risk |
+| 150–230 | `SCALE_DOWN` down to 1 pod while traffic is at 8 | **Aegis gives the pods back** when they are not needed, after 15–60 s of low risk (60 s in the recorded runs) |
 | 255–300 | `SCALE_UP` again, up to 3 pods | The second wave is higher than 2C: it asks for the third pod |
 | 345–480 | `SCALE_DOWN 3 -> 2`, then `2 -> 1` | It goes back to 1 pod, one step at a time |
 | 480 | k6 summary | Few or no failed requests |

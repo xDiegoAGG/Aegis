@@ -57,3 +57,7 @@ https://otexts.com/fpp3/
 [20] E. A. Silver, D. F. Pyke, and R. Peterson, *Inventory Management and Production Planning and Scheduling*, 3rd ed., Wiley, 1998.
 
 [21] E. S. Gardner Jr. and E. McKenzie, "Forecasting Trends in Time Series," *Management Science*, vol. 31, no. 10, pp. 1237–1246, 1985.
+
+[22] A. R. Karlin, M. S. Manasse, L. Rudolph, and D. D. Sleator, "Competitive Snoopy Caching," *Algorithmica*, vol. 3, pp. 79–119, 1988.
+
+[23] M. Lin, A. Wierman, L. L. H. Andrew, and E. Thereska, "Dynamic Right-Sizing for Power-Proportional Data Centers," in *Proc. IEEE INFOCOM*, 2011, pp. 1098–1106.

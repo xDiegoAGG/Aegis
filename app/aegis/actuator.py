@@ -190,6 +190,7 @@ def build_meta(config, actuator):
         "scale_up_threshold": thresholds["scale_up"],
         "scale_down_threshold": thresholds["scale_down"],
         "scale_down_sustained_seconds": thresholds["scale_down_sustained_seconds"],
+        "scale_down_min_wait_seconds": thresholds.get("scale_down_min_wait_seconds", thresholds["scale_down_sustained_seconds"]),
         "calibrated_at": config.get("calibrated_at"),
         "started_at": time.time(),
     }

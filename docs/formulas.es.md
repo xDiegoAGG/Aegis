@@ -14,7 +14,7 @@ T es el tiempo que necesita un pod nuevo para estar Ready. Preguntar por "ahora"
 | 4 | riesgo = Φ((p − C·N) / σ) | Distribución normal de los errores de pronóstico | Qué tan probable es pasarse de la capacidad |
 | 5 | σ = √(2 · promedio(max(0, e)²)) | Errores del pronóstico, semidesviación superior | Cuánto confiar en la proyección |
 
-La regla de decisión encima de ellas (70% para subir, 30% durante 60 s para bajar) es histéresis, la misma idea que usa el HPA.
+La regla de decisión encima de ellas (70% para subir; bajar cuando el riesgo se mantiene bajo 30% entre 15 y 60 s) es histéresis, la misma idea que usa el HPA.
 
 ## 1. Capacidad: C · N
 
@@ -74,12 +74,22 @@ $$\sigma = \sqrt{2 \cdot \text{promedio}\left(\max(0, e)^2\right)}, \quad e = \t
 
 **Límites.** σ empieza en 2 hasta tener 6 errores, y nunca baja de 1 req/s, para que un tráfico muy estable no vuelva a Aegis demasiado confiado.
 
-## 6. La regla de decisión: 70% para subir, 30% durante 60 s para bajar
+## 6. La regla de decisión: 70% para subir, 30% durante 15–60 s para bajar
 
 Dos umbrales y un tiempo de espera son **histéresis**: el sistema no cambia de un lado a otro alrededor de un solo valor. El HPA hace lo mismo con sus ventanas de estabilización [1].
 
 - **Sube** cuando el riesgo con los pods ya pedidos es ≥ 70%. Usar los pods pedidos (no solo los Ready) evita pedir más mientras un pod todavía está arrancando.
-- **Baja** cuando el riesgo con **un pod menos** se mantiene bajo 30% durante 60 s. Preguntar "¿estaría seguro con uno menos?" en vez de "¿el riesgo es bajo ahora?" evita quitar el pod que es justamente la razón de que el riesgo sea bajo.
+- **Baja** cuando el riesgo con **menos pods** se mantiene bajo 30% durante una espera. Preguntar "¿estaría seguro con uno menos?" en vez de "¿el riesgo es bajo ahora?" evita quitar el pod que es justamente la razón de que el riesgo sea bajo.
+
+**La espera depende del riesgo** (desde noviembre de 2026; las corridas de octubre usaron 60 s fijos):
+
+$$W = W_{min} + (W_{max} - W_{min}) \cdot \frac{\text{riesgo máximo mientras estuvo bajo}}{30\%}, \qquad W_{min} = 15\ \text{s},\ W_{max} = 60\ \text{s}$$
+
+Para cada número menor de pods k, Aegis mide cuánto tiempo lleva el riesgo con k pods bajo 30% y el riesgo más alto visto en ese tiempo, y baja directo al menor k cuya espera ya pasó (de 3 a 1 en un paso, no en dos esperas).
+
+**De dónde sale.** Devolver un pod es un problema de *alquiler de esquís* (ski rental): seguir pagando un pod que quizás está ocioso, o soltarlo y pagar la falta de capacidad si vuelve a hacer falta (T + lag segundos para recuperarlo). La respuesta sin conocer el futuro es esperar hasta que lo pagado por el pod ocioso iguale lo que costaría equivocarse [22]; aplicado a servidores es el *lazy capacity provisioning* [23]. Aegis ya proyecta a T + lag, el tiempo para recuperar un pod, así que con un pronóstico perfecto no haría falta esperar: **la espera solo cubre el error de la proyección**. Por eso es corta cuando el riesgo con menos pods es ~0% y larga cerca de 30%. 15 s es un arranque T; 60 s es la espera fija anterior.
+
+**Evidencia (simulación, falta una corrida en el clúster).** El motor real alimentado con la demanda de las 22 corridas grabadas de Aegis (`scripts/experiments/scale_down_sim.py`): 10–14% menos pods-minuto, las mismas subidas, ningún segundo extra sin capacidad. Con tráfico sintético con caídas cortas y ráfagas tampoco añadió falta de capacidad; una espera fija de 15 s añadió 126 s sin capacidad en las ráfagas.
 
 ## Supuestos y límites
 

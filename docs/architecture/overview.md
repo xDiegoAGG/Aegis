@@ -40,7 +40,7 @@ Aegis runs on the laptop or as a Deployment in `aegis-system` ([deployment.md](.
 | Calibration (`aegis.calibrate`) | Measures C (capacity of one pod) and T (startup time) with a step load and saves them in a ConfigMap |
 | HPA | Keeps the replicas between `minReplicas` and `maxReplicas`. With Aegis its CPU target is 95% (never reached), so Aegis decides; without Aegis it scales on CPU at 70% (baseline) |
 | Deployment / ReplicaSet | Creates and removes pods to match the replicas |
-| Readiness probe | Marks a pod Ready (`/health`, 5 s timeout); Traefik v3.7 also routes to not-ready pods ([limitations.md](../limitations.md#pod-startup-under-overload)) |
+| Readiness probe | Marks a pod Ready (`/ready` on port 3004, served by a worker thread outside the request queue, 5 s timeout); Traefik v3.7 also routes to not-ready pods ([limitations.md](../limitations.md#pod-startup-under-overload)) |
 
 Aegis only reads Prometheus and changes one field of the HPA. If it stops, the HPA keeps the last `minReplicas` and works on its own.
 
@@ -54,7 +54,7 @@ flowchart TD
     D --> E["risk = Φ((p − C·N) / σ)"]
     E --> F{"decision.py"}
     F -->|"risk with requested pods ≥ 70%"| G["one pod more"]
-    F -->|"risk with one pod less < 30% for 60 s"| H["one pod less"]
+    F -->|"risk with fewer pods < 30% for 15–60 s"| H["fewer pods"]
     F -->|otherwise| I["hold"]
     G --> J["actuator.py<br/>patch HPA minReplicas"]
     H --> J
@@ -68,7 +68,7 @@ flowchart TD
 | Project | `risk.py` | Linear trend over the last 30 s, extrapolated T + 20 s ahead (20 s = measured delay of a 30 s rate) |
 | Uncertainty | `risk.py` (`SigmaEstimator`) | Compares every projection with the real traffic when its moment arrives; σ from the errors where traffic came above (5 min window, minimum 1 req/s) |
 | Risk | `risk.py` | Probability that the traffic goes over C · N, with a normal projection error |
-| Decide | `decision.py` | Up at 70% with the pods already requested; down when the risk with one pod less stays under 30% for 60 s |
+| Decide | `decision.py` | Up at 70% with the pods already requested; down to the fewest pods whose risk stays under 30% for 15–60 s (shorter the lower the risk) |
 | Act | `actuator.py` | Sets `minReplicas` only when it changes; on an API error it retries next cycle |
 | Log | `actuator.py` (`--log`) | One JSON line per cycle with every value above |
 | Publish | `server.py` | The same cycle on `/api/state` (dashboard) and `/metrics` (Prometheus) |
@@ -99,5 +99,5 @@ sequenceDiagram
 | T | Time from asking for a pod until it is Ready | measured | `aegis.calibrate`: raises `minReplicas` and times it (15 s) |
 | lag | Delay of the demand measurement | 20 s | Measured once on a real ramp (`config.yaml`, `sampling.metric_lag_seconds`) |
 | σ | Projection error | live | `SigmaEstimator`, from the projection errors |
-| Thresholds | Scale up / scale down / waiting time | 70% / 30% / 60 s | Decided (`config.yaml`, `risk_thresholds`) |
+| Thresholds | Scale up / scale down / waiting time | 70% / 30% / 15–60 s | Decided (`config.yaml`, `risk_thresholds`) |
 | Replicas | Range Aegis can request | 1 to 3 | `config.yaml` and `kubernetes/hpa/aegis.yaml` |

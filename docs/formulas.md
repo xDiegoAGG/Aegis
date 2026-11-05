@@ -14,7 +14,7 @@ T is the time a new pod needs to be Ready. Asking about "now" is too late: a pod
 | 4 | risk = Φ((p − C·N) / σ) | Normal distribution of forecast errors | How likely it is to go over capacity |
 | 5 | σ = √(2 · mean(max(0, e)²)) | Forecast errors, upper semi-deviation | How much to trust the projection |
 
-The decision rule on top of them (70% up, 30% for 60 s down) is hysteresis, the same idea the HPA uses.
+The decision rule on top of them (70% up; down after the risk stays under 30% for 15–60 s) is hysteresis, the same idea the HPA uses.
 
 ## 1. Capacity: C · N
 
@@ -74,12 +74,22 @@ $$\sigma = \sqrt{2 \cdot \text{mean}\left(\max(0, e)^2\right)}, \quad e = \text{
 
 **Limits.** σ starts at 2 until there are 6 errors, and never goes under 1 req/s, so a very steady traffic does not make Aegis overconfident.
 
-## 6. The decision rule: 70% up, 30% for 60 s down
+## 6. The decision rule: 70% up, 30% for 15–60 s down
 
 Two thresholds and a waiting time are **hysteresis**: the system does not switch back and forth around a single value. The HPA does the same with its stabilization windows [1].
 
 - **Up** when the risk with the pods already requested is ≥ 70%. Using the requested pods (not only the Ready ones) avoids asking for more while a pod is still starting.
-- **Down** when the risk with **one pod less** stays under 30% for 60 s. Asking "would I be safe with one less?" instead of "is the risk low now?" avoids removing a pod that is the reason the risk is low.
+- **Down** when the risk with **fewer pods** stays under 30% for a wait. Asking "would I be safe with one less?" instead of "is the risk low now?" avoids removing a pod that is the reason the risk is low.
+
+**The wait depends on the risk** (since November 2026; the October runs used a fixed 60 s):
+
+$$W = W_{min} + (W_{max} - W_{min}) \cdot \frac{\max \text{risk while low}}{30\%}, \qquad W_{min} = 15\ \text{s},\ W_{max} = 60\ \text{s}$$
+
+For every smaller pod count k, Aegis tracks how long the risk with k pods has stayed under 30% and the highest risk seen meanwhile, and goes straight to the smallest k whose wait has passed (3 → 1 in one step, not two waits).
+
+**Where it comes from.** Giving a pod back is a *ski-rental* decision: keep paying for a pod that may be idle, or release it and pay the shortfall if it is needed again (T + lag seconds to get it back). The online answer is to wait until what was paid for the idle pod matches what a wrong release would cost [22]; applied to servers this is *lazy capacity provisioning* [23]. Aegis already projects at T + lag, the time to get a pod back, so with a perfect forecast no wait would be needed: **the wait only covers the error of the projection**. That is why it is short when the risk with fewer pods is ~0% and long near 30%. 15 s is one startup time T; 60 s is the previous fixed wait.
+
+**Evidence (simulation, not yet a cluster run).** The real engine fed with the demand of the 22 recorded Aegis runs (`scripts/experiments/scale_down_sim.py`): 10–14% fewer pod-minutes, the same scale-ups, no extra seconds short of capacity. On synthetic traffic with short dips and bursts it added no shortfall either; a fixed 15 s wait added 126 s of shortfall on bursts.
 
 ## Assumptions and limits
 
