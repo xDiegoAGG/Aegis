@@ -72,7 +72,7 @@ python3 -m aegis.calibrate
 cd ..
 ```
 
-Termina con `Saved in ConfigMap aegis-calibration: C=… req/s, T=… s`. Si dice `no degradation up to 80 req/s`, corre `scripts/setup.sh --pod-cpu 60m` y calibra de nuevo: los perfiles esperan un C entre 20 y 30 req/s.
+Termina con `Saved in ConfigMap aegis-calibration: C=… req/s, T=… s`. Los perfiles de tráfico esperan un C entre 20 y 30 req/s, y los tiempos de abajo son para C ≈ 24. Si C queda fuera de ese rango (o dice `no degradation up to 80 req/s`), cambia el CPU del pod con CPU nuevo ≈ CPU probado × (C buscado ÷ C medido), por ejemplo `scripts/setup.sh --pod-cpu 60m`, y calibra de nuevo. Un clúster nuevo arranca con 200m; este PC usa 200m (C = 24).
 
 ### 1.5 Dejarlo en reposo
 
@@ -100,6 +100,8 @@ python3 scripts/experiments/reset.py
 cd app
 python3 -m aegis.actuator
 ```
+
+Usa el modo `min_replicas`, que es el de siempre: Aegis sube `minReplicas` del HPA. El modo métrica es solo un experimento (prueba 8) y no se usa en la demo.
 
 Debes ver `Calibration from …: C=… req/s, T=… s` y después una línea cada 5 s:
 
@@ -159,7 +161,7 @@ Deja Aegis corriendo en la terminal 1.
 
 ## 4. Demo 2: tráfico fluctuante
 
-Dos olas: hasta 40 req/s (necesita 2 pods), 2 minutos en 8 req/s, hasta 55 req/s (necesita 3 pods, 2C ≈ 48), 2 minutos en 8 req/s.
+Dos olas que suben como la rampa, 560 s en total: 30 s en 5 req/s, una ola hasta 30 req/s (necesita 2 pods), 105 s en 5 req/s, una ola hasta 50 req/s (necesita 3 pods, 2C ≈ 48), 120 s en 5 req/s. Tiempos de la prueba 2.
 
 En la terminal 3:
 
@@ -210,3 +212,4 @@ y al final `python3 scripts/experiments/reset.py` (vuelve a poner el HPA de Aegi
 | `kubectl apply` dice que el Job es inmutable | Quedó un Job anterior: `python3 scripts/experiments/reset.py` |
 | `/api/books` devuelve 500 | `scripts/setup.sh` (vuelve a llenar la tabla) |
 | Aegis arranca con más de 1 pod | Detenlo, `python3 scripts/experiments/reset.py`, arráncalo otra vez |
+| `Address already in use` (puerto 8080) | Sigue corriendo otro Aegis o un replay: `pkill -f aegis.replay` (o detén el otro Aegis), o arranca con `--port 8081` |

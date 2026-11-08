@@ -62,7 +62,7 @@ usando la simetría de la distribución normal. Φ es su función de distribuci�
 - El umbral tiene significado. Riesgo = 50% significa p = C·N exacto. Riesgo ≥ 70% significa p ≥ C·N + 0.52σ: la proyección está sobre la capacidad con margen.
 - La misma fórmula sirve para cualquier número de pods: el motor de decisión pide el riesgo con los pods ya pedidos (para subir) y con uno menos (para bajar).
 
-Ejemplo con C = 26 req/s, 1 pod, σ = 3: una proyección de 26 da 50%; 27.6 da 70% (Aegis pide un pod); 20 da 2%.
+Ejemplo con C = 24 req/s, 1 pod, σ = 3: una proyección de 24 da 50%; 25.6 da 70% (Aegis pide un pod); 18 da 2%.
 
 ## 5. sigma: aprendido de los propios errores de la proyección
 

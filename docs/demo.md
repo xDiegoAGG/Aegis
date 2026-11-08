@@ -72,7 +72,7 @@ python3 -m aegis.calibrate
 cd ..
 ```
 
-It ends with `Saved in ConfigMap aegis-calibration: C=… req/s, T=… s`. If it says `no degradation up to 80 req/s`, run `scripts/setup.sh --pod-cpu 60m` and calibrate again: the profiles expect C between 20 and 30 req/s.
+It ends with `Saved in ConfigMap aegis-calibration: C=… req/s, T=… s`. The traffic profiles expect C between 20 and 30 req/s, and the timings below are for C ≈ 24. If C is outside that range (or it says `no degradation up to 80 req/s`), change the pod CPU with new CPU ≈ tested CPU × (wanted C ÷ measured C), for example `scripts/setup.sh --pod-cpu 60m`, and calibrate again. A new cluster starts at 200m; this PC uses 200m (C = 24).
 
 ### 1.5 Leave it at rest
 
@@ -100,6 +100,8 @@ python3 scripts/experiments/reset.py
 cd app
 python3 -m aegis.actuator
 ```
+
+It uses the default `min_replicas` mode: Aegis raises `minReplicas` of the HPA. The metric mode is only an experiment (test 8), not used in the demo.
 
 You should see `Calibration from …: C=… req/s, T=… s`, then one line every 5 s:
 
@@ -159,7 +161,7 @@ Leave Aegis running in terminal 1.
 
 ## 4. Demo 2: fluctuating traffic
 
-Two waves: up to 40 req/s (needs 2 pods), 2 minutes at 8 req/s, up to 55 req/s (needs 3 pods, 2C ≈ 48), 2 minutes at 8 req/s.
+Two waves that climb like the ramp, 560 s in total: 30 s at 5 req/s, a wave to 30 req/s (needs 2 pods), 105 s at 5 req/s, a wave to 50 req/s (needs 3 pods, 2C ≈ 48), 120 s at 5 req/s. Times from test 2.
 
 In terminal 3:
 
@@ -210,3 +212,4 @@ and at the end `python3 scripts/experiments/reset.py` (it puts the Aegis HPA bac
 | `kubectl apply` says the Job is immutable | A previous Job is still there: `python3 scripts/experiments/reset.py` |
 | `/api/books` returns 500 | `scripts/setup.sh` (it seeds the table again) |
 | Aegis starts with more than 1 pod | Stop it, `python3 scripts/experiments/reset.py`, start it again |
+| `Address already in use` (port 8080) | Another Aegis or replay is still running: `pkill -f aegis.replay` (or stop the other Aegis), or start with `--port 8081` |
