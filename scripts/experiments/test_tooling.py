@@ -11,7 +11,11 @@ from compare import climb
 from load import first_crossing, planned_rate, read_profile, total_duration
 from metrics import false_alarms, needed_pod_minutes
 from run import metric_path_delays
-from settings import BOUNDARY_TESTS, CAMPAIGN_RUNS, COMPARISONS, HPA_FILES, PROFILES, ROOT, TESTS
+from settings import (AUTOSCALERS, BLOCKS, BOUNDARY_TESTS, COMPARISONS, DESIGN_TESTS, HPA_FILES, LOADS, PROFILES,
+                      ROOT, TESTS)
+import campaign
+import design_analysis
+from metrics import reasks, window_pod_minutes
 
 
 # Checks of the experiment tooling that need no cluster: profiles, metrics, charts helpers, campaign rules.
@@ -21,7 +25,7 @@ class ProfilesTest(unittest.TestCase):
             self.assertIn(profile, PROFILES, name)
             self.assertTrue(PROFILES[profile].exists(), name)
             self.assertTrue(HPA_FILES[mode].exists(), name)
-        for name in list(CAMPAIGN_RUNS) + BOUNDARY_TESTS + [n for pair in COMPARISONS for n in pair[:2]]:
+        for name in list(DESIGN_TESTS) + BOUNDARY_TESTS + [n for pair in COMPARISONS for n in pair[:2]]:
             self.assertIn(name, TESTS)
 
     def test_profiles_parse_and_jobs_match(self):
@@ -61,7 +65,79 @@ class ProfilesTest(unittest.TestCase):
         self.assertEqual(climb(read_profile("spike"), 24)[0], 8.0)
 
 
+class DesignTest(unittest.TestCase):
+    def test_factorial_cells(self):
+        self.assertEqual(len(DESIGN_TESTS), len(AUTOSCALERS) * len(LOADS))
+        self.assertEqual(sorted({mode for _, mode, _ in DESIGN_TESTS.values()}), sorted(AUTOSCALERS))
+
+    # Every block holds every cell exactly once; orders differ between blocks and are reproducible.
+    def test_schedule_is_a_randomized_complete_block_design(self):
+        plan = campaign.schedule()
+        self.assertEqual(len(plan), BLOCKS)
+        for entry in plan:
+            self.assertEqual(sorted(entry["order"]), sorted(DESIGN_TESTS))
+        self.assertGreater(len({tuple(e["order"]) for e in plan}), 1)
+        self.assertEqual(plan, campaign.schedule())
+        self.assertEqual(campaign.parse_blocks("2-4"), [2, 3, 4])
+        self.assertEqual(campaign.parse_blocks("5"), [5])
+
+    def runs(self, effect, noise, blocks=6, seed=1):
+        import random
+        rnd = random.Random(seed)
+        runs = {}
+        for load in LOADS:
+            for autoscaler in AUTOSCALERS:
+                for block in range(1, blocks + 1):
+                    drift = block * 0.5  # a session effect the blocks must absorb
+                    value = (2.0 if autoscaler == "aegis" else 2.0 + effect) + drift + rnd.gauss(0, noise)
+                    runs.setdefault((load, autoscaler), {})[block] = {"failed_percent": max(0.0, value), "run": block,
+                                                                      "block": block}
+        return runs
+
+    def test_analysis_finds_a_real_effect(self):
+        result = design_analysis.analyze(self.runs(effect=30, noise=2))
+        self.assertEqual(len(result["primary"]), 6)
+        for row in result["primary"]:
+            self.assertTrue(row["significant"], row)
+            self.assertLess(row["diff"], 0)
+            self.assertAlmostEqual(row["p_within_block"], 2 / 64)
+            self.assertEqual(row["cliffs_delta"], -1.0)
+
+    def test_analysis_finds_nothing_without_effect(self):
+        result = design_analysis.analyze(self.runs(effect=0, noise=2, seed=3))
+        self.assertFalse(any(row["significant"] for row in result["primary"]))
+
+    # The dashboard reads the JSON: booleans and numbers must be JSON ones, not numpy scalars written as text.
+    def test_results_are_plain_json(self):
+        result = design_analysis.plain(design_analysis.analyze(self.runs(effect=0, noise=2, seed=3)))
+        text = json.dumps(result)
+        for row in json.loads(text)["primary"]:
+            self.assertIsInstance(row["significant"], bool)
+            self.assertIsInstance(row["p_decision"], float)
+
+    def test_holm(self):
+        self.assertEqual(design_analysis.holm([0.01, 0.04, 0.03]), [0.03, 0.06, 0.06])
+
+    def test_blocks_absorb_drift(self):
+        # Same effect, a large drift between blocks: the block term removes it from the error.
+        runs = self.runs(effect=5, noise=0.5)
+        for key in runs:
+            for block, summary in runs[key].items():
+                summary["failed_percent"] += 20 * block
+        row = design_analysis.analyze(runs)["primary"][0]
+        self.assertTrue(row["significant"])
+
+
 class MetricsTest(unittest.TestCase):
+    def test_reasks(self):
+        downs = [{"s": 100, "from": 2, "to": 1}]
+        self.assertEqual(reasks([{"s": 150, "from": 1, "to": 2}], downs), 1)
+        self.assertEqual(reasks([{"s": 400, "from": 1, "to": 2}, {"s": 50, "from": 1, "to": 2}], downs), 0)
+
+    def test_window_pod_minutes(self):
+        changes = [{"time": 1060, "from": 1, "to": 2}, {"time": 1120, "from": 2, "to": 1}]
+        self.assertEqual(window_pod_minutes(changes, 1000, 180), 4.0)
+
     def test_false_alarm(self):
         linear = read_profile("linear")
         self.assertEqual(false_alarms([{"s": 71, "from": 1, "to": 2}], linear, 24), 0)

@@ -5,8 +5,8 @@ import socket
 import subprocess
 import sys
 from load import read_profile, total_duration
-from run import saved_calibrations
-from settings import AEGIS_NAMESPACE, AFTER_SECONDS, CAMPAIGN_RUNS, PROFILES, ROOT, TESTS, TESTS_DIR
+from run import saved_calibrations, tail_for
+from settings import AEGIS_NAMESPACE, BLOCKS, DESIGN_TESTS, PROFILES, ROOT, TESTS, TESTS_DIR
 
 # Time a run takes besides its load: reset to 1 pod, cooldown, Aegis start, k6 polling, Prometheus export.
 RUN_OVERHEAD_SECONDS = 200
@@ -112,6 +112,30 @@ def check_metric_mode(tests):
     return True, "in-cluster Aegis deployed, Custom Metrics API available"
 
 
+# The host power mode changes how much a tiny CPU quota serves: on 2026-11-04 the same pod gave
+# C = 4 req/s in "balanced" and ~3.5x less CPU per request in "performance". It must not change between sessions.
+def power_profile():
+    try:
+        with open("/sys/firmware/acpi/platform_profile") as f:
+            platform = f.read().strip()
+    except OSError:
+        platform = None
+    tuned = None
+    if shutil.which("tuned-adm"):
+        out = subprocess.run(["tuned-adm", "active"], capture_output=True, text=True).stdout
+        tuned = out.split(":", 1)[1].strip() if ":" in out else None
+    return platform, tuned
+
+
+def check_power():
+    platform, tuned = power_profile()
+    if platform is None and tuned is None:
+        return True, "power profile not readable on this host: keep it fixed by hand"
+    ok = platform in (None, "performance") and (tuned is None or "performance" in tuned)
+    detail = "platform " + str(platform) + ", tuned " + str(tuned)
+    return ok, detail if ok else detail + ": set Performance mode (sudo tuned-adm profile throughput-performance)"
+
+
 def check_python():
     try:
         import matplotlib  # noqa: F401
@@ -129,7 +153,7 @@ def estimate(tests, runs):
         profile_name, mode, title = TESTS[name]
         done = len(list((TESTS_DIR / name / "data").glob("run-*-summary.json")))
         missing = max(0, runs[name] - done)
-        total += missing * (total_duration(read_profile(profile_name)) + AFTER_SECONDS[mode] + RUN_OVERHEAD_SECONDS)
+        total += missing * (total_duration(read_profile(profile_name)) + tail_for(name, mode) + RUN_OVERHEAD_SECONDS)
     return round(total / 60)
 
 
@@ -143,6 +167,7 @@ def preflight(tests, runs, archive=False):
         ("Dashboard port", check_port),
         ("Metric mode", lambda: check_metric_mode(tests)),
         ("Python and disk", check_python),
+        ("Power mode", check_power),
     ]
     if not archive:
         checks.append(("One calibration per test", lambda: check_runs_consistent(tests)))
@@ -167,9 +192,9 @@ def preflight(tests, runs, archive=False):
 
 def main():
     parser = argparse.ArgumentParser(description="Check that everything is in place before running the tests")
-    parser.add_argument("tests", nargs="*", default=list(CAMPAIGN_RUNS), choices=list(TESTS))
+    parser.add_argument("tests", nargs="*", default=list(DESIGN_TESTS), choices=list(TESTS))
     args = parser.parse_args()
-    runs = {name: CAMPAIGN_RUNS.get(name, 1) for name in args.tests}
+    runs = {name: BLOCKS for name in args.tests}
     sys.exit(0 if preflight(args.tests, runs) else 1)
 
 

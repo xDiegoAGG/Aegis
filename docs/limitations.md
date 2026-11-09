@@ -34,7 +34,7 @@ Between the start of a climb and a Ready pod there are three delays: the demand 
 | False alarms per run | 1 | 0.2 |
 
 - On the ramp Aegis spent **+2.8 pod-minutes (+49%)** to cut failures from 37.1% to 2.5%. The HPA saves pods by under-provisioning: it never reached the 3 pods 46 req/s needs.
-- The overhead comes from requesting T + lag early and from waiting 60 s of low risk before scaling down. On the waves (test 2) the wait dominates: +4.9 pod-minutes per run.
+- The overhead comes from requesting T + lag early and from waiting 60 s of low risk before scaling down. On the waves (test 2) the wait dominates: +4.9 pod-minutes per run. Since November 2026 the wait is 15–60 s by risk; simulated on these runs it saves 10–14% of pod-minutes ([formulas.md](formulas.md#6-the-decision-rule-70-up-30-for-1560-s-down)), still to be measured in the cluster.
 - **False alarms:** none on ramps and waves. On the spike every run added a 3rd pod the peak did not need (the 30 s slope overshoots right after a jump), ~2.5 pod-minutes each. Damped forecasters overshoot less but request later on ramps ([forecast.md](tests/forecast.md)).
 
 ## 3. Metric mode
@@ -63,6 +63,8 @@ Measured with Prometheus and a controlled run (1 pod overloaded, then `minReplic
 - `/health` shares Node's event loop with the queued requests, so it misses its 5 s timeout until the load drops.
 
 So "Ready" understates the HPA's capacity in the charts; compare request times and k6 failures instead. A fix for production: an ingress that honours readiness, or a health check outside the request queue.
+
+**Fix applied after the 2026-10-25 campaign (not yet measured in the cluster):** the readiness probe now calls `/ready` on port 3004, served by a worker thread with its own event loop (`services/catalog-service/src/health.js`). It answers while the main loop keeps ticking, even slowly, and fails only before the HTTP server listens or when the main loop has not ticked for 30 s. In a local test with the process limited to 6 % CPU (like a 60m pod) and ~3× overload, the old `/health` missed the 5 s timeout in 5 of 10 probes, and `/ready` answered all 10 in under 100 ms. The 32 runs above were recorded with the old probe; rerun the campaign to measure the effect on Ready times and failures.
 
 ## 5. Threats to validity
 

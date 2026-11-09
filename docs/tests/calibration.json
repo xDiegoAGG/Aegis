@@ -1,9 +1,9 @@
 {
   "capacity_rps": 22,
-  "startup_time_seconds": 15,
-  "measured_at": "2026-10-25T03:16:57Z",
-  "measured_at_unix": 1792898217.8084772,
-  "started_at": "2026-10-25T03:02:54Z",
+  "startup_time_seconds": 12,
+  "measured_at": "2026-11-05T05:07:20Z",
+  "measured_at_unix": 1793855240.9160876,
+  "started_at": "2026-11-05T04:53:26Z",
   "environment": {
     "image": "catalog-service:local",
     "cpu_limit": "60m",
@@ -23,102 +23,37 @@
   },
   "capacity_runs": [
     {
-      "started_at": "2026-10-25T03:03:20Z",
+      "started_at": "2026-11-05T04:53:26Z",
       "capacity_rps": 22,
-      "reason": "served under 90% of the sent req/s at 24 req/s",
-      "degraded_at": "2026-10-25T03:08:36Z",
+      "reason": "P95 above 1.0 s at 24 req/s",
+      "degraded_at": "2026-11-05T04:58:37Z",
       "degraded_step_rps": 24,
-      "ended_at": "2026-10-25T03:08:48Z",
+      "ended_at": "2026-11-05T04:58:49Z",
       "steps": [
         {
           "target_rps": 4,
           "measured_rps": 4.0,
-          "p95_max_s": 0.5
-        },
-        {
-          "target_rps": 6,
-          "measured_rps": 6.0,
-          "p95_max_s": 0.225
-        },
-        {
-          "target_rps": 8,
-          "measured_rps": 8.05,
-          "p95_max_s": 0.756
-        },
-        {
-          "target_rps": 10,
-          "measured_rps": 10.0,
-          "p95_max_s": 0.792
-        },
-        {
-          "target_rps": 12,
-          "measured_rps": 12.0,
           "p95_max_s": 0.45
         },
         {
-          "target_rps": 14,
-          "measured_rps": 14.0,
-          "p95_max_s": 1.342
-        },
-        {
-          "target_rps": 16,
-          "measured_rps": 16.0,
-          "p95_max_s": 0.55
-        },
-        {
-          "target_rps": 18,
-          "measured_rps": 18.0,
-          "p95_max_s": 0.487
-        },
-        {
-          "target_rps": 20,
-          "measured_rps": 20.0,
-          "p95_max_s": 0.808
-        },
-        {
-          "target_rps": 22,
-          "measured_rps": 22.05,
-          "p95_max_s": 0.892
-        },
-        {
-          "target_rps": 24,
-          "measured_rps": 22.13,
-          "p95_max_s": 2.325
-        }
-      ]
-    },
-    {
-      "started_at": "2026-10-25T03:09:54Z",
-      "capacity_rps": 22,
-      "reason": "served under 90% of the sent req/s at 24 req/s",
-      "degraded_at": "2026-10-25T03:15:25Z",
-      "degraded_step_rps": 24,
-      "ended_at": "2026-10-25T03:15:37Z",
-      "steps": [
-        {
-          "target_rps": 4,
-          "measured_rps": 4.0,
-          "p95_max_s": 0.075
-        },
-        {
           "target_rps": 6,
           "measured_rps": 6.0,
-          "p95_max_s": 0.225
+          "p95_max_s": 0.625
         },
         {
           "target_rps": 8,
           "measured_rps": 8.0,
-          "p95_max_s": 0.049
+          "p95_max_s": 0.243
         },
         {
           "target_rps": 10,
           "measured_rps": 10.0,
-          "p95_max_s": 0.48
+          "p95_max_s": 0.272
         },
         {
           "target_rps": 12,
           "measured_rps": 12.0,
-          "p95_max_s": 0.625
+          "p95_max_s": 0.433
         },
         {
           "target_rps": 14,
@@ -128,46 +63,116 @@
         {
           "target_rps": 16,
           "measured_rps": 16.0,
-          "p95_max_s": 0.414
+          "p95_max_s": 0.271
         },
         {
           "target_rps": 18,
           "measured_rps": 18.0,
-          "p95_max_s": 0.887
+          "p95_max_s": 0.41
         },
         {
           "target_rps": 20,
-          "measured_rps": 20.0,
-          "p95_max_s": 2.36
+          "measured_rps": 19.75,
+          "p95_max_s": 0.957
         },
         {
           "target_rps": 22,
           "measured_rps": 22.0,
-          "p95_max_s": 0.828
+          "p95_max_s": 0.467
         },
         {
           "target_rps": 24,
-          "measured_rps": 24.0,
-          "p95_max_s": 1.702
+          "measured_rps": 22.2,
+          "p95_max_s": 5.786
+        }
+      ]
+    },
+    {
+      "started_at": "2026-11-05T04:59:55Z",
+      "capacity_rps": 24,
+      "reason": "served under 90% of the sent req/s at 26 req/s",
+      "degraded_at": "2026-11-05T05:05:51Z",
+      "degraded_step_rps": 26,
+      "ended_at": "2026-11-05T05:06:03Z",
+      "steps": [
+        {
+          "target_rps": 4,
+          "measured_rps": 4.0,
+          "p95_max_s": 0.2
+        },
+        {
+          "target_rps": 6,
+          "measured_rps": 6.0,
+          "p95_max_s": 0.05
+        },
+        {
+          "target_rps": 8,
+          "measured_rps": 8.0,
+          "p95_max_s": 0.458
+        },
+        {
+          "target_rps": 10,
+          "measured_rps": 10.0,
+          "p95_max_s": 0.175
+        },
+        {
+          "target_rps": 12,
+          "measured_rps": 12.0,
+          "p95_max_s": 0.275
+        },
+        {
+          "target_rps": 14,
+          "measured_rps": 14.0,
+          "p95_max_s": 0.293
+        },
+        {
+          "target_rps": 16,
+          "measured_rps": 16.0,
+          "p95_max_s": 0.3
+        },
+        {
+          "target_rps": 18,
+          "measured_rps": 18.0,
+          "p95_max_s": 0.398
+        },
+        {
+          "target_rps": 20,
+          "measured_rps": 20.0,
+          "p95_max_s": 0.719
+        },
+        {
+          "target_rps": 22,
+          "measured_rps": 21.85,
+          "p95_max_s": 0.96
+        },
+        {
+          "target_rps": 24,
+          "measured_rps": 24.45,
+          "p95_max_s": 0.597
         },
         {
           "target_rps": 26,
+          "measured_rps": 23.45,
+          "p95_max_s": 4.441
+        },
+        {
+          "target_rps": 28,
           "measured_rps": null,
-          "p95_max_s": 1.967
+          "p95_max_s": 5.792
         }
       ]
     }
   ],
   "startup_measurements": [
     {
-      "pod": "catalog-service-84dccb7884-55lch",
-      "request_to_ready_s": 14.1,
-      "created_to_ready_s": 14.8
+      "pod": "catalog-service-79cd8fffdf-pwlrn",
+      "request_to_ready_s": 11.1,
+      "created_to_ready_s": 11.9
     },
     {
-      "pod": "catalog-service-84dccb7884-msv7h",
-      "request_to_ready_s": 14.1,
-      "created_to_ready_s": 14.8
+      "pod": "catalog-service-79cd8fffdf-qzxx6",
+      "request_to_ready_s": 11.1,
+      "created_to_ready_s": 11.9
     }
   ]
 }

@@ -1,6 +1,6 @@
 # Experimental Methodology
 
-This document defines the experimental protocol for evaluating Aegis against a reactive HPA baseline. It is the reference for Sprint 1, Sprint 2, and Sprint Final experiment runs. For architecture and parameter definitions, see [architecture/overview.md](../architecture/overview.md).
+This document defines the research questions, hypotheses and phases for evaluating Aegis against a reactive HPA baseline. **How the hypotheses are tested (factors, randomization, blocks, sample size, analysis) is in [design.md](design.md)** ([español](design.es.md)), registered before the runs. For architecture and parameter definitions, see [architecture/overview.md](../architecture/overview.md).
 
 ---
 

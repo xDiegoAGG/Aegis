@@ -1,0 +1,52 @@
+seconds,time_utc,source,event,detail
+-20568.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-20542.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+-1.0,10:34:36,kubernetes,Scheduled,Pod/load-fluctuating-nfxr9: Successfully assigned default/load-fluctuating-nfxr9 to minikube
+-1.0,10:34:36,kubernetes,SuccessfulCreate,Job/load-fluctuating: Created pod: load-fluctuating-nfxr9
+0,10:34:37,k6,load started,fluctuating
+0.0,10:34:37,kubernetes,Pulled,"Pod/load-fluctuating-nfxr9: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,10:34:37,kubernetes,Created,Pod/load-fluctuating-nfxr9: Container created
+0.0,10:34:37,kubernetes,Started,Pod/load-fluctuating-nfxr9: Container started
+73.0,10:35:50,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-dcc7x: Successfully assigned default/catalog-service-79cd8fffdf-dcc7x to minikube
+73.0,10:35:50,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-dcc7x
+73.0,10:35:50,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+73.0,10:35:50,pod,created,catalog-service-79cd8fffdf-dcc7x
+73.9,10:35:50,aegis,scale_up 1->2,risk 0.7323: risk with 1 pod(s) 73.2% >= 70.0%
+74.0,10:35:51,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-dcc7x: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+74.0,10:35:51,kubernetes,Created,Pod/catalog-service-79cd8fffdf-dcc7x: Container created
+74.0,10:35:51,kubernetes,Started,Pod/catalog-service-79cd8fffdf-dcc7x: Container started
+78.5,10:35:55,k6,planned traffic passes C,22.0 req/s
+81.0,10:35:58,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-dcc7x: Readiness probe failed: Get ""http://10.244.0.101:3004/ready"": dial tcp 10.244.0.101:3004: connect: connection refused"
+84.0,10:36:01,pod,ready,catalog-service-79cd8fffdf-dcc7x
+178.0,10:37:35,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-dcc7x: Stopping container catalog-service
+178.0,10:37:35,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-79cd8fffdf from 2 to 1
+178.9,10:37:35,aegis,scale_down 2->1,risk 0.0: risk with 1 pod(s) 0.0% < 30.0% for 20 s (wait 16 s)
+308.0,10:39:45,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-lk97h: Successfully assigned default/catalog-service-79cd8fffdf-lk97h to minikube
+308.0,10:39:45,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-lk97h
+308.0,10:39:45,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: Current number of replicas below Spec.MinReplicas
+308.0,10:39:45,pod,created,catalog-service-79cd8fffdf-lk97h
+308.9,10:39:45,aegis,scale_up 1->2,risk 0.8366: risk with 1 pod(s) 83.7% >= 70.0%
+309.0,10:39:46,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-lk97h: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+309.0,10:39:46,kubernetes,Created,Pod/catalog-service-79cd8fffdf-lk97h: Container created
+309.0,10:39:46,kubernetes,Started,Pod/catalog-service-79cd8fffdf-lk97h: Container started
+316.0,10:39:53,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-lk97h: Readiness probe failed: Get ""http://10.244.0.102:3004/ready"": dial tcp 10.244.0.102:3004: connect: connection refused"
+319.0,10:39:56,pod,ready,catalog-service-79cd8fffdf-lk97h
+348,10:40:25,client,degraded,P95 above L or over 1% failed for T_d
+363.0,10:40:40,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-mjq65: Successfully assigned default/catalog-service-79cd8fffdf-mjq65 to minikube
+363.0,10:40:40,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 3; reason: Current number of replicas below Spec.MinReplicas
+363.0,10:40:40,pod,created,catalog-service-79cd8fffdf-mjq65
+363.9,10:40:40,aegis,scale_up 2->3,risk 0.7042: risk with 2 pod(s) 70.4% >= 70.0%
+364.0,10:40:41,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-mjq65: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+364.0,10:40:41,kubernetes,Created,Pod/catalog-service-79cd8fffdf-mjq65: Container created
+364.0,10:40:41,kubernetes,Started,Pod/catalog-service-79cd8fffdf-mjq65: Container started
+371.0,10:40:48,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-mjq65: Readiness probe failed: Get ""http://10.244.0.103:3004/ready"": dial tcp 10.244.0.103:3004: connect: connection refused"
+374.0,10:40:51,pod,ready,catalog-service-79cd8fffdf-mjq65
+458.0,10:42:15,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-mjq65: Stopping container catalog-service
+458.0,10:42:15,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-79cd8fffdf from 3 to 2
+458.0,10:42:15,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: All metrics below target
+458.9,10:42:15,aegis,scale_down 3->2,risk 0.0: risk with 2 pod(s) 0.0% < 30.0% for 19 s (wait 16 s)
+478.9,10:42:35,aegis,scale_down 2->1,risk 0.0: risk with 1 pod(s) 0.0% < 30.0% for 15 s (wait 15 s)
+500.0,10:42:57,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-lk97h: Stopping container catalog-service
+500.0,10:42:57,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 1; reason: All metrics below target
+560.0,10:43:57,k6,load finished,
+925.0,10:50:02,kubernetes,Killing,Pod/load-fluctuating-nfxr9: Stopping container k6

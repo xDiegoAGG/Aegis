@@ -1,5 +1,7 @@
 # Tests
 
+> **These are the preliminary October 2026 runs** (one factor at a time, not randomized). The formal evaluation is the randomized block design in [../experiments/design.md](../experiments/design.md); **its results are in [../experiments/results.md](../experiments/results.md)** (generated analysis: [design-results.md](design-results.md)). Why the October design was replaced: [design.md, section 2](../experiments/design.md#2-why-the-october-campaign-was-replaced).
+
 32 runs on minikube, 2026-10-25. Calibration (`calibration.json`, pod 60m CPU): **C = 22 req/s**, **T = 15 s**. Degraded = client P95 > 1 s or > 1% failed, for 15 s. Load files are written for C = 24 and scaled by C / 24.
 
 | Test | Traffic | Mode | Runs | Failed (mean, min–max) |
@@ -37,8 +39,9 @@ Compare request times, not Ready times: Traefik routes to not-ready pods, so a p
 ```bash
 cd scripts/experiments
 python3 preflight.py       # what is missing and how long it takes
-./run_all.sh               # all tests (~3 h, resumable), then charts, comparison, capacity, forecast
-python3 run.py test1-linear-ramp --runs 5
+python3 campaign.py --plan        # the experiment design: 9 cells x 6 blocks in random order (../experiments/design.md)
+python3 campaign.py --blocks 1-2  # whole blocks per session (~134 min each), resumable; then design_analysis.py
+python3 run.py test1-linear-ramp --runs 5   # October 2026 tests, kept to reproduce them
 python3 report.py && python3 compare.py && python3 forecast_accuracy.py
 ```
 

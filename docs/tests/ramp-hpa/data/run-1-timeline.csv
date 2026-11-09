@@ -1,0 +1,23 @@
+seconds,time_utc,source,event,detail
+-2669.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-2643.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+-1.0,05:36:17,kubernetes,Scheduled,Pod/load-linear-b88lf: Successfully assigned default/load-linear-b88lf to minikube
+-1.0,05:36:17,kubernetes,SuccessfulCreate,Job/load-linear: Created pod: load-linear-b88lf
+0,05:36:18,k6,load started,linear
+0.0,05:36:18,kubernetes,Pulled,"Pod/load-linear-b88lf: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,05:36:18,kubernetes,Created,Pod/load-linear-b88lf: Container created
+0.0,05:36:18,kubernetes,Started,Pod/load-linear-b88lf: Container started
+80.0,05:37:38,k6,planned traffic passes C,22.0 req/s
+107,05:38:05,client,degraded,P95 above L or over 1% failed for T_d
+152.0,05:38:50,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-5d8vq: Successfully assigned default/catalog-service-79cd8fffdf-5d8vq to minikube
+152.0,05:38:50,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-5d8vq
+152.0,05:38:50,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+152.0,05:38:50,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: cpu resource utilization (percentage of request) above target
+152.0,05:38:50,pod,created,catalog-service-79cd8fffdf-5d8vq
+153.0,05:38:51,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-5d8vq: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+153.0,05:38:51,kubernetes,Created,Pod/catalog-service-79cd8fffdf-5d8vq: Container created
+154.0,05:38:52,kubernetes,Started,Pod/catalog-service-79cd8fffdf-5d8vq: Container started
+163.0,05:39:01,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-5d8vq: Readiness probe failed: Get ""http://10.244.0.35:3004/ready"": dial tcp 10.244.0.35:3004: connect: connection refused"
+166.0,05:39:04,pod,ready,catalog-service-79cd8fffdf-5d8vq
+240.0,05:40:18,k6,load finished,
+602.0,05:46:20,kubernetes,Killing,Pod/load-linear-b88lf: Stopping container k6

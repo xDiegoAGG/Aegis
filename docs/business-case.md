@@ -1,210 +1,229 @@
 # Caso de negocio de Aegis
 
-Documento de respaldo de la presentación «Aegis: caso de negocio» (12 diapositivas). Reemplaza el modelo económico de `business_case.md` y del PDF del Sprint 0, que no mostraban de dónde salían sus números.
+Documento de respaldo de la presentación «Aegis: caso de negocio» (21 diapositivas). Contiene el razonamiento, los cálculos y la fuente de cada cifra. Reemplaza la versión anterior, que establecía el problema con datos propios (37 % de fallas en la campaña de octubre) y cuyo modelo económico solo aplicaba a organizaciones que venden productos.
 
-Cada número de este documento es de uno de tres tipos:
+Cada cifra pertenece a una de tres categorías:
 
-- **Medido:** de nuestra campaña de 32 corridas del 2026-10-25 (`docs/tests/`).
-- **Fuente:** de un estudio, organismo oficial o proveedor, citado en la sección 9 con su enlace.
-- **Estimación:** juicio del equipo sin fuente pública; se dice así y se muestra su efecto.
+- **Medición propia:** campaña de 54 corridas del 2026-11-05 ([diseño](experiments/design.md), [resultados](experiments/results.md), datos en `docs/tests/`). Se usa **solo para medir el efecto de Aegis**, nunca para dimensionar el problema.
+- **Fuente externa:** documentación oficial, organismos públicos, publicaciones revisadas por pares o encuestas de proveedores (estas últimas se identifican como tales). Referencias en la sección 12.
+- **Estimación:** juicio del equipo o parámetro de cada organización; se declara y se muestra su efecto en la sensibilidad.
 
-## 1. Evaluación de realismo del modelo anterior
+La investigación completa, con muestra, año y grado de confianza de cada cifra, está en [`reports/Evidencia externa caso de negocio Aegis.md`](../reports/Evidencia%20externa%20caso%20de%20negocio%20Aegis.md).
 
-El modelo anterior (ROI de 105 % y 720 %, y las primeras versiones de esta presentación) dependía de valores sin respaldo, y comparaba ventas rescatadas con costos sin descontar el margen. Esta tabla resume qué se conservó y qué se cambió:
+## 1. Cambios respecto de la versión anterior
 
 | Elemento | Antes | Problema | Ahora |
 |---|---|---|---|
-| Ingreso de la empresa | 50 M $/año | empresa inventada | ya no se supone: es el dato de entrada de cada empresa (ventas durante sus picos) |
-| Tráfico en el pico | 3 veces el promedio | supuesto sin fuente | eliminado: el modelo usa directamente las ventas durante los picos |
-| Usuarios que reintentan tras un error | 50 % | supuesto sin fuente | 53 % de abandono de visitas a páginas que tardan más de 3 s (Akamai 2017, Google), usado como aproximación: estimación apoyada en una fuente |
-| Picos al año | 200 | supuesto sin fuente | eliminado: queda dentro de «ventas durante los picos al año» |
-| Ahorro FinOps de 100.000 $ | colchón ocioso del 30 % al 10 % | contradicho por nuestros datos: Aegis usa más pods que el HPA durante un pico | eliminado |
-| Margen | no se consideraba: se comparaban ventas rescatadas con costos | una venta rescatada no es ganancia completa | margen bruto del comercio minorista, 33,18 % (Damodaran, enero de 2026): fuente |
-| Horas de implementación | 100.000 $ sin desglose | sin cálculo | 160 h × 93,26 $/h (BLS); las horas siguen siendo estimación y se da su rango |
-| Cifras de la industria | TracResearch, Akamai/SpeedCurve 2025, Catchpoint 2025, AWS EKS 2026 | no verificables en su fuente original | retiradas; sección 8 |
+| Magnitud del problema | 37 % de fallas medido en nuestro laboratorio | el problema se establecía con datos propios, y la cifra quedó desactualizada (con la sonda de salud corregida, el HPA por defecto falla 16,9 % en la misma rampa) | documentación oficial de AWS, Google Cloud y Kubernetes, y un estudio revisado por pares (sección 3) |
+| Competencia | no se analizaba | | comparación con HPA, KEDA, Knative, PredictKube, escalado predictivo de AWS y Google, y Datadog (sección 5) |
+| Modelo económico | ventas rescatadas × 53 % de abandono × margen minorista | solo aplicaba a quien vende; el 53 % mide visitas a páginas lentas, no peticiones fallidas | minutos degradados evitados × picos al año × costo de un minuto degradado, con componentes por tipo de organización (sección 9) |
+| Valor no monetario | no se consideraba | | usuarios, carga operativa, energía, trazabilidad y cumplimiento (sección 8) |
+| Evidencia | 32 corridas, un factor a la vez, sin aleatorizar | autoscaler confundido con la hora del día; solo contra el HPA por defecto | 54 corridas en bloques aleatorizados contra el HPA por defecto y uno afinado (sección 7) |
+| Pods adicionales | 2,8 pods-minuto más por rampa | regla de bajada de 60 s fijos | regla de 15 a 60 s según el riesgo: igual o menor consumo que el HPA por defecto (sección 10) |
+| Código de colores | HPA en rojo | el rojo se reserva para fallas | Aegis azul, HPA por defecto naranja, HPA afinado verde agua, tráfico gris, rojo solo para fallas |
 
-## 2. Por qué solo Kubernetes (diapositiva 3)
+## 2. Mercado (diapositiva 3)
 
-| Cifra | Qué dice | Tipo | Fuente |
+| Cifra | Qué indica | Tipo | Fuente |
 |---|---|---|---|
-| 82 % de quienes usan contenedores corre Kubernetes en producción (66 % en 2023) | Kubernetes es el estándar de facto para correr contenedores | fuente | [11] |
-| Más del 90 % de las organizaciones correrá aplicaciones en contenedores en producción en 2027 (menos del 40 % en 2021) | el mercado de contenedores sigue creciendo | fuente (Gartner, cita textual en [12]) | [12] |
-| 66 % de las organizaciones que alojan IA generativa usa Kubernetes para algunas o todas sus cargas de inferencia | también es la base de las nuevas cargas de IA | fuente | [11] |
-| El HPA es el escalador horizontal estándar de Kubernetes | Aegis se integra con él (ajusta `minReplicas` o le entrega una métrica) sin reemplazar el scheduler ni cambiar cómo se despliega | fuente | [4] |
+| 82 % de las organizaciones que utilizan contenedores ejecuta Kubernetes en producción (66 % en 2023) | Kubernetes es el estándar de facto | fuente | [1] |
+| Más del 90 % de las organizaciones ejecutará contenedores en producción en 2027 (menos del 40 % en 2021) | el mercado sigue creciendo | fuente secundaria (Gartner citado por Google Cloud) | [2] |
+| 66 % de las organizaciones que alojan IA generativa usa Kubernetes para la inferencia | también es la base de las cargas de IA | fuente | [1] |
 
-Construir sobre Kubernetes permite que Aegis llegue a la mayoría de las organizaciones que usan contenedores con un solo punto de integración, el HPA, que ya usan.
+Aegis se integra con el HPA, el escalador horizontal estándar de Kubernetes [3], ajustando su mínimo de réplicas sin sustituirlo.
 
-## 3. El problema (diapositivas 2, 4 y 5)
+## 3. El problema, con fuentes externas (diapositivas 2 y 4)
 
-| Cifra | Qué mide | Tipo | Fuente |
-|---|---|---|---|
-| −7 % de conversión por cada 100 ms de demora | móvil, unos 10 mil millones de visitas a retailers | fuente | [1] |
-| 53 % de los visitantes móviles se va si la página tarda más de 3 s | abandono por demora | fuente | [1], [2] |
-| +8,4 % de conversiones en retail al ganar 0,1 s | móvil, 37 marcas, más de 30 millones de sesiones | fuente | [3] |
-| El HPA revisa la métrica cada 15 s y no actúa dentro de una tolerancia del 10 % | funcionamiento del HPA | fuente | [4] |
-| Aegis pide el 2º pod en el segundo 73,5 a 74,5; el HPA, en el 116 a 145 (el tráfico supera un pod en el 80) | rampa, 5 corridas por lado | medido | `docs/tests/comparison.md` |
-| 37,1 % de peticiones fallidas sin Aegis en la rampa (34,7 a 40,1 %) | 5 corridas | medido | `docs/tests/test3-hpa-baseline/` |
-| 10 % de uso medio de CPU en clústeres Kubernetes | más de 2.100 organizaciones, datos de 2024 | fuente | [5] |
+| Afirmación | Tipo | Fuente |
+|---|---|---|
+| «an autoscaler can only scale a group reactively, based on observed changes in load in real time… might not increase your application's capacity quickly enough» | documentación oficial | [4] |
+| «dynamic scaling, which is reactive in nature» | documentación oficial | [5] |
+| El HPA evalúa la métrica cada 15 s y no actúa mientras se mantenga a menos de un 10 % de su objetivo | documentación oficial | [3] |
+| En el HPA de Kubernetes, «the first scaling-ups cause the majority of failed requests» | revisado por pares (banco de pruebas de 5 nodos; cualitativo) | [6] |
+| La guía de Google para GKE recomienda reservar un 30 % de CPU ociosa mientras se inician nuevas réplicas | documentación oficial | [7] |
+| La utilización media de CPU en clústeres Kubernetes es del 10 % (más de 2.100 organizaciones, datos de 2024) | encuesta de proveedor | [8] |
 
-## 4. La evidencia medida (diapositiva 6)
+No existe en la literatura revisada una cifra fiable del tipo «el escalado reactivo falla un X % en los picos»: los porcentajes que circulan provienen de preprints y tesis con bancos de pruebas no comparables. Por eso el problema se establece cualitativamente con la documentación de los propios proveedores, y su costo con la recomendación oficial de sobreaprovisionar.
 
-| Carga | Aegis | Solo HPA | Diferencia |
-|---|---|---|---|
-| Rampa (5 a 46 req/s en 2 min) | **2,5 %** (0,48 a 4,69) | 37,1 % (34,7 a 40,1) | 34,6 puntos, 15 veces menos |
-| Pico (5 a 41 req/s en 5 s) | **13,3 %** (11,7 a 16,1) | 54,8 % (51,9 a 61,0) | 41,5 puntos, 4 veces menos |
-| Pods-minuto por rampa | 8,53 | 5,74 | 2,79 más con Aegis |
+## 4. Cómo funciona Aegis (diapositivas 7 y 8)
 
-Medido por k6 desde el cliente, media de 5 corridas por fila. Metodología: `docs/tests/README.md`; límites: `docs/limitations.md`.
-
-## 5. El modelo económico (diapositivas 7 a 10)
-
-### 5.1 Beneficio
+**Subida (cada 5 s):**
 
 ```
-ganancia rescatada al año = V × Δf × p × m
+p      = r + m × (T + lag)          demanda proyectada al momento en que un pod nuevo estaría listo
+riesgo = Φ((p − C·N) / σ)           probabilidad de capacidad insuficiente
+si riesgo ≥ 70 %: mínimo de réplicas del HPA + 1
 ```
 
-| Símbolo | Significado | Valor | Tipo y origen |
-|---|---|---|---|
-| V | ventas que pasan por el servicio durante sus picos de tráfico, en un año | dato de cada empresa | entrada |
-| Δf | peticiones que dejan de fallar con Aegis: 37,12 % menos 2,50 % | 0,3462 | medido, rampa, 5 + 5 corridas |
-| p | parte de los compradores afectados por una falla que no compra | 0,53 | estimación apoyada en [1], [2] (ver abajo) |
-| m | parte de cada venta que es ganancia: margen bruto del comercio minorista general de EE. UU. | 0,3318 | fuente [13] |
-| Δf × p × m | dólares de ganancia rescatados por cada dólar vendido durante los picos | **0,0609** | cálculo |
+r: peticiones por segundo actuales; m: tendencia de los últimos 30 s; T = 12 s de arranque de un pod (calibrado) y lag = 20 s de retraso de la medición; C = 22 req/s, capacidad calibrada de un pod; N: pods solicitados; σ: error de la proyección en los últimos 5 minutos (solo errores por debajo de la demanda real); Φ: distribución normal acumulada. Detalle en [formulas.md](formulas.md).
 
-**Por qué el margen.** Una venta rescatada no es ganancia completa: la tienda tiene que pagar el producto que vende. Lo que gana de verdad es el margen bruto (ventas menos costo de lo vendido). Los costos fijos no cambian por vender un poco más, así que el margen bruto es la medida adecuada para una venta adicional. Usamos el del comercio minorista general (33,18 %); otros sectores minoristas están entre 30,6 % (distribuidores) y 35,3 % (líneas especiales) [13]. Cada empresa debe poner el suyo.
+**Bajada:** Aegis calcula el riesgo con menos pods. Si permanece por debajo del 30 %, espera `15 s + 45 s × riesgo máximo / 30 %` y reduce directamente al menor número seguro de pods; cualquier ciclo con riesgo elevado reinicia la espera. La regla se inspira en el problema del alquiler de esquís [9]: la espera solo cubre el error de la proyección, que ya mira T + lag hacia adelante. Antes de adoptarla se simuló sobre 22 corridas registradas: entre 10 y 14 % menos pods-minuto sin aumentar el tiempo con capacidad insuficiente (`scripts/experiments/scale_down_sim.py`).
 
-**Qué es p y por qué es una aproximación.** La fuente dice que el 53 % de las visitas móviles se abandona si la página tarda más de 3 segundos en cargar. El modelo lo usa como «compradores perdidos ÷ compradores afectados por una falla», y para eso supone tres cosas que la fuente no mide:
+**Requisitos:** una calibración inicial de C y T, unos minutos de datos en vivo y ningún historial de días; los datos no salen del clúster.
 
-| La fuente habla de | El modelo lo usa como | Efecto probable |
+## 5. Competencia (diapositivas 5 y 6)
+
+| Herramienta | Escala según | ¿Anticipa? | Historial | Con el HPA | Explica cada decisión | Fuente |
+|---|---|---|---|---|---|---|
+| HPA | CPU o memoria | no | ninguno | es el HPA | no | [3] |
+| KEDA (CNCF, graduado en 2023) | eventos, peticiones/s, horario | solo picos con horario fijo | ninguno | sí, lo gestiona | no | [10] |
+| Knative (CNCF, graduado en 2025) | peticiones en curso | no; modo pánico sobre una ventana de 6 s | ninguno | utiliza su propio escalador | no | [11] |
+| PredictKube | pronóstico con IA | sí, horas | 7 a 14 días; los datos salen del clúster | sí, vía KEDA | no | [12] |
+| AWS y Google, predictivo | ciclos diarios de carga | sí, sobre máquinas virtuales | 1 a 14 días | no aplica a pods | no | [5], [4] |
+| Datadog Kubernetes Autoscaling | uso de recursos | ajuste, sin anticipación de picos | servicio de Datadog | no: sustituye al HPA | no | [13] |
+| **Aegis** | peticiones/s, cada 5 s | **sí, ~30 s** | **minutos de datos y una calibración; nada sale del clúster** | **sí, lo conserva** | **sí** | este repositorio |
+
+**Diferenciación defendible:** entre las herramientas principales revisadas no se encontró otra que anticipe a nivel de pod sin días de historial, conserve el HPA y justifique cada decisión. La afirmación es «no encontrada entre las principales», no «única».
+
+**Límites honestos:** KEDA y Knative ya escalan por peticiones por segundo; ante picos abruptos nadie anticipa (Aegis pidió el 2º pod unos 12 s después de que la demanda superara un pod; Knative no se midió); para picos con horario fijo, KEDA por horario o el escalado predictivo de la nube anticipan más; KEDA y Knative son proyectos graduados de la CNCF y Aegis es un desarrollo reciente. Aegis escala pods y se complementa con Karpenter o Cluster Autoscaler para la capacidad de nodos.
+
+## 6. Diseño experimental (diapositivas 9 a 12)
+
+Diseño de bloques completos aleatorizados con tratamientos factoriales 3 × 3 [14]: 3 autoscalers (Aegis, HPA por defecto con CPU al 70 %, HPA afinado con CPU al 50 % y reducción en 60 s) × 3 cargas (rampa, pico, olas) × 6 bloques = 54 corridas en orden aleatorio con semilla fija, registradas antes de la primera corrida. Métrica principal: porcentaje de peticiones fallidas medido por k6. Análisis: ANOVA con bloques, 6 contrastes corregidos con Holm [15], respaldo por rangos donde los residuos no son normales (el pico). Plan completo en [design.md](experiments/design.md).
+
+| Carga | Perfil (escalado a C = 22 req/s) | Cruza la capacidad de un pod |
 |---|---|---|
-| visitas de cualquier visitante | compradores | quien iba a comprar probablemente abandona menos: p sería menor |
-| abandonar la página | perder la venta | algunos vuelven más tarde: p sería menor |
-| una página que tarda más de 3 s | una petición que falla o tarda 10 s | una falla es peor que una demora: p sería mayor |
+| Rampa | de 5 a 46 req/s en 2 min, 1 min sostenido | a los 80 s |
+| Pico | de 5 a 41 req/s en 5 s, 90 s sostenido | a los 33 s |
+| Olas | hasta 28 y 46 req/s, con 2 min de tráfico bajo después de cada una | a los 79 s |
 
-Además, Δf mide peticiones y p se refiere a visitas: el modelo supone que la parte de visitas afectadas es igual a la parte de peticiones fallidas. No existe un estudio público de compradores perdidos por peticiones fallidas; el 53 % es la referencia más cercana. Su efecto está en la sensibilidad (5.5).
+## 7. Evidencia (diapositivas 13 y 14)
 
-**Lo que el modelo no supone.** No supone que cada visita sea una venta: la tasa de conversión se cancela si los compradores están repartidos por igual entre las visitas que fallan y las que no, así que basta con las ventas V. Y si la empresa usa hoy el HPA, sus ventas V ya tienen descontadas las que pierde por fallas, así que en ese punto el modelo se queda corto, no se pasa.
+Peticiones fallidas, media de 6 corridas (en la diapositiva, cada corrida se muestra como un punto):
 
-**Lo que más pesa:** Δf es de un laboratorio diseñado para saturarse (un nodo, pods de 60m de CPU, como mucho 3 pods, el HPA por defecto). Una empresa real que ya deja pods de sobra o afina su HPA tendrá una brecha menor.
-
-Para el pico abrupto, Δf = 0,4147 y Δf × p × m = 0,0729; se usa la rampa porque es el caso donde Aegis puede anticiparse.
-
-### 5.2 Costos
-
-| Concepto | Cálculo | Valor | Tipo y origen |
-|---|---|---|---|
-| Hora de ingeniería | 135.980 $/año ÷ 2.080 h = 65,38 $/h; ÷ 0,701 porque el salario es el 70,1 % del costo del empleador | 93,26 $/h | fuente [6], [7] |
-| Implementación, una vez | 160 h × 93,26 $ | **14.922 $** | horas: estimación (rango 80 a 320 h) |
-| Mantenimiento, por año | 4 h/mes × 12 × 93,26 $ | 4.476 $ | horas: estimación |
-| Pod de Aegis encendido todo el año | límite de 200m CPU en `kubernetes/aegis/deployment.yaml`; Fargate lo cobra en su tamaño mínimo, 0,25 vCPU y 0,5 GB: (0,25 × 0,04048 + 0,5 × 0,004445) $/h × 8.760 h | 108 $ | repositorio + fuente [8] |
-| **Operación, por año** | 4.476 + 108 | **4.585 $** | |
-| Pods extra durante un pico | medido: 2,79 pods-minuto más por rampa con un pico de 3 pods. Cota superior: 100 pods de 4 vCPU y 8 GB son 93 pods-minuto × 0,00329 $ | **≤ 0,31 $ por pico** | medido + fuente [8] |
-
-Más del 99 % del costo anual es tiempo de personas; pedir capacidad antes casi no cuesta. Con un pico por semana, los pods extra suman como mucho 16 $ al año y no se incluyen.
-
-### 5.3 Punto de equilibrio
-
-| Indicador | Cálculo | Valor |
-|---|---|---|
-| Equilibrio en operación (desde el año 2) | 4.585 ÷ 0,0609 | **75.297 $** de ventas en picos al año |
-| Equilibrio del año 1 (con implementación) | (14.922 + 4.585) ÷ 0,0609 | **320.393 $** |
-| Equivalencia del equilibrio en operación | 75.297 ÷ (4 min × 52 semanas) | 362 $ por minuto en un pico de 4 min por semana |
-
-### 5.4 Tres escenarios (diapositiva 10)
-
-| Ventas en picos al año (V) | Ganancia rescatada (0,0609 × V) | ROI año 1 | ROI desde el año 2 | Recuperación |
+| Carga | Aegis | HPA por defecto | HPA afinado | Contrastes (p de Holm) |
 |---|---|---|---|---|
-| 250.000 $ | 15.220 $ | −22 % | 232 % | 17 meses |
-| 1.000.000 $ | 60.881 $ | 212 % | 1.228 % | 3,2 meses |
-| 3.000.000 $ | 182.642 $ | 836 % | 3.884 % | 1 mes |
+| Rampa | **1,9 %** | 16,9 % (9,1×) | 15,4 % (8,3×) | 0,026 y 0,030 |
+| Pico | **5,6 %** | 26,7 % (4,7×) | 24,9 % (4,4×) | 0,001 y 0,0001 (rangos) |
+| Olas | **1,4 %** | 3,7 % (no demostrado) | 7,1 % (5,0×) | 0,18 y 0,019 |
 
-ROI año 1 = (ganancia − 14.922 − 4.585) ÷ (14.922 + 4.585). ROI desde el año 2 = (ganancia − 4.585) ÷ 4.585. Recuperación = 14.922 ÷ ((ganancia − 4.585) ÷ 12).
+Aegis tuvo menos fallas en 5 de las 6 comparaciones registradas. Con la mediana la conclusión no cambia (rampa 0,9 % frente a 14,4 % y 12,9 %; pico 5,5 % frente a 19,9 % y 23,4 %). En un análisis de sensibilidad no registrado (t pareado sobre log(1 + %)) los mismos 5 contrastes son significativos; con el t pareado sin transformar, 2 son significativos y 3 quedan en p = 0,063.
 
-Referencia de escala (no entra en el cálculo): en las horas pico de Cyber Monday 2024 los consumidores de EE. UU. gastaron en línea 15,8 millones de dólares por minuto [9].
+Métricas secundarias (exploratorias, sin corrección): tiempo degradado de 58 s frente a 123 y 129 s en la rampa, y 46 s frente a 123 y 113 s en el pico; solicitud del 2º pod a los 77 s frente a 148 y 138 s en la rampa; pods-minuto inferiores al HPA por defecto en las tres cargas (−27 % en las olas) y equivalentes al HPA afinado salvo en el pico (13,9 frente a 12,3). Detalle en [results.md](experiments/results.md).
 
-### 5.5 Sensibilidad
+## 8. Valor no monetario (diapositiva 15)
 
-Equilibrio = costo ÷ (Δf × p × m). Cada fila cambia un solo supuesto respecto al caso base.
-
-| Si cambia | Factor | Equilibrio en operación | Equilibrio del año 1 |
+| Dimensión | Evidencia externa | Tipo | Fuente |
 |---|---|---|---|
-| Caso base (rampa, p = 0,53, m = 0,33) | 0,0609 | 75.297 $ | 320.393 $ |
-| Pico abrupto en vez de rampa (Δf = 0,4147) | 0,0729 | 62.859 $ | 267.470 $ |
-| Margen del 50 % | 0,0917 | 49.967 $ | 212.613 $ |
-| Margen del 20 % | 0,0367 | 124.917 $ | 531.532 $ |
-| La brecha de fallas es la mitad (por ejemplo, un HPA afinado) | 0,0304 | 150.594 $ | 640.785 $ |
-| Aegis conectado por la Custom Metrics API (Δf = 0,1693) | 0,0298 | 153.974 $ | 655.168 $ |
-| Abandono del 25 % en vez del 53 % | 0,0287 | 159.629 $ | 679.233 $ |
-| Brecha de 10 puntos | 0,0176 | 260.678 $ | 1.109.200 $ |
-| Brecha de 5 puntos | 0,0088 | 521.355 $ | 2.218.399 $ |
-| Implementación de 80 h | 0,0609 | 75.297 $ | 197.845 $ |
-| Implementación de 320 h | 0,0609 | 75.297 $ | 565.489 $ |
+| Retención de usuarios | 32 % de los consumidores abandonaría una marca de su preferencia tras una única mala experiencia (49 % en América Latina); 15.000 personas | encuesta, intención declarada, verificada en fuentes secundarias | [16] |
+| Carga operativa | Google limita el trabajo operativo reactivo («toil») al 50 % del tiempo de cada ingeniero y advierte que su exceso conduce al agotamiento | publicación de Google | [17] |
+| Eficiencia energética | los centros de datos consumieron cerca de 415 TWh en 2024, el 1,5 % de la electricidad mundial | organismo internacional | [18] |
+| Trazabilidad y cumplimiento | el reglamento DORA exige a las entidades financieras de la UE gestionar y notificar los incidentes graves de TIC | regulación | [19] |
 
-El resultado depende sobre todo de la brecha real de cada empresa. Con la del laboratorio, Aegis conviene a tiendas medianas; con una brecha de pocos puntos, solo a las que venden mucho durante sus picos.
+No se midieron alertas, consumo energético ni abandono de usuarios: la relación entre menor tiempo degradado y estos beneficios es una inferencia.
 
-### 5.6 Cómo calcularlo para una empresa
+## 9. Modelo económico (diapositivas 16, 18 y 19)
 
-1. Estimar V: las ventas que pasan por el servicio durante los momentos en que el tráfico sube más rápido de lo que el HPA alcanza a escalar (campañas, horarios, lanzamientos).
-2. Poner su margen bruto m.
-3. Si puede, medir su propia brecha de fallas Δf con y sin Aegis; si no, usar la nuestra sabiendo que es de laboratorio.
-4. Ganancia rescatada al año = V × Δf × 0,53 × m.
-5. Ajustar las horas de implementación y mantenimiento a su equipo; el costo por hora sale del BLS o del salario local.
+```
+valor anual = minutos degradados evitados por pico × picos al año × costo de un minuto degradado
+```
 
-## 6. Qué tan sólido es (diapositiva 11)
-
-| Medido | Fuente oficial | Estimación |
+| Factor | Valor | Tipo |
 |---|---|---|
-| Fallas: 2,5 % contra 37,1 % | 93,26 $ por hora de ingeniería [6], [7] | 160 h de implementación |
-| Pedido del pod: 6 s antes contra 36 a 65 s tarde | precios de AWS Fargate [8] | 4 h al mes de operación |
-| 2,79 pods-minuto extra por pico | margen bruto minorista de 33,18 % [13] | que una petición fallida pierda clientes como una página lenta (53 %, apoyado en [1], [2]) |
-| | | que el laboratorio se parezca a producción |
+| Minutos degradados evitados por pico | 0,76 min: promedio de rampa (65 s), pico (77,5 s) y olas (−5,8 s, no significativo) frente al HPA por defecto | medición propia, métrica secundaria; se trata como estimación |
+| Picos al año | parámetro de cada organización | estimación |
+| Costo de un minuto degradado | parámetro de cada organización, suma de los componentes que le apliquen | estimación |
+
+**Componentes del costo por minuto, por tipo de organización:**
+
+| Organización | Componentes |
+|---|---|
+| Comercio en línea | ventas por minuto × margen × proporción de compras no concretadas; clientes que no regresan |
+| Software como servicio | créditos por incumplimiento de SLA (AWS y Google reembolsan entre 10 y 100 % de la factura según la disponibilidad, solo por indisponibilidad) [20]; cancelación de clientes |
+| Plataforma interna | personas afectadas × costo de su hora ÷ 60; horas del equipo que atiende el incidente |
+| Banca y sector público | sanciones y obligaciones de notificación (por ejemplo, DORA [19]); atención a clientes o ciudadanos afectados |
+
+El modelo anterior (ventas recuperadas × margen) corresponde solo al primer caso. Que el costo de una interrupción no se limita a los ingresos lo respalda Splunk y Oxford Economics: además de los ingresos perdidos, las empresas del Global 2000 reportan en promedio 22 M$ anuales en sanciones regulatorias y 16 M$ en penalizaciones de SLA (encuesta de proveedor, 2.000 ejecutivos) [21].
+
+## 10. Costos (diapositiva 17)
+
+| Concepto | Cálculo | Valor | Tipo |
+|---|---|---|---|
+| Hora de ingeniería | 135.980 $/año ÷ 2.080 h = 65,38 $/h; ÷ 0,701 (salario = 70,1 % del costo del empleador) | 93,26 $/h | fuente [22], [23] |
+| Implementación, una vez | 160 h × 93,26 $ | **14.922 $** | horas: estimación (rango 80 a 320 h) |
+| Mantenimiento, por año | 4 h/mes × 12 × 93,26 $ | 4.476 $ | estimación |
+| Pod de Aegis, por año | tamaño mínimo de AWS Fargate (0,25 vCPU, 0,5 GB): (0,25 × 0,04048 + 0,5 × 0,004445) $/h × 8.760 h | 108 $ | fuente [24] |
+| **Operación, por año** | 4.476 + 108 | **4.584 $** | |
+| Pods adicionales | consumo de pods-minuto igual o inferior al del HPA por defecto en las tres cargas | 0 $ | medición propia |
+
+Cerca del 98 % del costo anual de operación corresponde a horas de ingeniería.
+
+## 11. Punto de equilibrio y sensibilidad (diapositivas 18 y 20)
+
+```
+costo por minuto de equilibrio = costo anual ÷ (minutos evitados por pico × picos al año)
+```
+
+| Picos al año | Equilibrio a partir del año 2 | Primer año (con implementación) |
+|---|---|---|
+| 52 (semanal) | **116 $/min** | 494 $/min |
+| 156 (tres por semana) | 39 $/min | 165 $/min |
+| 365 (diario) | 17 $/min | 70 $/min |
+
+Sensibilidad, con 52 picos al año:
+
+| Si cambia | A partir del año 2 | Primer año |
+|---|---|---|
+| Caso base (0,76 min por pico frente al HPA por defecto) | 116 $/min | 494 $/min |
+| Solo rampa (65 s por pico) | 81 $/min | 346 $/min |
+| Solo pico (77,5 s por pico) | 68 $/min | 290 $/min |
+| Frente al HPA afinado (61,9 s por pico, promedio de las tres cargas) | 85 $/min | 363 $/min |
+| En producción Aegis evita la mitad (0,38 min por pico) | 232 $/min | 988 $/min |
+| Implementación de 80 h | 116 $/min | 305 $/min |
+| Implementación de 320 h | 116 $/min | 872 $/min |
+
+**Referencias de contraste** (no entran en el cálculo, son interrupciones totales y encuestas autodeclaradas): 4.537 $ por minuto de incidente en empresas de más de 1.000 empleados (PagerDuty 2024, 500 líderes de TI, encuesta de proveedor) [25]; más del 90 % de las empresas medianas y grandes declara que una hora de interrupción cuesta más de 300.000 $ (ITIC 2024, más de 1.000 empresas) [26]. No existe una cifra publicada de la relación entre el costo de un minuto degradado y el de un minuto de interrupción total; con picos semanales, basta con que un minuto degradado cueste 1/39 de la cifra de PagerDuty para alcanzar el equilibrio.
+
+## 12. Robustez y riesgos (diapositiva 20)
+
+| Medición propia | Fuente externa | Estimación |
+|---|---|---|
+| Fallas, tiempo degradado y pods-minuto (54 corridas) | documentación de AWS, Google y Kubernetes; BLS; IEA; Google SRE | 160 h de implementación y 4 h mensuales |
+| 0,76 minutos degradados evitados por pico | encuestas de proveedores, identificadas: CAST AI, Splunk, PagerDuty, PwC | picos al año y costo por minuto de cada organización |
+| | | representatividad del laboratorio respecto de producción |
 
 Riesgos principales:
 
-- **El laboratorio no es producción:** un nodo, pods de 60m de CPU, el HPA por defecto (CPU al 70 %) y un timeout de 10 s en k6. Se diseñó para que el servicio se saturara. Un HPA afinado (objetivo más bajo, métrica de peticiones) o pods de sobra reducirían la brecha; la literatura académica también reporta grandes mejoras de los escaladores proactivos frente al HPA en picos [10], pero no se usa ese número en el cálculo.
-- **El abandono es una aproximación:** el 53 % mide visitas a páginas lentas, no compradores ante peticiones fallidas (5.1).
-- **Picos sin tendencia:** si el tráfico sube en menos de unos 40 s, Aegis reduce las fallas de 54,8 % a 13,3 % pero no las evita.
-- **Conexión por la Custom Metrics API:** la decisión llega de 3 a 12 s tarde (9,5 s de media) y las fallas suben a 20,2 %; se recomienda que Aegis escriba `minReplicas`.
+- **Representatividad del laboratorio:** un nodo, pods de 60m de CPU, como máximo 3 réplicas, carga sintética. Si en producción Aegis evitara la mitad de los minutos degradados, el equilibrio semanal pasa de 116 a 232 $/min.
+- **Deriva de capacidad durante la campaña:** C medida pasó de 22 a 30 y a 24 req/s; se mantuvo C = 22 como establece el plan, lo que hace a Aegis más conservador (registro de desviaciones en [design.md](experiments/design.md)).
+- **Picos abruptos:** Aegis no los anticipa; reduce las fallas al reaccionar antes que el HPA, pero no las evita.
+- **Métricas secundarias:** el tiempo degradado y los pods-minuto no tienen corrección por comparaciones múltiples.
+- **Regla de bajada elegida sobre trazas de la campaña de octubre con las mismas cargas:** su ventaja en costo podría ser menor con tráfico no visto.
 
-## 7. Diapositivas y su contenido
+## 13. Cifras retiradas
 
-| N.º | Título | Contenido |
-|---|---|---|
-| 1 | Aegis | portada: la capacidad llega antes que el tráfico |
-| 2 | Unas décimas de segundo valen ventas | −7 %, +8,4 %, 53 % |
-| 3 | Por qué Kubernetes | 82 % en producción, +90 % de organizaciones con contenedores en 2027, 66 % para inferencia de IA |
-| 4 | El HPA pide el pod cuando el servicio ya se rompió | línea de tiempo medida: s 74 contra s 116 a 145 |
-| 5 | Hoy se elige entre estas dos | 37 % de fallas o 10 % de uso de CPU |
-| 6 | La evidencia | 15 veces menos fallas; barras de rampa y pico |
-| 7 | Aegis rescata 6 centavos de ganancia por cada dólar vendido en picos | 0,346 × 0,53 × 0,33 = 0,06 |
-| 8 | Lo que cuesta es la ingeniería, no los pods | 14.900 $, 4.600 $/año, ≤ 0,31 $ por pico |
-| 9 | Se paga desde 75.000 $ al año vendidos en picos | gráfico de equilibrio; 360 $/min |
-| 10 | Cuanto más se vende en los picos, antes se paga | escenarios de 250.000, 1.000.000 y 3.000.000 $ |
-| 11 | De dónde sale cada número | medido, fuente oficial, estimación; riesgo del laboratorio |
-| 12 | Todo número tiene su origen | fuentes |
+- **37 % de fallas sin Aegis** (campaña de octubre): dato propio usado para establecer el problema y desactualizado tras corregir la sonda de salud.
+- **53 % de abandono** (Google/SOASTA 2016–2017) como proporción de compradores perdidos: mide visitas a páginas lentas, no peticiones fallidas.
+- **Margen bruto minorista de 33,18 %** como factor universal: aplica solo a comercio; ahora es un componente opcional del costo por minuto.
+- **Gartner, 5.600 $ por minuto** (2014): sin metodología verificable y con 12 años de antigüedad.
+- **Porcentajes de violación de SLO del HPA** (15,3 % y 53 %): provienen de un preprint y una tesis no comparables.
+- Las cifras retiradas en la versión anterior por no ser verificables (TracResearch, Akamai/SpeedCurve 2025, Catchpoint 2025, «AWS EKS 2026») siguen retiradas.
 
-Cada diapositiva lleva en sus notas del presentador el razonamiento completo.
+## 14. Fuentes
 
-## 8. Cifras retiradas
-
-No se encontraron en una fuente primaria verificable: «10x más frecuentes las degradaciones» (TracResearch, 2025); «28 % de abandono permanente contra 9 %» (Akamai/SpeedCurve, 2025); «42 % de directivos» y «51 % pierde más de 1 M $ al mes» (Catchpoint, 2025); «AWS EKS, 2026» como fuente de tiempos de arranque. También se retiraron los supuestos sin respaldo del modelo anterior (sección 1).
-
-## 9. Fuentes
-
-1. Akamai, «Akamai Releases Spring 2017 State of Online Retail Performance Report», 18 de abril de 2017. https://www.ir.akamai.com/node/12716
-2. Google, «The Need for Mobile Speed» y «Mobile site load time statistics», Think with Google. https://www.thinkwithgoogle.com/consumer-insights/consumer-trends/mobile-site-load-time-statistics/
-3. Deloitte para Google, «Milliseconds Make Millions», 24 de marzo de 2020. https://www.deloitte.com/ie/en/services/consulting/research/milliseconds-make-millions.html
-4. The Kubernetes Authors, «Horizontal Pod Autoscaling», documentación oficial. https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/
-5. CAST AI, «2025 Kubernetes Cost Benchmark Report», 5 de marzo de 2025. https://cast.ai/press-release/new-kubernetes-cost-benchmark-report-reveals-persistent-cloud-waste/
-6. U.S. Bureau of Labor Statistics, «Software Developers», Occupational Outlook Handbook (mediana de mayo de 2025: 135.980 $). https://www.bls.gov/ooh/computer-and-information-technology/software-developers.htm
-7. U.S. Bureau of Labor Statistics, «Employer Costs for Employee Compensation», diciembre de 2025 (salario = 70,1 % del costo en el sector privado). https://www.bls.gov/news.release/ecec.htm
-8. Amazon Web Services, «AWS Fargate Pricing», US East (N. Virginia), Linux/x86: 0,000011244 $ por vCPU-segundo (0,04048 $/h) y 0,000001235 $ por GB-segundo (0,004445 $/h), mínimo de 1 minuto. https://aws.amazon.com/fargate/pricing/
-9. Adobe, «Cyber Monday recap», 3 de diciembre de 2024. https://news.adobe.com/news/2024/12/120324-adi-cyber-monday-recap
-10. B. Choi, J. Park, C. Lee y D. Han, «pHPA: A Proactive Autoscaling Framework for Microservice Chain», 5th Asia-Pacific Workshop on Networking (APNet), 2021. https://doi.org/10.1145/3469393.3469401
-11. Cloud Native Computing Foundation, «Kubernetes Established as the De Facto "Operating System" for AI as Production Use Hits 82% in 2025 CNCF Annual Cloud Native Survey», 20 de enero de 2026. https://www.cncf.io/announcements/2026/01/20/kubernetes-established-as-the-de-facto-operating-system-for-ai-as-production-use-hits-82-in-2025-cncf-annual-cloud-native-survey/ · informe: https://www.cncf.io/reports/the-cncf-annual-cloud-native-survey/
-12. C. Goldberg y D. Bradstock, «Google is a Leader in the 2023 Gartner Magic Quadrant for Container Management», Google Cloud Blog, 26 de septiembre de 2023 (cita textual de la predicción de Gartner). https://cloud.google.com/blog/products/containers-kubernetes/a-leader-in-2023-gartner-magic-quadrant-for-container-management
-
-13. A. Damodaran, «Margins by Sector (US)», NYU Stern, datos de enero de 2026 (Retail (General): margen bruto 33,18 %, 23 empresas; Retail (Special Lines) 35,30 %; Retail (Distributors) 30,57 %). https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/margin.html
-
-Lecturas de contexto, no usadas en el cálculo: R. Kohavi, D. Tang y Y. Xu, *Trustworthy Online Controlled Experiments*, Cambridge University Press, 2020 (cap. «Speed Matters»); E. Schurman y J. Brutlag, «Performance Related Changes and their User Impact», O’Reilly Velocity, 2009; Uptime Institute, «Annual Outage Analysis 2025»; ITIC, «2024 Hourly Cost of Downtime Survey».
+1. Cloud Native Computing Foundation, Annual Cloud Native Survey, 20 de enero de 2026. https://www.cncf.io/reports/the-cncf-annual-cloud-native-survey/
+2. C. Goldberg y D. Bradstock, «Google is a Leader in the 2023 Gartner Magic Quadrant for Container Management», Google Cloud Blog, 26 de septiembre de 2023. https://cloud.google.com/blog/products/containers-kubernetes/a-leader-in-2023-gartner-magic-quadrant-for-container-management
+3. The Kubernetes Authors, «Horizontal Pod Autoscaling», documentación oficial. https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/
+4. Google Cloud, «Scaling based on predictions» (Predictive autoscaling), documentación de Compute Engine. https://docs.cloud.google.com/compute/docs/autoscaler/predictive-autoscaling
+5. Amazon Web Services, «Predictive scaling for Amazon EC2 Auto Scaling», documentación oficial. https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-predictive-scaling.html
+6. T.-T. Nguyen, Y.-J. Yeom, T. Kim, D.-H. Park y S. Kim, «Horizontal Pod Autoscaling in Kubernetes for Elastic Container Orchestration», Sensors 20(16):4621, 2020. https://pmc.ncbi.nlm.nih.gov/articles/PMC7471989
+7. Google Cloud, «Best practices for running cost-optimized Kubernetes applications on GKE». https://docs.cloud.google.com/architecture/best-practices-for-running-cost-effective-kubernetes-applications-on-gke
+8. CAST AI, «2025 Kubernetes Cost Benchmark Report», 5 de marzo de 2025. https://cast.ai/press-release/new-kubernetes-cost-benchmark-report-reveals-persistent-cloud-waste/
+9. A. R. Karlin, M. S. Manasse, L. Rudolph y D. D. Sleator, «Competitive Snoopy Caching», Algorithmica 3, pp. 79–119, 1988.
+10. KEDA, documentación (escaladores cron y PredictKube) y anuncio de graduación en la CNCF, agosto de 2023. https://keda.sh/docs/2.18/scalers/cron/ · https://www.cncf.io/news/2023/08/22/itops-times-keda-graduates-from-cncf/
+11. Knative, «Additional autoscaling configuration for KPA» y anuncio de graduación en la CNCF, 8 de octubre de 2025. https://knative.dev/docs/serving/autoscaling/kpa-specific/ · https://www.cncf.io/announcements/2025/10/08/cloud-native-computing-foundation-announces-knatives-graduation/
+12. KEDA, «PredictKube scaler». https://keda.sh/docs/2.18/scalers/predictkube/
+13. Datadog, «Kubernetes Autoscaling», documentación. https://docs.datadoghq.com/containers/autoscaling
+14. R. A. Fisher, *The Design of Experiments*, Oliver and Boyd, 1935; D. C. Montgomery, *Design and Analysis of Experiments*, 9.ª ed., Wiley, 2017.
+15. S. Holm, «A Simple Sequentially Rejective Multiple Test Procedure», Scandinavian Journal of Statistics 6(2), pp. 65–70, 1979.
+16. PwC, «Experience is everything: Here's how to get it right», 2018. https://www.pwc.com/cb/en/services/consulting/pdf/customer-experience-placemat.pdf
+17. B. Beyer et al., *Site Reliability Engineering*, cap. 5 «Eliminating Toil», Google, 2016. https://sre.google/sre-book/eliminating-toil/
+18. International Energy Agency, *Energy and AI*, 2025. https://www.iea.org/reports/energy-and-ai
+19. Reglamento (UE) 2022/2554 sobre la resiliencia operativa digital del sector financiero (DORA). https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng
+20. Amazon Compute Service Level Agreement; Google Compute Engine Service Level Agreement. https://aws.amazon.com/compute/sla/ · https://cloud.google.com/compute/sla
+21. Splunk y Oxford Economics, «The Hidden Costs of Downtime», junio de 2024. https://newsroom.cisco.com/c/r/newsroom/en/us/a/y2024/m06/conf24-splunk-report-shows-downtime-costs-global-2000-companies-400b-annually.html
+22. U.S. Bureau of Labor Statistics, «Software Developers», Occupational Outlook Handbook (mediana de mayo de 2025: 135.980 $). https://www.bls.gov/ooh/computer-and-information-technology/software-developers.htm
+23. U.S. Bureau of Labor Statistics, «Employer Costs for Employee Compensation», diciembre de 2025. https://www.bls.gov/news.release/ecec.htm
+24. Amazon Web Services, «AWS Fargate Pricing», US East (N. Virginia). https://aws.amazon.com/fargate/pricing/
+25. PagerDuty, «Cost of Incidents» study, 2024. https://pagerduty.com/newsroom/study-cost-of-incidents
+26. ITIC, «2024 Hourly Cost of Downtime Survey». https://itic-corp.com/?p=3152

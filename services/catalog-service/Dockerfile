@@ -13,5 +13,5 @@ COPY services/catalog-service/src /app/services/catalog-service/src
 COPY services/catalog-service/seed /app/services/catalog-service/seed
 
 ENV NODE_ENV=production
-EXPOSE 3003 50053
+EXPOSE 3003 3004 50053
 CMD ["node", "src/server.js"]

@@ -1,4 +1,4 @@
-# Aegis decides through minReplicas; CPU 95% is never reached. No scale-down window: Aegis waits 60 s.
+# Aegis decides through minReplicas; CPU 95% is never reached. No scale-down window: Aegis waits 15–60 s.
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:

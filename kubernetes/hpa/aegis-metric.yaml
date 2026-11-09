@@ -38,7 +38,7 @@ spec:
         - type: Pods
           value: 2
           periodSeconds: 15
-    # Aegis already waits 60 s; this window only absorbs a stale sample.
+    # Aegis already waits 15–60 s; this window only absorbs a stale sample.
     scaleDown:
       stabilizationWindowSeconds: 30
       selectPolicy: Min

@@ -107,7 +107,7 @@ def load_runs(pattern):
     for path in sorted(glob.glob(str(TESTS_DIR / pattern))):
         summary = summary_for(path)
         records = [r for r in read_ndjson(path) if r["rps"] is not None]
-        if summary is None or len(records) < 20 or summary["mode"] == "hpa":
+        if summary is None or len(records) < 20 or summary["mode"] not in ("aegis", "metric"):
             continue
         name = str(Path(path).relative_to(TESTS_DIR)).replace("/data/", " ").replace("-aegis.ndjson", "")
         runs.append({"name": name, "records": records, "summary": summary})

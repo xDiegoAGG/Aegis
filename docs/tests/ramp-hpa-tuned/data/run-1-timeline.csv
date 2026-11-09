@@ -1,0 +1,39 @@
+seconds,time_utc,source,event,detail
+-3984.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-3958.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+-1.0,05:58:12,kubernetes,Scheduled,Pod/load-linear-vhwbv: Successfully assigned default/load-linear-vhwbv to minikube
+-1.0,05:58:12,kubernetes,Pulled,"Pod/load-linear-vhwbv: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+-1.0,05:58:12,kubernetes,Created,Pod/load-linear-vhwbv: Container created
+-1.0,05:58:12,kubernetes,Started,Pod/load-linear-vhwbv: Container started
+-1.0,05:58:12,kubernetes,SuccessfulCreate,Job/load-linear: Created pod: load-linear-vhwbv
+0,05:58:13,k6,load started,linear
+80.0,05:59:33,k6,planned traffic passes C,22.0 req/s
+87,05:59:40,client,degraded,P95 above L or over 1% failed for T_d
+103.0,05:59:56,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-mmpgp
+103.0,05:59:56,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+103.0,05:59:56,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: cpu resource utilization (percentage of request) above target
+103.0,05:59:56,pod,created,catalog-service-79cd8fffdf-mmpgp
+104.0,05:59:57,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-mmpgp: Successfully assigned default/catalog-service-79cd8fffdf-mmpgp to minikube
+104.0,05:59:57,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-mmpgp: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+105.0,05:59:58,kubernetes,Created,Pod/catalog-service-79cd8fffdf-mmpgp: Container created
+105.0,05:59:58,kubernetes,Started,Pod/catalog-service-79cd8fffdf-mmpgp: Container started
+118.0,06:00:11,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-mmpgp: Readiness probe failed: Get ""http://10.244.0.40:3004/ready"": dial tcp 10.244.0.40:3004: connect: connection refused"
+121.0,06:00:14,pod,ready,catalog-service-79cd8fffdf-mmpgp
+224.0,06:01:57,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-bnt4c: Successfully assigned default/catalog-service-79cd8fffdf-bnt4c to minikube
+224.0,06:01:57,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-bnt4c: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+224.0,06:01:57,kubernetes,Created,Pod/catalog-service-79cd8fffdf-bnt4c: Container created
+224.0,06:01:57,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-bnt4c
+224.0,06:01:57,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 2 to 3
+224.0,06:01:57,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 3; reason: cpu resource utilization (percentage of request) above target
+224.0,06:01:57,pod,created,catalog-service-79cd8fffdf-bnt4c
+225.0,06:01:58,kubernetes,Started,Pod/catalog-service-79cd8fffdf-bnt4c: Container started
+234.0,06:02:07,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-bnt4c: Readiness probe failed: Get ""http://10.244.0.41:3004/ready"": dial tcp 10.244.0.41:3004: connect: connection refused"
+237.0,06:02:10,pod,ready,catalog-service-79cd8fffdf-bnt4c
+240.0,06:02:13,k6,load finished,
+389.0,06:04:42,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-bnt4c: Stopping container catalog-service
+389.0,06:04:42,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-mmpgp: Stopping container catalog-service
+389.0,06:04:42,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-mmpgp
+389.0,06:04:42,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-bnt4c
+389.0,06:04:42,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-79cd8fffdf from 3 to 1
+389.0,06:04:42,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 1; reason: All metrics below target
+602.0,06:08:15,kubernetes,Killing,Pod/load-linear-vhwbv: Stopping container k6

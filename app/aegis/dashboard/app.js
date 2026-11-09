@@ -1,24 +1,38 @@
-import { ChartGroup, LineChart } from "./plot.js";
+import { ChartGroup, LineChart, niceStep } from "./plot.js";
 
 const POLL_MS = 2000;
-const RUN_COLORS = ["var(--run-1)", "var(--run-2)", "var(--run-3)", "var(--run-4)"];
+// Colors follow the actor, never the order of selection: Aegis blue, HPA alone orange (style.css).
+const ACTOR_COLORS = { aegis: "var(--aegis)", hpa: "var(--hpa)", "hpa-tuned": "var(--hpa-tuned)" };
+const actorOf = (mode) => (mode === "hpa" || mode === "hpa-tuned" ? mode : "aegis");
+const MODE_NAMES = { es: { hpa: "HPA por defecto", "hpa-tuned": "HPA afinado", metric: "Aegis (metric)", aegis: "Aegis" },
+  en: { hpa: "Default HPA", "hpa-tuned": "Tuned HPA", metric: "Aegis (metric)", aegis: "Aegis" } };
+// Runs of the experiment design are named <load>-<autoscaler>; the October 2026 ones test<N>-<...>.
+const isDesign = (test) => !/^test\d+-/.test(test);
+// Prefer the design runs when there are any, so a comparison never mixes the two campaigns.
+const samePool = (entries) => (entries.some((e) => isDesign(e.test)) ? entries.filter((e) => isDesign(e.test)) : entries);
+const REPEAT_DASHES = [null, "7 4", "2 3"];
 const MAX_RUNS = 3;
 
 const TEXT = {
   es: {
-    tabLive: "En vivo", tabExperiments: "Experimentos", all: "Todo",
+    tabLive: "Una corrida", tabLiveNow: "En vivo", tabExperiments: "Resultados", all: "Todo",
     waitingTitle: "Esperando el primer ciclo de Aegis",
     waitingBody: "Este panel lo sirve Aegis. Arráncalo en vivo o reproduce una corrida grabada:",
-    versusTitle: "Aegis frente al HPA solo, con la misma carga",
-    versusLead: "Con esta misma carga, el HPA solo dejó fallar <b>{hpa} %</b> de las peticiones; con Aegis, <b>{aegis} %</b>. Aegis pidió el 2º pod <b>{gain} s antes</b>.",
-    vsAegis: "Aegis (esta corrida)", vsHpa: "Solo HPA (corrida mediana)",
+    versusTitle: "Aegis frente a los HPA, con la misma carga",
+    versusLead: "Con esta misma carga ({n} corridas de cada uno), con el HPA solo fallaron de media <b>{hpa}</b> de las peticiones; con Aegis, <b>{aegis}</b>.",
+    versusLead3: "Con esta misma carga ({n} corridas de cada uno), fallaron de media: con Aegis <b>{aegis}</b> de las peticiones, con el HPA por defecto <b>{hpa}</b> y con el HPA afinado <b>{tuned}</b>.",
+    vsPanelOwn: "{who} · {f} fallidas", vsPanelMedian: "{who} · {f} fallidas",
+    replayDesign: "Campaña de bloques aleatorizados: {desc}",
+    vsMeanOf: "Media de {n} corridas", vsAskAt: "Pide el 2º pod a los",
+    vsNote3: "Los paneles muestran esta corrida de Aegis y la corrida mediana de cada HPA (por peticiones fallidas), con la misma escala. En rojo, el tráfico enviado por el % que falló en cada intervalo de 5 s. La tabla son medias de todas las corridas; en negrita, la mejor.",
     vsAsk: "Pide el 2º pod", vsFailed: "Peticiones fallidas", vsSlow: "Segundos con el servicio lento", vsCost: "Costo (pods-minuto)",
     vsBefore: "{s} s, {d} s antes de superar un pod", vsAfter: "{s} s, {d} s después de superar un pod", vsNever: "nunca",
-    vsNote: "Resultados finales de cada corrida, medidos por k6 desde el cliente. Solo HPA: {n} corridas, fallos entre {min} y {max} %. En «Últimos minutos», la línea gris es la capacidad que tuvo el HPA solo en el mismo momento de la carga.",
+    vsPanelAegis: "Con Aegis: {f} % fallidas", vsPanelHpa: "Solo HPA: {f} % fallidas",
+    vsTraffic: "tráfico enviado", vsCapacity: "capacidad (pods listos × C)", vsLost: "tráfico que falló", vsAskPod: "pide pod {n}",
     vsMissing: "Esta carga no se probó con el HPA solo. Elige la prueba 1 (rampa) o la 4 (pico) para ver la comparación.",
-    lHpa: "capacidad del HPA solo",
-    presetsTitle: "Comparaciones principales", presetLabel: "{profile}: Aegis contra HPA solo",
+    presetsTitle: "Comparaciones principales", presetLabel: "{profile}: Aegis contra los HPA",
     pickTitle: "O elige hasta 3 corridas", testGroup: "Prueba {n}: {mode}, {profile}", runNumber: "corrida {n}",
+    designGroup: "{Profile}: {mode}", blockNumber: "bloque {n}", designName: "{mode}, {profile}, bloque {run}", designShort: "{mode}, bloque {run}",
     mAsk: "Pide el 2º pod", mSlow: "Segundos con el servicio lento", mCost: "Costo (pods-minuto)", mChangeAt: "{from}→{to} a los {s} s",
     profiles: { linear: "rampa", fluctuating: "olas", spike: "pico", "ramp-045": "rampa rápida", "ramp-050": "rampa más rápida" },
     replayPick: "Corrida grabada que se reproduce", replayNote: "Prueba {n}: {desc}", replayError: "No se pudo cambiar la corrida: {e}",
@@ -31,6 +45,7 @@ const TEXT = {
     testOther: "una corrida guardada.",
     stateLive: "En vivo", stateReplay: "Reproduciendo", stateDry: "Dry-run, sin aplicar", stateOffline: "Sin conexión con Aegis",
     lastCycle: "último ciclo hace {s} s", speed: "a ×{v}",
+    nowReplay: "En este momento de la repetición ({clock})", nowLive: "Ahora ({clock})",
     vOverflow: "Los pods no alcanzan.", vScale: "En {h} s no alcanzarían: Aegis pide otro pod.",
     vShrink: "Sobra un pod: Aegis lo apaga.", vNear: "Alcanzan, pero están cerca del límite.", vWaiting: "Al límite hasta que el pod {n} esté listo.", vCalm: "Los pods alcanzan con holgura.",
     vNoData: "Sin datos de tráfico en este ciclo.",
@@ -39,22 +54,23 @@ const TEXT = {
     pod: "pod", pods: "pods", podN: "Pod {n}", serveOne: "aguanta", serveMany: "aguantan",
     tankLoad: "al {v} %", tankStarting: "aún no listo", tankOff: "apagado",
     tankOverflow: "{v} req/s sin atender",
-    tankKey: "El agua es el tráfico que recibe cada pod (Traefik lo reparte por igual). La línea ámbar es el nivel esperado en {h} s. Un pod punteado no está listo: está arrancando, o está tan saturado que no responde a su chequeo de salud.",
+    tankKey: "El agua es el tráfico que recibe cada pod (Traefik lo reparte por igual). La línea punteada es el nivel esperado en {h} s. Un pod punteado no está listo: está arrancando, o está tan saturado que no responde a su chequeo de salud.",
     historyTitle: "Últimos minutos", decisionsTitle: "Qué hizo Aegis",
-    lTraffic: "tráfico", lCapacity: "capacidad (pods listos)", lForecast: "en {h} s",
-    upEvent: "Pidió el pod {n}", downEvent: "Apagó el pod {n}",
+    lTraffic: "tráfico", lCapacity: "capacidad con Aegis", lForecast: "en {h} s", lProjection: "proyección (zona sombreada: el horizonte)",
+    upEvent: "Pidió el pod {n}", downEvent: "Apagó el pod {n}", downEventMany: "Apagó los pods {from} a {to}",
     upWhy: "En {h} s esperaba {p} req/s y {n} {podsWord} {serveVerb} {cap}. Probabilidad de no alcanzar: {risk}.",
-    downWhy: "El tráfico bajó: con {n} {podsWord} la probabilidad de no alcanzar llevaba 60 s bajo {down}, así que sobraba uno.",
+    downWhy: "El tráfico bajó: con {n} {podsWord} la probabilidad de no alcanzar se quedó bajo {down} el tiempo de espera ({wait}), así que sobraban.",
+    waitRange: "entre {min} y {max} s, menos cuanto más bajo el riesgo", waitFixed: "{max} s",
     noDecisions: "Todavía no cambió nada: Aegis mantiene los pods.",
     markUp: "+1 pod", markDown: "−1 pod",
     techTitle: "Cómo decide Aegis", techHint: "La fórmula y las señales que usa en cada ciclo",
     fDemand: "tráfico que llega", fTrend: "cuánto sube por segundo", fHorizon: "lo que tarda un pod en estar listo (T + retraso)",
     fForecast: "tráfico esperado", fCapacity: "lo que aguantan los pods pedidos", fError: "cuánto se equivoca la proyección",
-    fRisk: "probabilidad de no alcanzar", fRule: "Pide un pod si pasa de {up}. Apaga uno si, con un pod menos, se queda bajo {down} durante 60 s.",
+    fRisk: "probabilidad de no alcanzar", fRule: "Pide un pod si pasa de {up}. Apaga pods si, con menos pods, se queda bajo {down} el tiempo de espera ({wait}).",
     chartForecast: "Qué tan bien predice", chartForecastNote: "Cada proyección dibujada en el momento al que apuntaba, junto al tráfico que de verdad llegó.",
-    chartRisk: "Probabilidad de no alcanzar en 35 s", chartRiskNote: "Sobre la línea de 70 % Aegis pide un pod. La línea gris es la misma cuenta con un pod menos: si se queda bajo 30 % durante 60 s, apaga uno.",
+    chartRisk: "Probabilidad de no alcanzar en {h} s", chartRiskNote: "Sobre la línea de {up} Aegis pide un pod. La línea gris es la misma cuenta con un pod menos: si se queda bajo {down} el tiempo de espera, apaga uno.",
     chartPods: "Pods", chartPodsNote: "Los que pidió Aegis, los que ya están listos y lo que hace el HPA.",
-    chartLatency: "Lentitud (P95)", chartLatencyNote: "El 95 % de las peticiones tarda menos que esto. Sobre 1 s el servicio se considera lento.",
+    chartLatency: "Lentitud (P95)", chartLatencyNote: "El 95 % de las peticiones tarda menos que esto. Sobre {l} s el servicio se considera lento.",
     chartSigma: "Error de la proyección (σ)", chartSigmaNote: "Cuánto se ha equivocado últimamente hacia arriba. Más error, más cautela.",
     chartSlope: "Tendencia (m)", chartSlopeNote: "Cuántas req/s sube o baja el tráfico por segundo.",
     sDemand: "llegó", sProjected: "había proyectado", sRisk: "con los pods pedidos", sRiskLess: "con un pod menos",
@@ -66,12 +82,39 @@ const TEXT = {
     pDownWait: "Espera para apagar", pRange: "Rango de pods", pMode: "Cómo actúa", pCalibrated: "Calibrado",
     modeMin: "escribe minReplicas", modeMetric: "publica una métrica",
     colTime: "hora", colAction: "pods", colReason: "motivo",
-    experimentsTitle: "Corridas grabadas",
+    experimentsTitle: "Explorar las corridas",
+    resultsTitle: "Resultados de la campaña",
+    headline: "Con el mismo tráfico, con Aegis fallaron entre {min} y {max} veces menos peticiones que con el HPA.",
+    headlineScope: "Así fue en {n} de las {total} comparaciones fijadas antes de correr.",
+    headlineException: "La excepción: {list}, donde no se demostró diferencia.",
+    exceptionItem: "{load} frente al {who}", theLoad: "el {load}",
+    resultsFoot: "Cada punto es una corrida; la raya vertical y el número en negrita, la media de las 6. Todas las filas comparten la escala de abajo. Análisis completo en docs/tests/design-results.md; el plan, en docs/experiments/design.md.",
+    loadRampHint: "el tráfico sube de forma gradual", loadSpikeHint: "salto brusco, sin tendencia previa", loadWavesHint: "sube y baja dos veces",
+    vFailTimes: "fallan {r} veces más peticiones que con Aegis", vFailMore: "fallan más peticiones que con Aegis", vNoDiff: "diferencia con Aegis no demostrada",
+    vDegradedMore: "{v} más degradado que Aegis", vDegradedLess: "{v} menos degradado que Aegis",
+    vPodMore: "gasta {v} pods-minuto más que Aegis", vPodLess: "gasta {v} pods-minuto menos que Aegis",
+    vAskLater: "pide el 2º pod {v} después que Aegis", vAskEarlier: "pide el 2º pod {v} antes que Aegis",
+    findTrendTitle: "No solo anticipa.", findTrend: "En el pico no hay tendencia que anticipar y aun así Aegis pide el 2º pod a los {aegis} s; los HPA, a los {lo}–{hi} s. Su ventaja ahí es tan grande como en la rampa (la diferencia entre ambas no es significativa, p = {p}): reacciona antes porque mira las peticiones por segundo cada 5 s, no la CPU promediada.",
+    findCostTitle: "No gasta más.", findCost: "Con la regla de bajada de 15–60 s usa menos pods-minuto que el HPA en {n} de las 6 comparaciones",
+    findCostExcept: "; solo gasta más en {list}, que ahorra pods a cambio de fallar más.",
+    findCostNone: "en ninguna gasta más.", findMethodTitle: "Cómo se midió.", findMethod: "54 corridas: los 3 autoscalers en las 3 cargas, repetidos en 6 bloques con el orden sorteado. El plan y el análisis se fijaron antes de la primera corrida.",
+    mFailedPct: "Peticiones fallidas", mDegraded: "Segundos degradado", mPodMin: "Pods-minuto", mAsk2: "Pide el 2º pod",
+    noteFailed: "Métrica principal: el % de peticiones que el usuario vio fallar (medido por k6). Menos es mejor.",
+    noteDegraded: "Secundaria. Segundos con P95 > 1 s o > 1 % de fallos durante 15 s. Menos es mejor.",
+    notePodMin: "Secundaria. Costo: pods pedidos × tiempo, en la misma ventana para todos (carga + 6 min). Menos es mejor.",
+    noteAsk2: "Secundaria. Segundos desde el inicio de la carga hasta pedir el 2º pod. Antes es mejor.",
+    loadRamp: "Rampa", loadSpike: "Pico", loadWaves: "Olas",
+    basisHolm: " (Holm)", basisRanks: " (Holm, por rangos)", basisExploratory: " (exploratoria)",
+    vsDefault: "frente al HPA por defecto", vsTuned: "frente al HPA afinado",
+    blockLabel: "Bloque {b}",
+    tableView: "Ver como tabla", tLoad: "Carga", tActor: "Autoscaler", tMean: "Media", tRange: "Mín – máx", tRuns: "Corridas",
+    octoberTitle: "Campaña preliminar de octubre de 2026 (un factor a la vez, sin aleatorizar)",
     runHint: "Las corridas se dibujan sobre el mismo eje: segundos desde que empezó la carga.",
     noTestsTitle: "No hay corridas grabadas",
     noTestsBody: "Se leen de docs/tests: arranca Aegis o el replay desde el repositorio.",
     calibrationTitle: "Calibración: cuánto aguanta un pod y cuánto tarda en arrancar",
-    eTraffic: "Carga planificada (punteada) y demanda medida", ePods: "Pods pedidos (sólido) y listos (punteado)",
+    eTraffic: "Carga enviada (gris punteada) y demanda medida", ePods: "Pods listos (los que atienden)", eAsk: "pide 2º",
+    eLegend: "Azul: Aegis. Naranja: HPA por defecto. Verde agua: HPA afinado. Si eliges dos corridas del mismo tipo, la segunda va punteada.",
     eLatency: "P95 que vio el cliente", eFailed: "Peticiones fallidas", eRisk: "Probabilidad de no alcanzar, según Aegis",
     secondsAxis: "s desde el inicio", crossesC: "supera C",
     mFailed: "Peticiones fallidas", mReady: "2º pod listo",
@@ -83,19 +126,24 @@ const TEXT = {
     langButton: "EN",
   },
   en: {
-    tabLive: "Live", tabExperiments: "Experiments", all: "All",
+    tabLive: "One run", tabLiveNow: "Live", tabExperiments: "Results", all: "All",
     waitingTitle: "Waiting for the first Aegis cycle",
     waitingBody: "Aegis serves this page. Start it live or replay a recorded run:",
-    versusTitle: "Aegis against the HPA alone, same load",
-    versusLead: "With this same load, the HPA alone let <b>{hpa} %</b> of requests fail; with Aegis, <b>{aegis} %</b>. Aegis asked for the 2nd pod <b>{gain} s earlier</b>.",
-    vsAegis: "Aegis (this run)", vsHpa: "HPA alone (median run)",
+    versusTitle: "Aegis against the HPAs, same load",
+    versusLead: "With this same load ({n} runs each), the HPA alone let <b>{hpa}</b> of requests fail on average; Aegis, <b>{aegis}</b>.",
+    versusLead3: "With this same load ({n} runs each), failed requests on average: <b>{aegis}</b> with Aegis, <b>{hpa}</b> with the default HPA and <b>{tuned}</b> with the tuned HPA.",
+    vsPanelOwn: "{who} · {f} failed", vsPanelMedian: "{who} · {f} failed",
+    replayDesign: "Randomized block campaign: {desc}",
+    vsMeanOf: "Mean of {n} runs", vsAskAt: "Asks for the 2nd pod at",
+    vsNote3: "The panels show this Aegis run and the median run of each HPA (by failed requests), on one scale. In red, the traffic sent times the % that failed in each 5 s interval. The table holds means of every run; the best in bold.",
     vsAsk: "Asks for the 2nd pod", vsFailed: "Failed requests", vsSlow: "Seconds with the service slow", vsCost: "Cost (pod-minutes)",
     vsBefore: "{s} s, {d} s before one pod is exceeded", vsAfter: "{s} s, {d} s after one pod is exceeded", vsNever: "never",
-    vsNote: "Final results of each run, measured by k6 on the client. HPA alone: {n} runs, failures between {min} and {max} %. In “Last minutes”, the grey line is the capacity the HPA alone had at the same moment of the load.",
+    vsPanelAegis: "With Aegis: {f} % failed", vsPanelHpa: "HPA alone: {f} % failed",
+    vsTraffic: "traffic sent", vsCapacity: "capacity (Ready pods × C)", vsLost: "traffic that failed", vsAskPod: "asks pod {n}",
     vsMissing: "This load was not run with the HPA alone. Pick test 1 (ramp) or test 4 (spike) to see the comparison.",
-    lHpa: "HPA alone capacity",
-    presetsTitle: "Main comparisons", presetLabel: "{profile}: Aegis against the HPA alone",
+    presetsTitle: "Main comparisons", presetLabel: "{profile}: Aegis against the HPAs",
     pickTitle: "Or pick up to 3 runs", testGroup: "Test {n}: {mode}, {profile}", runNumber: "run {n}",
+    designGroup: "{Profile}: {mode}", blockNumber: "block {n}", designName: "{mode}, {profile}, block {run}", designShort: "{mode}, block {run}",
     mAsk: "Asks for the 2nd pod", mSlow: "Seconds with the service slow", mCost: "Cost (pod-minutes)", mChangeAt: "{from}→{to} at {s} s",
     profiles: { linear: "ramp", fluctuating: "waves", spike: "spike", "ramp-045": "faster ramp", "ramp-050": "fastest ramp" },
     replayPick: "Recorded run being replayed", replayNote: "Test {n}: {desc}", replayError: "Could not switch the run: {e}",
@@ -108,6 +156,7 @@ const TEXT = {
     testOther: "a saved run.",
     stateLive: "Live", stateReplay: "Replaying", stateDry: "Dry-run, not applying", stateOffline: "Aegis is not answering",
     lastCycle: "last cycle {s} s ago", speed: "at ×{v}",
+    nowReplay: "At this moment of the replay ({clock})", nowLive: "Now ({clock})",
     vOverflow: "The pods are not enough.", vScale: "In {h} s they would not be enough: Aegis asks for another pod.",
     vShrink: "One pod is spare: Aegis turns it off.", vNear: "The pods are enough, but close to the limit.", vWaiting: "At the limit until pod {n} is Ready.", vCalm: "The pods are comfortably enough.",
     vNoData: "No traffic data this cycle.",
@@ -116,22 +165,23 @@ const TEXT = {
     pod: "pod", pods: "pods", podN: "Pod {n}", serveOne: "serves", serveMany: "serve",
     tankLoad: "at {v} %", tankStarting: "not Ready yet", tankOff: "off",
     tankOverflow: "{v} req/s not served",
-    tankKey: "Water is the traffic each pod receives (Traefik splits it evenly). The amber line is the level expected in {h} s. A dashed pod is not Ready: it is starting, or so saturated that it misses its health check.",
+    tankKey: "Water is the traffic each pod receives (Traefik splits it evenly). The dashed line is the level expected in {h} s. A dashed pod is not Ready: it is starting, or so saturated that it misses its health check.",
     historyTitle: "Last minutes", decisionsTitle: "What Aegis did",
-    lTraffic: "traffic", lCapacity: "capacity (ready pods)", lForecast: "in {h} s",
-    upEvent: "Asked for pod {n}", downEvent: "Turned off pod {n}",
+    lTraffic: "traffic", lCapacity: "capacity with Aegis", lForecast: "in {h} s", lProjection: "projection (shaded: the horizon)",
+    upEvent: "Asked for pod {n}", downEvent: "Turned off pod {n}", downEventMany: "Turned off pods {from} to {to}",
     upWhy: "In {h} s it expected {p} req/s and {n} {podsWord} {serveVerb} {cap}. Chance of falling short: {risk}.",
-    downWhy: "Traffic dropped: with {n} {podsWord} the chance of falling short had stayed under {down} for 60 s, so one was spare.",
+    downWhy: "Traffic dropped: with {n} {podsWord} the chance of falling short stayed under {down} for the wait ({wait}), so the rest were spare.",
+    waitRange: "between {min} and {max} s, shorter the lower the risk", waitFixed: "{max} s",
     noDecisions: "Nothing changed yet: Aegis holds the pods.",
     markUp: "+1 pod", markDown: "−1 pod",
     techTitle: "How Aegis decides", techHint: "The formula and the signals it uses every cycle",
     fDemand: "traffic arriving", fTrend: "how much it rises per second", fHorizon: "time a pod needs to be ready (T + delay)",
     fForecast: "expected traffic", fCapacity: "what the requested pods serve", fError: "how wrong the projection is",
-    fRisk: "chance of falling short", fRule: "It asks for a pod above {up}. It turns one off if, with one pod less, it stays under {down} for 60 s.",
+    fRisk: "chance of falling short", fRule: "It asks for a pod above {up}. It turns pods off if, with fewer pods, it stays under {down} for the wait ({wait}).",
     chartForecast: "How well it predicts", chartForecastNote: "Each projection drawn at the moment it was made for, next to the traffic that actually arrived.",
-    chartRisk: "Chance of falling short in 35 s", chartRiskNote: "Above the 70 % line Aegis asks for a pod. The grey line is the same with one pod less: if it stays under 30 % for 60 s, one is turned off.",
+    chartRisk: "Chance of falling short in {h} s", chartRiskNote: "Above the {up} line Aegis asks for a pod. The grey line is the same with one pod less: if it stays under {down} for the wait, one is turned off.",
     chartPods: "Pods", chartPodsNote: "Requested by Aegis, already ready, and what the HPA does.",
-    chartLatency: "Slowness (P95)", chartLatencyNote: "95 % of requests take less than this. Above 1 s the service counts as slow.",
+    chartLatency: "Slowness (P95)", chartLatencyNote: "95 % of requests take less than this. Above {l} s the service counts as slow.",
     chartSigma: "Projection error (σ)", chartSigmaNote: "How far it has recently been too low. More error, more caution.",
     chartSlope: "Trend (m)", chartSlopeNote: "How many req/s the traffic rises or falls per second.",
     sDemand: "arrived", sProjected: "projected", sRisk: "with the requested pods", sRiskLess: "with one pod less",
@@ -143,12 +193,39 @@ const TEXT = {
     pDownWait: "Wait to turn off", pRange: "Pod range", pMode: "How it acts", pCalibrated: "Calibrated",
     modeMin: "writes minReplicas", modeMetric: "publishes a metric",
     colTime: "time", colAction: "pods", colReason: "reason",
-    experimentsTitle: "Recorded runs",
+    experimentsTitle: "Explore the runs",
+    resultsTitle: "Campaign results",
+    headline: "With the same traffic, {min} to {max} times fewer requests failed with Aegis than with the HPA.",
+    headlineScope: "That held in {n} of the {total} comparisons fixed before the runs.",
+    headlineException: "The exception: {list}, where no difference was shown.",
+    exceptionItem: "{load} against the {who}", theLoad: "the {load}",
+    resultsFoot: "Each dot is one run; the vertical tick and the bold number are the mean of the 6. Every row shares the scale below. Full analysis in docs/tests/design-results.md; the plan in docs/experiments/design.md.",
+    loadRampHint: "traffic rises gradually", loadSpikeHint: "a sudden jump, no trend before it", loadWavesHint: "rises and falls twice",
+    vFailTimes: "{r} times more requests fail than with Aegis", vFailMore: "more requests fail than with Aegis", vNoDiff: "no difference with Aegis shown",
+    vDegradedMore: "{v} longer degraded than Aegis", vDegradedLess: "{v} shorter degraded than Aegis",
+    vPodMore: "uses {v} pod-minutes more than Aegis", vPodLess: "uses {v} pod-minutes less than Aegis",
+    vAskLater: "asks for the 2nd pod {v} after Aegis", vAskEarlier: "asks for the 2nd pod {v} before Aegis",
+    findTrendTitle: "It does not only anticipate.", findTrend: "On the spike there is no trend to anticipate, yet Aegis asks for the 2nd pod at {aegis} s; the HPAs at {lo}–{hi} s. Its advantage there is as large as on the ramp (the difference between them is not significant, p = {p}): it reacts sooner because it watches requests per second every 5 s, not averaged CPU.",
+    findCostTitle: "It does not cost more.", findCost: "With the 15–60 s scale-down rule it uses fewer pod-minutes than the HPA in {n} of the 6 comparisons",
+    findCostExcept: "; it only uses more on {list}, which saves pods while failing more.",
+    findCostNone: "it uses more in none.", findMethodTitle: "How it was measured.", findMethod: "54 runs: the 3 autoscalers on the 3 loads, repeated in 6 blocks in a drawn order. The plan and the analysis were fixed before the first run.",
+    mFailedPct: "Failed requests", mDegraded: "Seconds degraded", mPodMin: "Pod-minutes", mAsk2: "Asks for the 2nd pod",
+    noteFailed: "Primary metric: the % of requests users saw fail (measured by k6). Lower is better.",
+    noteDegraded: "Secondary. Seconds with P95 > 1 s or > 1% failed for 15 s. Lower is better.",
+    notePodMin: "Secondary. Cost: requested pods × time, same window for all (load + 6 min). Lower is better.",
+    noteAsk2: "Secondary. Seconds from the start of the load to asking for the 2nd pod. Earlier is better.",
+    loadRamp: "Ramp", loadSpike: "Spike", loadWaves: "Waves",
+    basisHolm: " (Holm)", basisRanks: " (Holm, on ranks)", basisExploratory: " (exploratory)",
+    vsDefault: "against the default HPA", vsTuned: "against the tuned HPA",
+    blockLabel: "Block {b}",
+    tableView: "Show as a table", tLoad: "Load", tActor: "Autoscaler", tMean: "Mean", tRange: "Min – max", tRuns: "Runs",
+    octoberTitle: "Preliminary October 2026 campaign (one factor at a time, not randomized)",
     runHint: "Runs are drawn on one axis: seconds since the load started.",
     noTestsTitle: "No recorded runs",
     noTestsBody: "They are read from docs/tests: start Aegis or the replay from the repository.",
     calibrationTitle: "Calibration: how much one pod serves and how long it takes to start",
-    eTraffic: "Planned load (dotted) and measured demand", ePods: "Pods requested (solid) and ready (dotted)",
+    eTraffic: "Load sent (grey dotted) and measured demand", ePods: "Ready pods (the ones serving)", eAsk: "asks 2nd",
+    eLegend: "Blue: Aegis. Orange: default HPA. Aqua: tuned HPA. If you pick two runs of the same kind, the second one is dashed.",
     eLatency: "P95 seen by the client", eFailed: "Failed requests", eRisk: "Chance of falling short, per Aegis",
     secondsAxis: "s since the start", crossesC: "passes C",
     mFailed: "Failed requests",
@@ -192,6 +269,13 @@ const pct = (value, decimals = 1) => (value === null || value === undefined ? "�
 const clock = (unix) => new Date(unix * 1000).toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
 const clockShort = (unix) => new Date(unix * 1000).toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit", hour12: false });
 
+// A share of failed requests: never "0.0" for a value that is not zero (0.03 % stays 0.03 %).
+function failedPct(value) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "–";
+  const digits = value === 0 ? 0 : value < 0.1 ? 2 : 1;
+  return Number(value).toFixed(digits) + (lang === "es" ? " %" : "%");
+}
+
 // +1.23 / −1.23: the sign always shown, for slopes and z.
 function signed(value, decimals) {
   if (value === null || value === undefined) return "–";
@@ -223,10 +307,10 @@ function buildLiveCharts() {
   live.charts.traffic = group.add(new LineChart(hero, Object.assign({
     unit: "req/s", height: 300, marginRight: 150, yFormat: (v) => num(v, 0), valueFormat: (v) => num(v, 1) + " req/s",
     series: [
-      { key: "rps", label: t("lTraffic"), endLabel: t("lTraffic"), color: "var(--water)", fill: true, width: 2.5, connect: true },
-      { key: "capacity", label: t("lCapacity"), endLabel: t("lCapacity"), color: "var(--ink)", step: true, width: 3, connect: true },
-      { key: "hpaCapacity", label: t("lHpa"), endLabel: t("lHpa"), color: "var(--quiet)", step: true, dash: "6 4", width: 2, connect: true },
+      { key: "rps", label: t("lTraffic"), endLabel: t("lTraffic"), color: "var(--traffic)", fill: true, width: 2, connect: true },
+      { key: "capacity", label: t("lCapacity") + " (" + t("sReady") + ")", endLabel: t("lCapacity"), color: "var(--aegis)", step: true, width: 2.5, connect: true },
     ],
+    legendExtra: [{ label: t("lProjection"), color: "var(--forecast)", width: 2, dash: "5 4" }],
   }, timeOptions)));
 
   const container = document.getElementById("live-charts");
@@ -238,7 +322,7 @@ function buildLiveCharts() {
   add("forecast", { title: t("chartForecast"), note: t("chartForecastNote"), unit: "req/s", height: 200,
     yFormat: (v) => num(v, 0), valueFormat: (v) => num(v, 1),
     series: [
-      { key: "rps", label: t("sDemand"), color: "var(--water)", width: 2.5, connect: true },
+      { key: "rps", label: t("sDemand"), color: "var(--traffic)", width: 2, connect: true },
       { key: "projected", label: t("sProjected"), color: "var(--forecast)", dash: "1 5", width: 2.5, connect: true },
     ] }).root.classList.add("wide");
   add("risk", { title: t("chartRisk"), note: t("chartRiskNote"), unit: "%", height: 170, yMax: 100,
@@ -250,17 +334,17 @@ function buildLiveCharts() {
   add("pods", { title: t("chartPods"), note: t("chartPodsNote"), height: 130, yMaxAtLeast: 3,
     yFormat: (v) => (Number.isInteger(v) ? String(v) : ""), valueFormat: (v) => num(v, 0),
     series: [
-      { key: "target", label: t("sTarget"), color: "var(--ink)", step: true, width: 3 },
-      { key: "ready", label: t("sReady"), color: "var(--water)", step: true },
+      { key: "target", label: t("sTarget"), color: "var(--aegis)", step: true, width: 3 },
+      { key: "ready", label: t("sReady"), color: "var(--ink)", step: true, width: 1.5 },
       { key: "hpaDesired", label: t("sHpa"), color: "var(--quiet)", step: true, dash: "2 3", width: 1.5 },
     ] });
   add("latency", { title: t("chartLatency"), note: t("chartLatencyNote"), unit: "s", height: 130, yMaxAtLeast: 0.5,
     yFormat: (v) => num(v, 1), valueFormat: (v) => num(v, 3) + " s",
-    series: [{ key: "p95", label: t("sP95"), color: "var(--alarm)" }] });
+    series: [{ key: "p95", label: t("sP95"), color: "var(--ink)" }] });
   add("sigma", { title: t("chartSigma"), note: t("chartSigmaNote"), unit: "req/s", height: 120,
     yFormat: (v) => num(v, 1), valueFormat: (v) => num(v, 2), series: [{ key: "sigma", label: t("sSigma"), color: "var(--forecast)" }] });
   add("slope", { title: t("chartSlope"), note: t("chartSlopeNote"), unit: "req/s²", height: 120, yMin: null, yMaxAtLeast: 0.1,
-    yFormat: (v) => num(v, 2), valueFormat: (v) => signed(v, 3), series: [{ key: "slope", label: t("sSlope"), color: "var(--water)" }] });
+    yFormat: (v) => num(v, 2), valueFormat: (v) => signed(v, 3), series: [{ key: "slope", label: t("sSlope"), color: "var(--traffic)" }] });
 }
 
 async function poll() {
@@ -296,6 +380,7 @@ function renderStatus() {
   const mode = !live.online || !meta ? "offline" : meta.mode;
   const labels = { live: t("stateLive"), replay: t("stateReplay"), "dry-run": t("stateDry"), offline: t("stateOffline") };
   el("span", "state " + mode, line, labels[mode]);
+  document.querySelector('.tabs [data-tab="live"]').textContent = t(mode === "live" ? "tabLiveNow" : "tabLive");
   if (mode === "offline") return;
   const parts = [];
   if (mode === "replay") {
@@ -325,16 +410,7 @@ function columns(records, meta) {
     cols.slope.push(r.slope);
   }
   const traffic = { rps: records.map((r) => r.rps),
-    capacity: records.map((r) => (r.replicas_ready === null ? null : C * r.replicas_ready)), hpaCapacity: records.map(() => null) };
-  // Same moment of the load in the HPA-only run: seconds since its k6 start, rows every 5 s.
-  const pair = comparison(meta);
-  if (pair && pair.rows) {
-    const bySecond = new Map(pair.rows.map((row) => [Math.round(row.seconds / 5) * 5, row]));
-    traffic.hpaCapacity = records.map((r) => {
-      const row = bySecond.get(Math.round((r.time - pair.k6Start) / 5) * 5);
-      return row && row.ready !== null && row.ready !== "" ? C * Number(row.ready) : null;
-    });
-  }
+    capacity: records.map((r) => (r.replicas_ready === null ? null : C * r.replicas_ready)) };
   // Forecast check: each projection at the moment it was made for (T + lag later).
   const horizon = horizonOf(meta);
   const byTime = new Map(records.map((r) => [r.time, { rps: r.rps, projected: null }]));
@@ -368,6 +444,8 @@ function renderLive() {
     if (r.action === "scale_up") markers.push({ x: r.time, kind: "up", label: t("markUp") });
     if (r.action === "scale_down") markers.push({ x: r.time, kind: "down", label: t("markDown") });
   }
+  // Labels of markers less than 40 s apart go on alternate rows so they do not overlap.
+  markers.forEach((m, i) => { m.row = i && m.x - markers[i - 1].x < 40 && !markers[i - 1].row ? 1 : 0; });
   live.charts.traffic.setData({
     x, columns: traffic, domain: [domain[0], last.time + horizon + 2], markers, now: last.time,
     zones: [{ x0: last.time, x1: last.time + horizon }],
@@ -376,6 +454,10 @@ function renderLive() {
   });
   const upPct = meta.scale_up_threshold * 100;
   const downPct = meta.scale_down_threshold * 100;
+  // Titles and notes from the running configuration, never from numbers written in the text.
+  live.charts.risk.setTitle(t("chartRisk", { h: num(horizon, 0) }));
+  live.charts.risk.setNote(t("chartRiskNote", { up: num(upPct, 0) + " %", down: num(downPct, 0) + " %" }));
+  live.charts.latency.setNote(t("chartLatencyNote", { l: meta.p95_threshold_seconds }));
   const base = { x, columns: cols, domain, markers };
   live.charts.forecast.setData({ x: forecastX, columns: forecast, domain, markers });
   live.charts.risk.setData(Object.assign({}, base, {
@@ -398,10 +480,14 @@ function renderLive() {
 }
 
 const podsWord = (n) => (n === 1 ? t("pod") : t("pods"));
+// The wait before turning pods off: fixed in older runs, 15-60 s by risk since November 2026.
+const minWait = (meta) => meta.scale_down_min_wait_seconds ?? meta.scale_down_sustained_seconds;
+const waitText = (meta) => (minWait(meta) === meta.scale_down_sustained_seconds ? t("waitFixed", { max: meta.scale_down_sustained_seconds })
+  : t("waitRange", { min: minWait(meta), max: meta.scale_down_sustained_seconds }));
 const serveVerb = (n) => (n === 1 ? t("serveOne") : t("serveMany"));
 
 // Recorded runs that can be replayed: the ones with an Aegis log (not the HPA-only tests).
-const replay = { runs: null, all: null, loading: false, hpaRows: {} };
+const replay = { runs: null, all: null, loading: false, rows: {} };
 
 async function loadReplayRuns() {
   if (replay.runs || replay.loading) return;
@@ -410,7 +496,7 @@ async function loadReplayRuns() {
     const catalog = await (await fetch("api/tests", { cache: "no-store" })).json();
     replay.all = [];
     for (const test of catalog.tests) for (const summary of test.runs) replay.all.push({ test: test.name, summary });
-    replay.runs = replay.all.filter((entry) => entry.summary.mode !== "hpa");
+    replay.runs = replay.all.filter((entry) => actorOf(entry.summary.mode) === "aegis");
   } catch {
     replay.runs = [];
     replay.all = [];
@@ -451,17 +537,81 @@ function comparison(meta) {
   const current = (meta.source || "").replace("-aegis.ndjson", "");
   const aegis = replay.all.find((e) => e.test + "/run-" + e.summary.run === current);
   if (!aegis) return null;
-  const hpa = replay.all.filter((e) => e.summary.mode === "hpa" && e.summary.profile === aegis.summary.profile)
-    .sort((a, b) => a.summary.failed_percent - b.summary.failed_percent);
-  const median = hpa.length ? hpa[Math.floor((hpa.length - 1) / 2)] : null;
-  if (median && !replay.hpaRows[median.test + median.summary.run]) {
-    replay.hpaRows[median.test + median.summary.run] = "loading";
-    fetch("api/tests/" + median.test + "/" + median.summary.run, { cache: "no-store" }).then((r) => r.json())
-      .then((run) => { replay.hpaRows[median.test + median.summary.run] = run.rows; renderLive(); });
+  // Same campaign and same load; the median run of each HPA by failed requests.
+  const pool = replay.all.filter((e) => isDesign(e.test) === isDesign(aegis.test) && e.summary.profile === aegis.summary.profile);
+  const group = {};
+  for (const actor of DESIGN_ACTORS) {
+    group[actor] = pool.filter((e) => e.summary.mode === actor).sort((a, b) => a.summary.failed_percent - b.summary.failed_percent);
   }
-  const rows = median ? replay.hpaRows[median.test + median.summary.run] : null;
-  return { aegis, hpa, median, rows: Array.isArray(rows) ? rows : null,
-    k6Start: Date.parse(aegis.summary.date_utc + "T" + aegis.summary.k6_start_utc + "Z") / 1000 };
+  const median = (runs) => (runs.length ? runs[Math.floor((runs.length - 1) / 2)] : null);
+  const panels = [{ actor: "aegis", entry: aegis, own: true }];
+  for (const actor of ["hpa", "hpa-tuned"]) {
+    const entry = median(group[actor]);
+    if (entry) panels.push({ actor, entry });
+  }
+  for (const panel of panels) panel.rows = runRows(panel.entry);
+  return { aegis, group, panels };
+}
+
+// Rows of a recorded run (every 5 s since k6 started), fetched once.
+function runRows(entry) {
+  const id = entry.test + "/" + entry.summary.run;
+  if (replay.rows[id] === undefined) {
+    replay.rows[id] = "loading";
+    fetch("api/tests/" + id, { cache: "no-store" }).then((r) => r.json())
+      .then((run) => { replay.rows[id] = run.rows; renderLive(); })
+      .catch(() => { replay.rows[id] = null; });
+  }
+  return Array.isArray(replay.rows[id]) ? replay.rows[id] : null;
+}
+
+// Aegis and the HPA alone side by side: same load, same scales, red where requests failed.
+const versus = { key: null };
+
+function renderVersusCharts(pair, C) {
+  const box = document.getElementById("versus-charts");
+  const ready = pair.panels.every((p) => p.rows);
+  const key = [lang, ...pair.panels.map((p) => p.entry.test + p.entry.summary.run), ready].join("|");
+  if (versus.key === key) return;
+  versus.key = key;
+  box.replaceChildren();
+  box.classList.toggle("three", pair.panels.length === 3);
+  if (!ready) return;
+  const value = (v) => (v === null || v === undefined || v === "" ? null : Number(v));
+  let top = 0;
+  let end = 0;
+  for (const panel of pair.panels) {
+    panel.color = ACTOR_COLORS[panel.actor];
+    panel.title = t(panel.own ? "vsPanelOwn" : "vsPanelMedian", { who: MODE_NAMES[lang][panel.actor],
+      f: failedPct(panel.entry.summary.failed_percent) });
+    panel.x = panel.rows.map((r) => Number(r.seconds));
+    panel.columns = {
+      traffic: panel.rows.map((r) => value(r.planned_rps)),
+      capacity: panel.rows.map((r) => (value(r.ready) === null ? null : C * value(r.ready))),
+      lost: panel.rows.map((r) => (value(r.planned_rps) === null || value(r.client_failed_ratio) === null ? null
+        : value(r.planned_rps) * value(r.client_failed_ratio))),
+    };
+    for (const v of [...panel.columns.traffic, ...panel.columns.capacity]) if (v !== null) top = Math.max(top, v);
+    end = Math.max(end, panel.x[panel.x.length - 1] || 0);
+  }
+  top = Math.ceil((top * 1.05) / 10) * 10;
+  const group = new ChartGroup();
+  for (const panel of pair.panels) {
+    const s = panel.entry.summary;
+    const markers = (s.scale_ups || []).map((c, i) => ({ x: c.s, kind: "up", label: t("vsAskPod", { n: c.to }), color: panel.color, row: i % 2 }));
+    if (s.crosses_c_s !== null && s.crosses_c_s !== undefined) markers.push({ x: s.crosses_c_s, kind: "info", label: t("crossesC"), row: 2 });
+    const chart = group.add(new LineChart(box, {
+      title: panel.title, unit: "req/s", height: 230, yMax: top,
+      xFormat: (v, long) => Math.round(v) + (long ? " " + t("secondsAxis") : " s"), timeTicks: true,
+      yFormat: (v) => num(v, 0), valueFormat: (v) => num(v, 1) + " req/s",
+      series: [
+        { key: "traffic", label: t("vsTraffic"), color: "var(--traffic)", fill: true, width: 2, connect: true },
+        { key: "capacity", label: t("vsCapacity"), color: panel.color, step: true, width: 3, connect: true },
+        { key: "lost", label: t("vsLost"), color: "var(--alarm)", fill: true, fillOpacity: 0.45, width: 1.5, connect: true },
+      ],
+    }));
+    chart.setData({ x: panel.x, columns: panel.columns, domain: [0, end], markers });
+  }
 }
 
 function renderVersus(meta) {
@@ -473,39 +623,45 @@ function renderVersus(meta) {
   const table = document.getElementById("versus-table");
   const note = document.getElementById("versus-note");
   table.replaceChildren();
-  if (!pair.median) {
+  if (pair.panels.length < 2) {
     lead.textContent = "";
     note.textContent = t("vsMissing");
+    document.getElementById("versus-charts").replaceChildren();
+    versus.key = null;
     return;
   }
-  const a = pair.aegis.summary;
-  const h = pair.median.summary;
-  lead.innerHTML = t("versusLead", { hpa: num(h.failed_percent, 1), aegis: num(a.failed_percent, 1),
-    gain: num((h.first_scale_up_s ?? 0) - (a.first_scale_up_s ?? 0), 0) });
-  const ask = (s) => {
-    if (s.first_scale_up_s === null || s.first_scale_up_s === undefined) return t("vsNever");
-    const delta = s.crosses_c_s - s.first_scale_up_s;
-    return t(delta >= 0 ? "vsBefore" : "vsAfter", { s: num(s.first_scale_up_s, 0), d: num(Math.abs(delta), 0) });
+  renderVersusCharts(pair, meta.pod_capacity_rps);
+  const actors = DESIGN_ACTORS.filter((a) => pair.group[a].length);
+  const mean = (actor, key) => {
+    const v = pair.group[actor].map((e) => e.summary[key]).filter((x) => x !== null && x !== undefined);
+    return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null;
   };
+  const failed = Object.fromEntries(actors.map((a) => [a, failedPct(mean(a, "failed_percent"))]));
+  lead.innerHTML = t(actors.includes("hpa-tuned") ? "versusLead3" : "versusLead", { n: pair.group.aegis.length,
+    aegis: failed.aegis, hpa: failed.hpa, tuned: failed["hpa-tuned"] });
   const head = el("tr", "", el("thead", "", table));
-  el("th", "", head, "");
-  el("th", "aegis", head, t("vsAegis"));
-  el("th", "hpa", head, t("vsHpa"));
+  el("th", "", head, t("vsMeanOf", { n: pair.group.aegis.length }));
+  for (const actor of actors) {
+    const th = el("th", actor, head);
+    th.appendChild(lineKey(ACTOR_COLORS[actor], null, "swatch"));
+    th.appendChild(document.createTextNode(MODE_NAMES[lang][actor]));
+  }
   const body = el("tbody", "", table);
+  const cost = pair.aegis.summary.pod_minutes_window !== undefined ? "pod_minutes_window" : "pod_minutes";
   const rows = [
-    [t("vsAsk"), ask(a), ask(h), null],
-    [t("vsFailed"), num(a.failed_percent, 1) + " %", num(h.failed_percent, 1) + " %", a.failed_percent < h.failed_percent],
-    [t("vsSlow"), num(a.degraded_seconds, 0) + " s", num(h.degraded_seconds, 0) + " s", a.degraded_seconds < h.degraded_seconds],
-    [t("vsCost"), num(a.pod_minutes, 1), num(h.pod_minutes, 1), null],
+    [t("vsFailed"), "failed_percent", failedPct],
+    [t("vsSlow"), "degraded_seconds", (v) => num(v, 0) + " s"],
+    [t("vsAskAt"), "first_scale_up_s", (v) => num(v, 0) + " s"],
+    [t("vsCost"), cost, (v) => num(v, 1)],
   ];
-  for (const [label, av, hv, aegisBetter] of rows) {
+  for (const [label, key, format] of rows) {
     const row = el("tr", "", body);
     el("td", "", row, label);
-    el("td", "aegis" + (aegisBetter === true ? " better" : ""), row, av);
-    el("td", "hpa" + (aegisBetter === false ? " better" : ""), row, hv);
+    const values = actors.map((a) => mean(a, key));
+    const best = Math.min(...values.filter((v) => v !== null));
+    actors.forEach((actor, i) => el("td", actor + (values[i] === best ? " better" : ""), row, values[i] === null ? "–" : format(values[i])));
   }
-  const failures = pair.hpa.map((e) => e.summary.failed_percent);
-  note.textContent = t("vsNote", { n: pair.hpa.length, min: num(Math.min(...failures), 1), max: num(Math.max(...failures), 1) });
+  note.textContent = t("vsNote3");
 }
 
 function renderReplayNote(meta) {
@@ -518,11 +674,15 @@ function renderReplayNote(meta) {
   if (replay.runs && select.value !== current && document.activeElement !== select) fillReplayPicker();
   const match = (meta.source || "").match(/^test(\d+)-/);
   const n = match ? match[1] : "";
-  document.getElementById("replay-note").textContent =
-    t("replayNote", { n, desc: TEXT[lang]["test" + n] ? t("test" + n) : t("testOther") });
+  const note = document.getElementById("replay-note");
+  // Design runs (<load>-<autoscaler>): describe the load; October runs: their test number.
+  const load = (meta.source || "").match(/^(ramp|spike|waves)-/);
+  if (load) note.textContent = t("replayDesign", { desc: t({ ramp: "test1", spike: "test4", waves: "test2" }[load[1]]) });
+  else note.textContent = t("replayNote", { n, desc: TEXT[lang]["test" + n] ? t("test" + n) : t("testOther") });
 }
 
 function renderVerdict(r, meta) {
+  document.getElementById("now-title").textContent = t(meta.mode === "replay" ? "nowReplay" : "nowLive", { clock: clock(r.time) });
   const title = document.getElementById("verdict");
   const detail = document.getElementById("verdict-detail");
   const C = meta.pod_capacity_rps;
@@ -606,12 +766,12 @@ function renderEquation(r, meta) {
     el("b", "", node, value);
     el("small", "", node, meaning);
   };
-  term2("C · N", num(C, 0) + " × " + N + " = " + num(C * N, 0), t("fCapacity"));
+  term2("C · N", num(C, 0) + " × " + N + " = " + num(C * N, 0), t("fCapacity"), "t-aegis");
   el("span", "op", second, "·");
   term2("σ", num(r.sigma_rps, 1), t("fError"));
   el("span", "op", second, "→");
   term2("Φ((p − C·N) / σ)", pct(r.risk), t("fRisk"), r.risk !== null && r.risk >= meta.scale_up_threshold ? "t-alarm" : "");
-  el("p", "formula-rule", box, t("fRule", { up: pct(meta.scale_up_threshold, 0), down: pct(meta.scale_down_threshold, 0) }));
+  el("p", "formula-rule", box, t("fRule", { up: pct(meta.scale_up_threshold, 0), down: pct(meta.scale_down_threshold, 0), wait: waitText(meta) }));
 }
 
 function renderDecisions(records, meta) {
@@ -624,12 +784,14 @@ function renderDecisions(records, meta) {
     const up = r.action === "scale_up";
     const li = el("li", up ? "up" : "down", list);
     const head = el("div", "log-head", li);
-    el("span", "what", head, up ? t("upEvent", { n: r.target }) : t("downEvent", { n: r.previous_target }));
+    const many = !up && r.previous_target - r.target > 1;
+    el("span", "what", head, up ? t("upEvent", { n: r.target })
+      : many ? t("downEventMany", { from: r.target + 1, to: r.previous_target }) : t("downEvent", { n: r.previous_target }));
     el("span", "when", head, clock(r.time));
     const why = up
       ? t("upWhy", { h: num(horizonOf(meta), 0), p: num(r.projected_rps, 0), n: r.previous_target,
         podsWord: podsWord(r.previous_target), serveVerb: serveVerb(r.previous_target), cap: num(C * r.previous_target, 0), risk: pct(r.risk, 0) })
-      : t("downWhy", { down: pct(meta.scale_down_threshold, 0), n: r.target, podsWord: podsWord(r.target) });
+      : t("downWhy", { down: pct(meta.scale_down_threshold, 0), n: r.target, podsWord: podsWord(r.target), wait: waitText(meta) });
     el("p", "why", li, why);
   }
 }
@@ -646,7 +808,8 @@ function renderParams(meta) {
     [t("pTd"), "T_d", meta.sustained_seconds + " s"],
     [t("pUp"), "", pct(meta.scale_up_threshold, 0)],
     [t("pDown"), "", pct(meta.scale_down_threshold, 0)],
-    [t("pDownWait"), "", meta.scale_down_sustained_seconds + " s"],
+    [t("pDownWait"), "", minWait(meta) === meta.scale_down_sustained_seconds ? meta.scale_down_sustained_seconds + " s"
+      : minWait(meta) + "–" + meta.scale_down_sustained_seconds + " s"],
     [t("pRange"), "", meta.min_replicas + "–" + meta.max_replicas],
     [t("pMode"), "", meta.actuator_mode === "metric" ? t("modeMetric") : t("modeMin")],
   ];
@@ -685,8 +848,9 @@ function runId(test, run) {
 
 function runLabel(entry, short) {
   const match = entry.test.match(/^test(\d+)/);
-  const mode = { hpa: "HPA", metric: "Aegis (metric)" }[entry.summary.mode] || "Aegis";
+  const mode = MODE_NAMES[lang][entry.summary.mode] || "Aegis";
   const profile = TEXT[lang].profiles[entry.summary.profile] || entry.summary.profile;
+  if (isDesign(entry.test)) return t(short ? "designShort" : "designName", { mode, profile, run: entry.summary.run });
   return t(short ? "runShort" : "runName", { n: match ? match[1] : entry.test, mode, profile,
     run: entry.summary.run });
 }
@@ -705,6 +869,14 @@ async function loadExperiments() {
     for (const summary of test.runs) experiments.runs.push({ id: runId(test.name, summary.run), test: test.name, summary });
   }
   document.getElementById("empty-experiments").hidden = experiments.runs.length > 0;
+  // No recorded runs (a cluster without docs/tests): the live view is the useful one.
+  if (!experiments.runs.length && !location.hash) selectTab("live");
+  try {
+    experiments.design = (await (await fetch("api/design", { cache: "no-store" })).json()).results;
+  } catch {
+    experiments.design = null;
+  }
+  renderResults();
   experiments.presets = buildPresets();
   experiments.selected = experiments.presets.length ? experiments.presets[0].ids.slice() : experiments.runs.slice(0, 2).map((e) => e.id);
   buildRunPicker();
@@ -713,14 +885,281 @@ async function loadExperiments() {
   await renderExperiments();
 }
 
+/* ------------------------------------------------- campaign results (design) */
+
+// The responses, in the order of the plan: the primary first. For every one of them lower is better.
+// verdict: how an HPA row reads against Aegis, worse (more) or better (less); {v} is the gap.
+const RESULT_METRICS = [
+  { key: "failed_percent", label: "mFailedPct", note: "noteFailed", unit: "%", digits: 1 },
+  { key: "degraded_seconds", label: "mDegraded", note: "noteDegraded", unit: " s", digits: 0, more: "vDegradedMore", less: "vDegradedLess" },
+  { key: "pod_minutes_window", label: "mPodMin", note: "notePodMin", unit: "", digits: 1, more: "vPodMore", less: "vPodLess" },
+  { key: "first_scale_up_s", label: "mAsk2", note: "noteAsk2", unit: " s", digits: 0, more: "vAskLater", less: "vAskEarlier" },
+];
+const DESIGN_LOADS = [["ramp", "loadRamp", "loadRampHint"], ["spike", "loadSpike", "loadSpikeHint"], ["waves", "loadWaves", "loadWavesHint"]];
+const DESIGN_ACTORS = ["aegis", "hpa", "hpa-tuned"];
+const results = { metric: readPreference("aegis-result-metric") || "failed_percent", observer: null };
+
+// {load: {actor: [{block, value}]}} from the summaries of the design runs.
+function designValues(metric) {
+  const out = {};
+  for (const entry of experiments.runs.filter((e) => isDesign(e.test))) {
+    const load = entry.test.split("-")[0];
+    const actor = entry.summary.mode;
+    const value = entry.summary[metric];
+    if (value === null || value === undefined) continue;
+    ((out[load] = out[load] || {})[actor] = out[load][actor] || []).push({ block: entry.summary.block ?? entry.summary.run, value });
+  }
+  return out;
+}
+
+// An autoscaler name inside a sentence: "the default HPA", not "the Default HPA".
+const nameInText = (actor) => (lang === "en" ? MODE_NAMES.en[actor].replace(/^(Default|Tuned)/, (w) => w.toLowerCase()) : MODE_NAMES[lang][actor]);
+const meanOf = (runs) => (runs && runs.length ? runs.reduce((a, r) => a + r.value, 0) / runs.length : null);
+const loadName = (load) => t((DESIGN_LOADS.find((l) => l[0] === load) || [])[1] || load);
+const ratioText = (r) => (r >= 10 ? num(r, 0) : num(r, 1));
+
+// The answer in one sentence, from the registered verdicts: how many times fewer requests failed with Aegis.
+function resultsHeadline(design, failed) {
+  const rows = design ? design.primary : [];
+  if (!rows.length) return ["", ""];
+  const ratios = rows.filter((r) => r.significant && r.mean_first > 0).map((r) => r.mean_second / r.mean_first);
+  const missing = rows.filter((r) => !r.significant)
+    .map((r) => t("exceptionItem", { load: loadName(r.load).toLowerCase(), who: nameInText(r.second) }));
+  const text = t("headline", { min: ratioText(Math.min(...ratios)), max: ratioText(Math.max(...ratios)) });
+  let scope = t("headlineScope", { n: ratios.length, total: rows.length });
+  if (missing.length) scope += " " + t("headlineException", { list: missing.join(", ") });
+  return [text, scope];
+}
+
+// Three findings in plain words, each computed from the runs and the analysis.
+function resultsFindings(design) {
+  const list = document.getElementById("findings");
+  list.replaceChildren();
+  if (!design) return;
+  const item = (title, body) => {
+    const li = el("li", "", list);
+    el("b", "", li, title + " ");
+    li.appendChild(document.createTextNode(body));
+  };
+  const ask = designValues("first_scale_up_s").spike || {};
+  const hpaAsks = ["hpa", "hpa-tuned"].map((a) => meanOf(ask[a])).filter((v) => v !== null);
+  if (design.interaction && ask.aegis && hpaAsks.length) {
+    item(t("findTrendTitle"), t("findTrend", { aegis: num(meanOf(ask.aegis), 0), lo: num(Math.min(...hpaAsks), 0),
+      hi: num(Math.max(...hpaAsks), 0), d: signed(design.interaction.mean, 1), p: num(design.interaction.p, 2) }));
+  }
+  const dearer = design.secondary.filter((r) => r.metric === "pod_minutes_window" && r.p < 0.05 && r.diff > 0);
+  const cheaper = design.secondary.filter((r) => r.metric === "pod_minutes_window" && r.p < 0.05 && r.diff < 0);
+  item(t("findCostTitle"), t("findCost", { n: cheaper.length }) + (dearer.length
+    ? t("findCostExcept", { list: dearer.map((r) => t("exceptionItem", { load: t("theLoad", { load: loadName(r.load).toLowerCase() }), who: nameInText(r.second) })).join(", ") })
+    : "; " + t("findCostNone")));
+  item(t("findMethodTitle"), t("findMethod"));
+}
+
+function renderResults() {
+  const box = document.getElementById("results");
+  const failed = designValues("failed_percent");
+  box.hidden = !Object.keys(failed).length;
+  if (box.hidden) return;
+  const design = experiments.design;
+  // The answer is the heading; the exception, if any, goes right under it.
+  const [answer, exception] = resultsHeadline(design, failed);
+  document.getElementById("results-title").textContent = answer || t("resultsTitle");
+  document.getElementById("results-lead").textContent = exception;
+  const picker = document.getElementById("metric-picker");
+  picker.replaceChildren();
+  for (const metric of RESULT_METRICS) {
+    const button = el("button", "", picker, t(metric.label));
+    button.type = "button";
+    button.setAttribute("aria-pressed", String(metric.key === results.metric));
+    button.addEventListener("click", () => {
+      results.metric = metric.key;
+      writePreference("aegis-result-metric", metric.key);
+      renderResults();
+    });
+  }
+  const metric = RESULT_METRICS.find((m) => m.key === results.metric) || RESULT_METRICS[0];
+  document.getElementById("metric-note").textContent = t(metric.note);
+  document.getElementById("results-foot").textContent = t("resultsFoot");
+  const metricValues = designValues(metric.key);
+  drawRows(metric, metricValues, design);
+  const old = document.querySelector("#results .strip-table");
+  if (old) old.remove();
+  document.getElementById("results-foot").before(stripTable(metric, metricValues, formatFor(metric)));
+  resultsFindings(design);
+  // Redraw the rows when their width changes (the dots are placed in pixels).
+  if (!results.observer) {
+    let width = 0;
+    results.observer = new ResizeObserver(() => {
+      const now = document.getElementById("strips").clientWidth;
+      if (now && now !== width) {
+        width = now;
+        requestAnimationFrame(() => drawRows(currentMetric(), designValues(currentMetric().key), experiments.design));
+      }
+    });
+    results.observer.observe(document.getElementById("strips"));
+  }
+}
+
+const currentMetric = () => RESULT_METRICS.find((m) => m.key === results.metric) || RESULT_METRICS[0];
+const formatFor = (metric) => (metric.key === "failed_percent" ? failedPct : (v) => num(v, metric.digits) + metric.unit);
+
+// One row per autoscaler, grouped by load, on one shared x scale: the 6 runs as dots, the mean as a tick and
+// a bold number, and on each HPA row the registered verdict against Aegis in words.
+function drawRows(metric, values, design) {
+  const box = document.getElementById("strips");
+  box.replaceChildren();
+  const all = [];
+  for (const load of Object.values(values)) for (const runs of Object.values(load)) for (const r of runs) all.push(r.value);
+  if (!all.length) return;
+  const highest = Math.max(1, ...all) * 1.04;
+  const step = niceStep(highest, 5);
+  const top = Math.ceil(highest / step) * step;
+  const fmt = formatFor(metric);
+  const tooltip = el("div", "chart-tooltip strip-tooltip", box);
+  tooltip.hidden = true;
+  const ns = "http://www.w3.org/2000/svg";
+  const add = (tag, attrs, parent) => {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    parent.appendChild(node);
+    return node;
+  };
+  const plots = [];
+  for (const [load, labelKey, hintKey] of DESIGN_LOADS) {
+    if (!values[load]) continue;
+    const group = el("section", "row-group", box);
+    const head = el("h3", "row-group-title", group, t(labelKey));
+    el("span", "row-group-hint", head, " " + t(hintKey));
+    for (const actor of DESIGN_ACTORS) {
+      const runs = values[load][actor] || [];
+      if (!runs.length) continue;
+      const row = el("div", "row" + (actor === "aegis" ? " is-aegis" : ""), group);
+      const name = el("div", "row-name", row);
+      name.appendChild(lineKey(ACTOR_COLORS[actor], null, "row-key"));
+      name.appendChild(document.createTextNode(MODE_NAMES[lang][actor]));
+      const cell = el("div", "row-plot", row);
+      const mean = meanOf(runs);
+      el("div", "row-value", row, fmt(mean));
+      const verdict = el("div", "row-verdict", row);
+      if (actor !== "aegis") fillVerdict(verdict, metric, design, load, actor, meanOf(values[load].aegis), mean);
+      plots.push({ cell, runs, actor, mean, load, labelKey });
+    }
+    plots.push({ axis: el("div", "row-axis", el("div", "row axis-row", group)) });
+  }
+  // Every plot cell has the same width: lay them out, then draw in pixels.
+  for (const p of plots) {
+    const target = p.axis || p.cell;
+    const width = target.clientWidth;
+    if (!width) continue;
+    const height = p.axis ? 22 : 34;
+    const sx = (v) => 6 + (v / top) * (width - 12);
+    const svgNode = add("svg", { width, height, viewBox: "0 0 " + width + " " + height, class: "row-svg" }, target);
+    if (p.axis) {
+      for (let tick = 0; tick <= top + 1e-9; tick += step) {
+        // The last tick ends at the edge instead of centering on it, so it is never cut off.
+        const last = tick + step > top + 1e-9;
+        const label = add("text", { x: sx(tick), y: 14, class: "tick tick-x" + (last ? " tick-last" : "") }, svgNode);
+        label.textContent = num(tick, step < 1 ? 1 : 0) + (last && metric.unit.trim() ? " " + metric.unit.trim() : "");
+      }
+      continue;
+    }
+    svgNode.setAttribute("role", "img");
+    svgNode.setAttribute("aria-label", MODE_NAMES[lang][p.actor] + ", " + t(p.labelKey) + ": " + p.runs.map((r) => fmt(r.value)).join(", "));
+    for (let tick = 0; tick <= top + 1e-9; tick += step) {
+      add("line", { x1: sx(tick), x2: sx(tick), y1: 3, y2: height - 3, class: "row-grid" }, svgNode);
+    }
+    const tickLine = add("line", { x1: sx(p.mean), x2: sx(p.mean), y1: 4, y2: height - 4, class: "row-mean" }, svgNode);
+    tickLine.style.stroke = ACTOR_COLORS[p.actor];
+    for (const r of p.runs) {
+      const x = sx(r.value);
+      const y = height / 2 + (r.block - 3.5) * 2.2;
+      const hit = add("circle", { cx: x, cy: y, r: 12, class: "strip-hit", tabindex: 0,
+        "aria-label": MODE_NAMES[lang][p.actor] + ", " + t("blockLabel", { b: r.block }) + ": " + fmt(r.value) }, svgNode);
+      const dot = add("circle", { cx: x, cy: y, r: 5, class: "strip-dot" }, svgNode);
+      dot.style.fill = ACTOR_COLORS[p.actor];
+      const show = () => {
+        tooltip.replaceChildren();
+        el("strong", "tooltip-value", tooltip, fmt(r.value));
+        el("div", "tooltip-x", tooltip, MODE_NAMES[lang][p.actor] + ", " + t(p.labelKey).toLowerCase() + ", " + t("blockLabel", { b: r.block }).toLowerCase());
+        tooltip.hidden = false;
+        dot.classList.add("active");
+        const rect = dot.getBoundingClientRect();
+        const host = box.getBoundingClientRect();
+        tooltip.style.left = Math.max(0, Math.min(host.width - 200, rect.left - host.left + 14)) + "px";
+        tooltip.style.top = rect.top - host.top - 12 + "px";
+      };
+      const hide = () => { tooltip.hidden = true; dot.classList.remove("active"); };
+      hit.addEventListener("pointerenter", show);
+      hit.addEventListener("focus", show);
+      hit.addEventListener("pointerleave", hide);
+      hit.addEventListener("blur", hide);
+    }
+  }
+}
+
+// The verdict of one HPA against Aegis, in words: icon, the gap and the p-value it rests on.
+function fillVerdict(node, metric, design, load, actor, aegisMean, mean) {
+  const row = verdictFor(design, metric.key, load, actor);
+  if (!row) return;
+  const primary = metric.key === "failed_percent";
+  const p = primary ? row.p_decision : row.p;
+  const significant = primary ? row.significant : p < 0.05;
+  // diff is Aegis minus this HPA: negative means the HPA had more (worse for every metric here).
+  const hpaWorse = row.diff < 0;
+  const kind = !significant ? "no" : hpaWorse ? "yes" : "worse";
+  node.classList.add("verdict", kind);
+  el("span", "verdict-icon", node, kind === "yes" ? "✓" : kind === "worse" ? "▲" : "–");
+  let text;
+  if (!significant) text = t("vNoDiff");
+  else if (primary) text = aegisMean > 0 ? t("vFailTimes", { r: ratioText(mean / aegisMean) }) : t("vFailMore");
+  else text = t(hpaWorse ? metric.more : metric.less, { v: num(Math.abs(row.diff), metric.digits) + metric.unit });
+  const basis = !primary ? t("basisExploratory") : row.decided_on === "ranks" ? t("basisRanks") : t("basisHolm");
+  el("span", "verdict-text", node, text);
+  el("span", "verdict-p", node, "p " + (p < 0.001 ? "" : "= ") + pValue(p) + basis);
+}
+
+// The accessible twin of the strip plots: every mean, range and run count in a table.
+function stripTable(metric, values, fmt) {
+  const details = el("details", "strip-table");
+  el("summary", "", details, t("tableView"));
+  const table = el("table", "", details);
+  const head = el("tr", "", el("thead", "", table));
+  for (const label of [t("tLoad"), t("tActor"), t("tMean"), t("tRange"), t("tRuns")]) el("th", "", head, label);
+  const body = el("tbody", "", table);
+  for (const [load, labelKey] of DESIGN_LOADS) {
+    for (const actor of DESIGN_ACTORS) {
+      const runs = (values[load] || {})[actor] || [];
+      if (!runs.length) continue;
+      const v = runs.map((r) => r.value);
+      const row = el("tr", "", body);
+      el("td", "", row, t(labelKey));
+      el("td", "", row, MODE_NAMES[lang][actor]);
+      el("td", "", row, fmt(v.reduce((a, b) => a + b, 0) / v.length));
+      el("td", "", row, fmt(Math.min(...v)) + " – " + fmt(Math.max(...v)));
+      el("td", "", row, String(v.length));
+    }
+  }
+  return details;
+}
+
+function verdictFor(design, metric, load, second) {
+  if (!design) return null;
+  const list = metric === "failed_percent" ? design.primary : design.secondary;
+  return list.find((r) => r.load === load && r.second === second && (metric === "failed_percent" || r.metric === metric)) || null;
+}
+
+const pValue = (p) => (p < 0.001 ? "< 0.001" : num(p, 3));
+
 // For every load run both with Aegis and with the HPA alone: the median run of each (by failed requests).
 function buildPresets() {
   const median = (runs) => runs.slice().sort((a, b) => a.summary.failed_percent - b.summary.failed_percent)[Math.floor((runs.length - 1) / 2)];
   const presets = [];
-  for (const profile of [...new Set(experiments.runs.map((e) => e.summary.profile))]) {
-    const aegis = experiments.runs.filter((e) => e.summary.profile === profile && e.summary.mode === "aegis");
-    const hpa = experiments.runs.filter((e) => e.summary.profile === profile && e.summary.mode === "hpa");
-    if (aegis.length && hpa.length) presets.push({ profile, ids: [median(aegis).id, median(hpa).id] });
+  for (const profile of [...new Set(samePool(experiments.runs).map((e) => e.summary.profile))]) {
+    const pool = samePool(experiments.runs.filter((e) => e.summary.profile === profile));
+    const of = (mode) => pool.filter((e) => e.summary.mode === mode);
+    if (of("aegis").length && of("hpa").length) {
+      presets.push({ profile, ids: ["aegis", "hpa", "hpa-tuned"].filter((m) => of(m).length).map((m) => median(of(m)).id) });
+    }
   }
   return presets;
 }
@@ -745,18 +1184,30 @@ function buildRunPicker() {
     }
   }
   el("h2", "", picker, t("pickTitle"));
-  const tests = [...new Set(experiments.runs.map((e) => e.test))];
+  const tests = [...new Set(experiments.runs.map((e) => e.test))].sort((a, b) => isDesign(b) - isDesign(a));
+  const hasDesign = tests.some(isDesign);
+  let october = null;
   for (const test of tests) {
     const runs = experiments.runs.filter((e) => e.test === test);
-    const group = el("fieldset", "run-group", picker);
+    let parent = picker;
+    if (hasDesign && !isDesign(test)) {
+      if (!october) {
+        october = el("details", "october", picker);
+        el("summary", "", october, t("octoberTitle"));
+      }
+      parent = october;
+    }
+    const group = el("fieldset", "run-group", parent);
     const first = runs[0];
     const match = test.match(/^test(\d+)-/);
-    const mode = { hpa: "HPA", metric: "Aegis (metric)" }[first.summary.mode] || "Aegis";
-    el("legend", "", group, t("testGroup", { n: match ? match[1] : test, mode,
-      profile: TEXT[lang].profiles[first.summary.profile] || first.summary.profile }));
+    const mode = MODE_NAMES[lang][first.summary.mode] || "Aegis";
+    const profileName = TEXT[lang].profiles[first.summary.profile] || first.summary.profile;
+    el("legend", "", group, isDesign(test)
+      ? t("designGroup", { Profile: profileName.charAt(0).toUpperCase() + profileName.slice(1), mode })
+      : t("testGroup", { n: match ? match[1] : test, mode, profile: profileName }));
     for (const entry of runs) {
       const label = el("label", "run-box", group);
-      label.title = t("runNumber", { n: entry.summary.run });
+      label.title = t(isDesign(entry.test) ? "blockNumber" : "runNumber", { n: entry.summary.run });
       const input = el("input", "", label);
       input.type = "checkbox";
       input.dataset.id = entry.id;
@@ -800,10 +1251,17 @@ async function fetchRun(id) {
 
 async function renderExperiments() {
   const entries = experiments.selected.map((id) => experiments.runs.find((e) => e.id === id)).filter(Boolean);
-  entries.forEach((entry, i) => { entry.color = RUN_COLORS[i % RUN_COLORS.length]; });
+  const seen = {};
+  for (const entry of entries) {
+    const actor = actorOf(entry.summary.mode);
+    seen[actor] = (seen[actor] || 0) + 1;
+    entry.color = ACTOR_COLORS[actor];
+    entry.dash = REPEAT_DASHES[seen[actor] - 1] || null;
+  }
   for (const box of document.querySelectorAll("#run-picker input")) {
     const entry = entries.find((e) => e.id === box.dataset.id);
     box.parentElement.style.setProperty("--run-color", entry ? entry.color : "transparent");
+    box.parentElement.classList.toggle("dashed", Boolean(entry && entry.dash));
   }
   const data = await Promise.all(entries.map((e) => fetchRun(e.id)));
   renderSummary(entries);
@@ -826,13 +1284,13 @@ async function renderExperiments() {
     cols[id + "failed"] = pick((r) => (r.client_failed_ratio === null ? null : r.client_failed_ratio * 100));
     cols[id + "risk"] = pick((r) => (r.aegis_risk === null ? null : r.aegis_risk * 100));
     const name = runLabel(entry, true);
-    seriesFor.traffic.push({ key: id + "demand", label: name, color: entry.color },
-      { key: id + "planned", label: name + " (plan)", color: entry.color, dash: "2 3", width: 1.5, hideInLegend: true });
-    seriesFor.pods.push({ key: id + "requested", label: name, color: entry.color, step: true, width: 2.5 },
-      { key: id + "ready", label: name + " (" + t("sReady") + ")", color: entry.color, step: true, dash: "2 3", width: 1.5, hideInLegend: true });
-    seriesFor.latency.push({ key: id + "p95", label: name, color: entry.color });
-    seriesFor.failed.push({ key: id + "failed", label: name, color: entry.color });
-    if (entry.summary.mode !== "hpa") seriesFor.risk.push({ key: id + "risk", label: name, color: entry.color });
+    const look = { color: entry.color, dash: entry.dash };
+    seriesFor.traffic.push(Object.assign({ key: id + "demand", label: name }, look),
+      { key: id + "planned", label: name + " (plan)", color: "var(--traffic)", dash: "2 3", width: 1.5, hideInLegend: true });
+    seriesFor.pods.push(Object.assign({ key: id + "ready", label: name, step: true, width: 2.5 }, look));
+    seriesFor.latency.push(Object.assign({ key: id + "p95", label: name }, look));
+    seriesFor.failed.push(Object.assign({ key: id + "failed", label: name }, look));
+    if (actorOf(entry.summary.mode) === "aegis") seriesFor.risk.push(Object.assign({ key: id + "risk", label: name }, look));
   });
   const domain = x.length ? [x[0], x[x.length - 1]] : [0, 1];
   const markers = [];
@@ -843,7 +1301,9 @@ async function renderExperiments() {
   const capacity = meta.capacity_rps ?? (entries[0] && entries[0].summary.capacity_rps);
   experiments.charts.traffic.setData({ x, columns: cols, domain, markers,
     rules: capacity ? [{ y: capacity, label: "C = " + capacity + " req/s" }] : [] });
-  experiments.charts.pods.setData({ x, columns: cols, domain, markers });
+  const asks = entries.filter((e) => e.summary.first_scale_up_s !== null && e.summary.first_scale_up_s !== undefined)
+    .map((e, i) => ({ x: e.summary.first_scale_up_s, kind: "up", label: t("eAsk"), color: e.color, row: i + 1 }));
+  experiments.charts.pods.setData({ x, columns: cols, domain, markers: markers.concat(asks) });
   const L = (meta.degradation && meta.degradation.p95_threshold_seconds) || 1;
   experiments.charts.latency.setData({ x, columns: cols, domain, markers, rules: [{ y: L, label: t("ruleL", { v: L }) }] });
   experiments.charts.failed.setData({ x, columns: cols, domain, markers, rules: [{ y: 1, label: "1%" }] });
@@ -858,17 +1318,17 @@ function renderSummary(entries) {
   el("th", "", head, "");
   for (const entry of entries) {
     const th = el("th", "", head);
-    const swatch = el("span", "swatch", th);
-    swatch.style.background = entry.color;
+    th.appendChild(lineKey(entry.color, entry.dash, "swatch"));
     th.appendChild(document.createTextNode(runLabel(entry)));
   }
   const seconds = (v) => (v === null || v === undefined ? "–" : num(v, 0) + " s");
   const rows = [
-    [t("mFailed"), "failed_percent", (v) => num(v, 1) + " %", "lower"],
+    [t("mFailed"), "failed_percent", failedPct, "lower"],
     [t("mSlow"), "degraded_seconds", seconds, "lower"],
     [t("mReady"), "second_pod_ready_s", seconds, "lower"],
     [t("mMaxPods"), "max_pods", (v) => String(v), null],
-    [t("mCost"), "pod_minutes", (v) => num(v, 1), "lower"],
+    // Pod-minutes in the common window (load + tail) when the run has it: the truncated count leaves out the tail.
+    [t("mCost"), "pod_minutes_window", (v) => num(v, 1), "lower"],
   ];
   const body = el("tbody", "", table);
   const askRow = el("tr", "", body);
@@ -887,7 +1347,7 @@ function renderSummary(entries) {
   for (const [label, key, format, better] of rows) {
     const row = el("tr", "", body);
     el("td", "", row, label);
-    const values = entries.map((e) => e.summary[key]);
+    const values = entries.map((e) => e.summary[key] ?? (key === "pod_minutes_window" ? e.summary.pod_minutes : null));
     const valid = values.filter((v) => v !== null && v !== undefined);
     let best = null;
     if (better && entries.length > 1 && valid.length > 1) best = better === "lower" ? Math.min(...valid) : Math.max(...valid);
@@ -900,6 +1360,22 @@ function renderSummary(entries) {
       .map((c) => t("mChangeAt", { from: c.from, to: c.to, s: Math.round(c.s) }));
     el("td", "", row).appendChild(el("small", "", null, changes.join(", ") || "–"));
   }
+}
+
+// A short line in a series color and dash, as in the chart legends.
+function lineKey(color, dash, className) {
+  const ns = "http://www.w3.org/2000/svg";
+  const key = document.createElementNS(ns, "svg");
+  key.setAttribute("width", "28");
+  key.setAttribute("height", "8");
+  key.setAttribute("class", className);
+  const line = document.createElementNS(ns, "line");
+  for (const [k, v] of Object.entries({ x1: 1, x2: 27, y1: 4, y2: 4 })) line.setAttribute(k, v);
+  line.style.stroke = color;
+  line.style.strokeWidth = 3;
+  if (dash) line.style.strokeDasharray = dash;
+  key.appendChild(line);
+  return key;
 }
 
 function renderCalibration() {
@@ -921,13 +1397,15 @@ function renderCalibration() {
   const x = [...xsSet].sort((a, b) => a - b);
   const cols = { sent: x.slice() };
   const p95Series = [];
-  const servedSeries = [{ key: "sent", label: t("calSent"), color: "var(--quiet)", dash: "4 4", width: 1.5 }];
+  const servedSeries = [{ key: "sent", label: t("calSent"), color: "var(--traffic)", dash: "1 4", width: 1.5 }];
   runs.forEach((run, i) => {
     const byX = new Map(run.steps.map((s) => [s.target_rps, s]));
     cols["p95" + i] = x.map((v) => (byX.has(v) ? byX.get(v).p95_max_s : null));
     cols["served" + i] = x.map((v) => (byX.has(v) ? byX.get(v).measured_rps : null));
-    p95Series.push({ key: "p95" + i, label: t("calRun", { n: i + 1 }) + " (C = " + run.capacity_rps + ")", color: RUN_COLORS[i], dots: true });
-    servedSeries.push({ key: "served" + i, label: t("calRun", { n: i + 1 }), color: RUN_COLORS[i], dots: true });
+    // Calibration runs are neither Aegis nor the HPA: neutral inks, dashed after the first.
+    const look = { color: i === 0 ? "var(--ink)" : "var(--quiet)", dash: i === 0 ? null : "5 3", dots: true };
+    p95Series.push(Object.assign({ key: "p95" + i, label: t("calRun", { n: i + 1 }) + " (C = " + run.capacity_rps + ")" }, look));
+    servedSeries.push(Object.assign({ key: "served" + i, label: t("calRun", { n: i + 1 }) }, look));
   });
   const group = new ChartGroup();
   const xFormat = (v, long) => num(v, 0) + (long ? " " + t("sentAxis") : "");
@@ -954,7 +1432,9 @@ function selectTab(name) {
   document.getElementById("tab-live").hidden = name !== "live";
   document.getElementById("tab-experiments").hidden = name !== "experiments";
   if (name === "experiments") loadExperiments();
-  if (name === "experiments" || location.hash === "#experiments") location.hash = name === "live" ? "" : name;
+  // Results are the default page; the run view keeps its own address so it can be linked.
+  const hash = name === "live" ? (location.hash === "#how" ? "#how" : "#live") : "";
+  if (location.hash !== hash) history.replaceState(null, "", location.pathname + location.search + hash);
 }
 
 function setWindow(seconds) {
@@ -993,6 +1473,7 @@ function init() {
     fillReplayPicker();
     renderLive();
     if (experiments.loaded) {
+      renderResults();
       buildRunPicker();
       buildExperimentCharts();
       renderCalibration();
@@ -1003,7 +1484,8 @@ function init() {
   document.getElementById("tech").addEventListener("toggle", () => renderLive());
   document.getElementById("replay-run").addEventListener("change", (event) => switchReplay(event.target.value));
   setWindow(live.windowSeconds);
-  selectTab(location.hash === "#experiments" ? "experiments" : "live");
+  const runTab = location.hash === "#live" || location.hash === "#how";
+  selectTab(runTab ? "live" : "experiments");
   if (location.hash === "#how") document.getElementById("tech").open = true;
   poll();
   setInterval(poll, POLL_MS);

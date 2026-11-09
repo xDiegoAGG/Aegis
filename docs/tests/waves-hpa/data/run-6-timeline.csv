@@ -1,0 +1,39 @@
+seconds,time_utc,source,event,detail
+-42275.0,04:51:49,pod,created,catalog-service-79cd8fffdf-4277p
+-42249.0,04:52:15,pod,ready,catalog-service-79cd8fffdf-4277p
+0,16:36:24,k6,load started,fluctuating
+0.0,16:36:24,kubernetes,Scheduled,Pod/load-fluctuating-95t88: Successfully assigned default/load-fluctuating-95t88 to minikube
+0.0,16:36:24,kubernetes,Pulled,"Pod/load-fluctuating-95t88: Container image ""grafana/k6:2.3.0"" already present on machine and can be accessed by the pod"
+0.0,16:36:24,kubernetes,Created,Pod/load-fluctuating-95t88: Container created
+0.0,16:36:24,kubernetes,Started,Pod/load-fluctuating-95t88: Container started
+0.0,16:36:24,kubernetes,SuccessfulCreate,Job/load-fluctuating: Created pod: load-fluctuating-95t88
+78.5,16:37:42,k6,planned traffic passes C,22.0 req/s
+159.0,16:39:03,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-s5bpj: Successfully assigned default/catalog-service-79cd8fffdf-s5bpj to minikube
+159.0,16:39:03,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-s5bpj
+159.0,16:39:03,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 1 to 2
+159.0,16:39:03,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 2; reason: cpu resource utilization (percentage of request) above target
+159.0,16:39:03,pod,created,catalog-service-79cd8fffdf-s5bpj
+160.0,16:39:04,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-s5bpj: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+160.0,16:39:04,kubernetes,Created,Pod/catalog-service-79cd8fffdf-s5bpj: Container created
+160.0,16:39:04,kubernetes,Started,Pod/catalog-service-79cd8fffdf-s5bpj: Container started
+167.0,16:39:11,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-s5bpj: Readiness probe failed: Get ""http://10.244.0.173:3004/ready"": dial tcp 10.244.0.173:3004: connect: connection refused"
+170.0,16:39:14,pod,ready,catalog-service-79cd8fffdf-s5bpj
+386,16:42:50,client,degraded,P95 above L or over 1% failed for T_d
+459.0,16:44:03,kubernetes,Scheduled,Pod/catalog-service-79cd8fffdf-p2fls: Successfully assigned default/catalog-service-79cd8fffdf-p2fls to minikube
+459.0,16:44:03,kubernetes,SuccessfulCreate,ReplicaSet/catalog-service-79cd8fffdf: Created pod: catalog-service-79cd8fffdf-p2fls
+459.0,16:44:03,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled up replica set catalog-service-79cd8fffdf from 2 to 3
+459.0,16:44:03,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 3; reason: cpu resource utilization (percentage of request) above target
+459.0,16:44:03,pod,created,catalog-service-79cd8fffdf-p2fls
+460.0,16:44:04,kubernetes,Pulled,"Pod/catalog-service-79cd8fffdf-p2fls: Container image ""catalog-service:local"" already present on machine and can be accessed by the pod"
+460.0,16:44:04,kubernetes,Created,Pod/catalog-service-79cd8fffdf-p2fls: Container created
+460.0,16:44:04,kubernetes,Started,Pod/catalog-service-79cd8fffdf-p2fls: Container started
+467.0,16:44:11,kubernetes,Unhealthy,"Pod/catalog-service-79cd8fffdf-p2fls: Readiness probe failed: Get ""http://10.244.0.174:3004/ready"": dial tcp 10.244.0.174:3004: connect: connection refused"
+470.0,16:44:14,pod,ready,catalog-service-79cd8fffdf-p2fls
+560.0,16:45:44,k6,load finished,
+804.0,16:49:48,kubernetes,ScalingReplicaSet,Deployment/catalog-service: Scaled down replica set catalog-service-79cd8fffdf from 3 to 1
+804.0,16:49:48,kubernetes,SuccessfulRescale,HorizontalPodAutoscaler/catalog-service: New size: 1; reason: All metrics below target
+805.0,16:49:49,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-p2fls: Stopping container catalog-service
+805.0,16:49:49,kubernetes,Killing,Pod/catalog-service-79cd8fffdf-s5bpj: Stopping container catalog-service
+805.0,16:49:49,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-s5bpj
+805.0,16:49:49,kubernetes,SuccessfulDelete,ReplicaSet/catalog-service-79cd8fffdf: Deleted pod: catalog-service-79cd8fffdf-p2fls
+926.0,16:51:50,kubernetes,Killing,Pod/load-fluctuating-95t88: Stopping container k6

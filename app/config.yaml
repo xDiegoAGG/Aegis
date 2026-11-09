@@ -3,11 +3,14 @@ degradation:
   p95_threshold_seconds: 1.0
   sustained_seconds: 15
 
-# Decision engine: one more pod at 70% risk; one less when the risk with one pod less stays under 30% for 60 s.
+# Decision engine: one more pod at 70% risk. Down to the smallest pod count whose risk stays under 30% for
+# a wait of 15 s (risk ~0%) to 60 s (risk near 30%). Simulated on the 22 recorded runs: 10-14% fewer
+# pod-minutes and no extra seconds short of capacity (scripts/experiments/scale_down_sim.py).
 risk_thresholds:
   scale_up: 0.70
   scale_down: 0.30
-  scale_down_sustained_seconds: 60
+  scale_down_min_wait_seconds: 15
+  scale_down_sustained_seconds: 60   # the longest wait, when the risk is near the threshold
 
 # One cycle every 5 s. The slope uses the last 30 s. The 30 s rate shows the traffic of ~20 s ago (half window + one scrape).
 sampling:

@@ -19,7 +19,7 @@ function html(tag, className, parent, text) {
 }
 
 // 1, 2, 2.5 or 5 times a power of ten, so that about `count` ticks fit in the range.
-function niceStep(range, count) {
+export function niceStep(range, count) {
   const raw = range / Math.max(1, count);
   const power = Math.pow(10, Math.floor(Math.log10(raw)));
   for (const factor of [1, 2, 2.5, 5, 10]) {
@@ -62,7 +62,7 @@ export class ChartGroup {
   }
 }
 
-// One chart: series = [{key, label, color, dash, step, width, dots}], one y axis only.
+// One chart: series = [{key, label, color, dash, step, width, dots, fill, fillColor, fillOpacity}], one y axis only.
 export class LineChart {
   constructor(container, options) {
     this.options = Object.assign({ height: 180, yMin: 0, yMaxAtLeast: 1, yFormat: (v) => String(v),
@@ -74,7 +74,8 @@ export class LineChart {
     this.titleNode = html("span", "chart-title", head, this.options.title || "");
     if (this.options.unit) html("span", "chart-unit", head, this.options.unit);
     this.legend = html("span", "chart-legend", head);
-    if (this.options.note) html("p", "chart-note", this.root, this.options.note);
+    this.noteNode = html("p", "chart-note", this.root, this.options.note || "");
+    this.noteNode.hidden = !this.options.note;
     this.plot = html("div", "chart-plot", this.root);
     this.plot.tabIndex = 0;
     this.plot.setAttribute("role", "img");
@@ -96,6 +97,11 @@ export class LineChart {
     this.titleNode.textContent = text;
   }
 
+  setNote(text) {
+    this.noteNode.textContent = text;
+    this.noteNode.hidden = !text;
+  }
+
   setSeries(series) {
     this.options.series = series;
     this.renderLegend();
@@ -103,7 +109,8 @@ export class LineChart {
 
   renderLegend() {
     this.legend.replaceChildren();
-    const series = (this.options.series || []).filter((s) => !s.hideInLegend && !s.endLabel);
+    // A legend whenever there are two or more series; end labels only supplement it.
+    const series = (this.options.series || []).filter((s) => !s.hideInLegend).concat(this.options.legendExtra || []);
     if (series.length < 2) return;
     for (const item of series) {
       const entry = html("span", "legend-item", this.legend);
@@ -118,6 +125,7 @@ export class LineChart {
 
   // data: {x, columns: {key: [...]}, domain: [x0, x1], rules: [{y, label}], markers: [{x, label, kind}], bands,
   //        zones: [{x0, x1, label}], now: x, segments: [{x0, y0, x1, y1, color, label}]}
+  // A marker may carry its own color and a label row (0, 1, …) so labels of close markers do not overlap.
   setData(data) {
     this.data = Object.assign({ rules: [], markers: [], bands: [], zones: [], segments: [] }, data);
     this.render();
@@ -226,7 +234,8 @@ export class LineChart {
     }
     for (const marker of this.data.markers) {
       if (marker.x < x0 || marker.x > x1) continue;
-      svg("line", { x1: sx(marker.x), x2: sx(marker.x), y1: top, y2: bottom, class: "marker marker-" + marker.kind }, layer);
+      const line = svg("line", { x1: sx(marker.x), x2: sx(marker.x), y1: top, y2: bottom, class: "marker marker-" + marker.kind }, layer);
+      if (marker.color) line.style.stroke = marker.color;
     }
     for (const rule of this.data.rules) {
       if (rule.y === null || rule.y === undefined || rule.y < y.min || rule.y > y.max) continue;
@@ -249,7 +258,7 @@ export class LineChart {
     }
     for (const marker of this.data.markers) {
       if (marker.x < x0 || marker.x > x1 || !marker.label) continue;
-      const label = svg("text", { x: sx(marker.x) + 3, y: top + 9, class: "marker-label marker-" + marker.kind }, this.svg);
+      const label = svg("text", { x: sx(marker.x) + 3, y: top + 9 + (marker.row || 0) * 14, class: "marker-label marker-" + marker.kind }, this.svg);
       label.textContent = marker.label;
     }
     // Labels in the right margin, at least 17 px apart.
@@ -260,7 +269,6 @@ export class LineChart {
     for (const item of this.endLabels) {
       const label = svg("text", { x: right + 10, y: item.y, class: "end-label" + (item.strong ? " strong" : "") }, this.svg);
       label.textContent = item.text;
-      label.style.fill = item.color;
     }
     this.cursorLine = svg("line", { y1: top, y2: bottom, class: "cursor" }, this.svg);
     this.cursorLine.style.display = "none";
@@ -301,7 +309,8 @@ export class LineChart {
       const endX = last ? (last[1] || last[2]) : null;
       if (first && endX && !d.slice(1).includes("M")) {
         const area = svg("path", { d: d + "V" + this.scale.bottom + "H" + first[1] + "Z", class: "area" }, layer);
-        area.style.fill = series.color;
+        area.style.fill = series.fillColor || series.color;
+        if (series.fillOpacity !== undefined) area.style.fillOpacity = series.fillOpacity;
       }
     }
     if (d) {
