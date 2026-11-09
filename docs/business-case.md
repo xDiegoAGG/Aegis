@@ -16,7 +16,7 @@ La investigación completa, con muestra, año y grado de confianza de cada cifra
 |---|---|---|---|
 | Magnitud del problema | 37 % de fallas medido en nuestro laboratorio | el problema se establecía con datos propios, y la cifra quedó desactualizada (con la sonda de salud corregida, el HPA por defecto falla 16,9 % en la misma rampa) | documentación oficial de AWS, Google Cloud y Kubernetes, y un estudio revisado por pares (sección 3) |
 | Competencia | no se analizaba | | comparación con HPA, KEDA, Knative, PredictKube, escalado predictivo de AWS y Google, y Datadog (sección 5) |
-| Modelo económico | ventas rescatadas × 53 % de abandono × margen minorista | solo aplicaba a quien vende; el 53 % mide visitas a páginas lentas, no peticiones fallidas | minutos degradados evitados × picos al año × costo de un minuto degradado, con componentes por tipo de organización (sección 9) |
+| Modelo económico | ventas rescatadas × 53 % de abandono × margen minorista | solo aplicaba a quien vende; el 53 % mide visitas a páginas lentas, no peticiones fallidas | Aegis se plantea como proyecto Open Source, sin ingresos por licencias; el costo directo estimado para quien lo adopta es el tiempo de integración. El beneficio se calcula con minutos degradados evitados × picos al año × costo de un minuto degradado (secciones 9–11) |
 | Valor no monetario | no se consideraba | | usuarios, carga operativa, energía, trazabilidad y cumplimiento (sección 8) |
 | Evidencia | 32 corridas, un factor a la vez, sin aleatorizar | autoscaler confundido con la hora del día; solo contra el HPA por defecto | 54 corridas en bloques aleatorizados contra el HPA por defecto y uno afinado (sección 7) |
 | Pods adicionales | 2,8 pods-minuto más por rampa | regla de bajada de 60 s fijos | regla de 15 a 60 s según el riesgo: igual o menor consumo que el HPA por defecto (sección 10) |
@@ -114,6 +114,10 @@ No se midieron alertas, consumo energético ni abandono de usuarios: la relació
 
 ## 9. Modelo económico (diapositivas 16, 18 y 19)
 
+Para las instrucciones de edición de la presentación, consulta la [guía del modelo económico Open Source](modelo-economico-open-source.md).
+
+**Modelo de adopción:** Aegis se plantea como software Open Source, al estilo de Prometheus, para que las organizaciones lo adopten sin pagar una licencia o suscripción. No se propone vender Aegis; el costo directo considerado para una organización es el tiempo de trabajo necesario para integrarlo en su ecosistema. El repositorio todavía no contiene un archivo de licencia, por lo que debe definirse y añadirse una licencia antes de afirmar que la distribución ya está formalmente licenciada como Open Source.
+
 ```
 valor anual = minutos degradados evitados por pico × picos al año × costo de un minuto degradado
 ```
@@ -139,52 +143,41 @@ El modelo anterior (ventas recuperadas × margen) corresponde solo al primer cas
 
 | Concepto | Cálculo | Valor | Tipo |
 |---|---|---|---|
-| Hora de ingeniería | 135.980 $/año ÷ 2.080 h = 65,38 $/h; ÷ 0,701 (salario = 70,1 % del costo del empleador) | 93,26 $/h | fuente [22], [23] |
-| Implementación, una vez | 160 h × 93,26 $ | **14.922 $** | horas: estimación (rango 80 a 320 h) |
-| Mantenimiento, por año | 4 h/mes × 12 × 93,26 $ | 4.476 $ | estimación |
-| Pod de Aegis, por año | tamaño mínimo de AWS Fargate (0,25 vCPU, 0,5 GB): (0,25 × 0,04048 + 0,5 × 0,004445) $/h × 8.760 h | 108 $ | fuente [24] |
-| **Operación, por año** | 4.476 + 108 | **4.584 $** | |
-| Pods adicionales | consumo de pods-minuto igual o inferior al del HPA por defecto en las tres cargas | 0 $ | medición propia |
+| Tiempo de integración inicial | Estimación de 16 h, equivalente a 2 jornadas de 8 h | **16 h** | estimación teórica |
+| Costo de la hora de trabajo | Supuesto del modelo | **30 $/h** | supuesto |
+| **Costo de integración, una vez** | 16 h × 30 $/h | **480 $** | estimación teórica |
+| Licencia o suscripción de Aegis | No se contempla cobro por uso | **0 $** | modelo de adopción propuesto |
+| Mantenimiento e infraestructura incremental | No incluidos en este cálculo; dependen de la operación de cada organización | — | fuera del alcance del modelo |
 
-Cerca del 98 % del costo anual de operación corresponde a horas de ingeniería.
+El cálculo asume que la organización ya cuenta con un clúster Kubernetes operativo y recursos para ejecutar Aegis. El costo de 480 $ representa únicamente el esfuerzo inicial estimado de integración; no es una tarifa que se pague al proyecto.
 
 ## 11. Punto de equilibrio y sensibilidad (diapositivas 18 y 20)
 
 ```
-costo por minuto de equilibrio = costo anual ÷ (minutos evitados por pico × picos al año)
+costo por minuto degradado de equilibrio, primer año = 480 $ ÷ (minutos evitados por pico × picos al año)
 ```
 
-| Picos al año | Equilibrio a partir del año 2 | Primer año (con implementación) |
-|---|---|---|
-| 52 (semanal) | **116 $/min** | 494 $/min |
-| 156 (tres por semana) | 39 $/min | 165 $/min |
-| 365 (diario) | 17 $/min | 70 $/min |
+| Picos al año | Costo por minuto degradado necesario para recuperar la integración en el primer año |
+|---|---|
+| 52 (semanal) | **12,15 $/min** |
+| 156 (tres por semana) | **4,05 $/min** |
+| 365 (diario) | **1,73 $/min** |
 
-Sensibilidad, con 52 picos al año:
+Los valores usan la estimación experimental de 0,76 minutos degradados evitados por pico. Con 52 picos al año, si Aegis evitara solo la mitad de ese tiempo (0,38 min por pico), el punto de equilibrio sería **24,29 $/min**. No se incluyen costos recurrentes ni infraestructura incremental.
 
-| Si cambia | A partir del año 2 | Primer año |
-|---|---|---|
-| Caso base (0,76 min por pico frente al HPA por defecto) | 116 $/min | 494 $/min |
-| Solo rampa (65 s por pico) | 81 $/min | 346 $/min |
-| Solo pico (77,5 s por pico) | 68 $/min | 290 $/min |
-| Frente al HPA afinado (61,9 s por pico, promedio de las tres cargas) | 85 $/min | 363 $/min |
-| En producción Aegis evita la mitad (0,38 min por pico) | 232 $/min | 988 $/min |
-| Implementación de 80 h | 116 $/min | 305 $/min |
-| Implementación de 320 h | 116 $/min | 872 $/min |
-
-**Referencias de contraste** (no entran en el cálculo, son interrupciones totales y encuestas autodeclaradas): 4.537 $ por minuto de incidente en empresas de más de 1.000 empleados (PagerDuty 2024, 500 líderes de TI, encuesta de proveedor) [25]; más del 90 % de las empresas medianas y grandes declara que una hora de interrupción cuesta más de 300.000 $ (ITIC 2024, más de 1.000 empresas) [26]. No existe una cifra publicada de la relación entre el costo de un minuto degradado y el de un minuto de interrupción total; con picos semanales, basta con que un minuto degradado cueste 1/39 de la cifra de PagerDuty para alcanzar el equilibrio.
+**Referencias de contraste** (no entran en el cálculo, son interrupciones totales y encuestas autodeclaradas): 4.537 $ por minuto de incidente en empresas de más de 1.000 empleados (PagerDuty 2024, 500 líderes de TI, encuesta de proveedor) [22]; más del 90 % de las empresas medianas y grandes declara que una hora de interrupción cuesta más de 300.000 $ (ITIC 2024, más de 1.000 empresas) [23]. No existe una cifra publicada de la relación entre el costo de un minuto degradado y el de un minuto de interrupción total; con picos semanales, el costo de un minuto degradado tendría que superar aproximadamente **12 $** para recuperar el esfuerzo de integración en el primer año.
 
 ## 12. Robustez y riesgos (diapositiva 20)
 
 | Medición propia | Fuente externa | Estimación |
 |---|---|---|
-| Fallas, tiempo degradado y pods-minuto (54 corridas) | documentación de AWS, Google y Kubernetes; BLS; IEA; Google SRE | 160 h de implementación y 4 h mensuales |
+| Fallas, tiempo degradado y pods-minuto (54 corridas) | documentación de AWS, Google y Kubernetes; IEA; Google SRE | 16 h de integración inicial y tarifa supuesta de 30 $/h; mantenimiento e infraestructura incremental excluidos |
 | 0,76 minutos degradados evitados por pico | encuestas de proveedores, identificadas: CAST AI, Splunk, PagerDuty, PwC | picos al año y costo por minuto de cada organización |
 | | | representatividad del laboratorio respecto de producción |
 
 Riesgos principales:
 
-- **Representatividad del laboratorio:** un nodo, pods de 60m de CPU, como máximo 3 réplicas, carga sintética. Si en producción Aegis evitara la mitad de los minutos degradados, el equilibrio semanal pasa de 116 a 232 $/min.
+- **Representatividad del laboratorio:** un nodo, pods de 60m de CPU, como máximo 3 réplicas, carga sintética. Si Aegis evitara la mitad de los minutos degradados, el equilibrio semanal pasa de 12,15 a 24,29 $/min.
 - **Deriva de capacidad durante la campaña:** C medida pasó de 22 a 30 y a 24 req/s; se mantuvo C = 22 como establece el plan, lo que hace a Aegis más conservador (registro de desviaciones en [design.md](experiments/design.md)).
 - **Picos abruptos:** Aegis no los anticipa; reduce las fallas al reaccionar antes que el HPA, pero no las evita.
 - **Métricas secundarias:** el tiempo degradado y los pods-minuto no tienen corrección por comparaciones múltiples.
@@ -222,8 +215,5 @@ Riesgos principales:
 19. Reglamento (UE) 2022/2554 sobre la resiliencia operativa digital del sector financiero (DORA). https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng
 20. Amazon Compute Service Level Agreement; Google Compute Engine Service Level Agreement. https://aws.amazon.com/compute/sla/ · https://cloud.google.com/compute/sla
 21. Splunk y Oxford Economics, «The Hidden Costs of Downtime», junio de 2024. https://newsroom.cisco.com/c/r/newsroom/en/us/a/y2024/m06/conf24-splunk-report-shows-downtime-costs-global-2000-companies-400b-annually.html
-22. U.S. Bureau of Labor Statistics, «Software Developers», Occupational Outlook Handbook (mediana de mayo de 2025: 135.980 $). https://www.bls.gov/ooh/computer-and-information-technology/software-developers.htm
-23. U.S. Bureau of Labor Statistics, «Employer Costs for Employee Compensation», diciembre de 2025. https://www.bls.gov/news.release/ecec.htm
-24. Amazon Web Services, «AWS Fargate Pricing», US East (N. Virginia). https://aws.amazon.com/fargate/pricing/
-25. PagerDuty, «Cost of Incidents» study, 2024. https://pagerduty.com/newsroom/study-cost-of-incidents
-26. ITIC, «2024 Hourly Cost of Downtime Survey». https://itic-corp.com/?p=3152
+22. PagerDuty, «Cost of Incidents» study, 2024. https://pagerduty.com/newsroom/study-cost-of-incidents
+23. ITIC, «2024 Hourly Cost of Downtime Survey». https://itic-corp.com/?p=3152
