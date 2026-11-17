@@ -46,9 +46,29 @@ kubernetes:
   min_replicas: 1
   max_replicas: 3
 
-# Prometheus metrics (/metrics) and the JSON API for the monitor (/api/state).
+# Prometheus metrics (/metrics) and the JSON API for the monitor; browsers may call it only from these origins.
 server:
   port: 8080
+  allowed_origins:
+    - http://localhost:5173
+    - http://127.0.0.1:5173
+
+# Loads of the monitor buttons (needs AEGIS_LOAD_KEY). Every stage [factor, seconds] goes to factor x C req/s.
+load:
+  job_name: aegis-load
+  max_seconds: 900
+  pre_allocated_vus: 50
+  max_vus: 600
+  profiles:
+    ramp:
+      start: 0.2
+      stages: [[0.2, 30], [2.1, 120], [2.1, 60], [0.2, 30]]
+    spike:
+      start: 0.2
+      stages: [[0.2, 30], [1.9, 5], [1.9, 90], [0.2, 5], [0.2, 60]]
+    waves:
+      start: 0.2
+      stages: [[0.2, 30], [1.25, 65], [1.25, 45], [0.2, 15], [0.2, 105], [2.1, 120], [2.1, 45], [0.2, 15], [0.2, 120]]
 
 # Through the API server, or at url in the cluster. Demand = finished requests + growth of the waiting ones.
 prometheus:

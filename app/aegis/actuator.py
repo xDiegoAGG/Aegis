@@ -1,6 +1,7 @@
 import argparse
 import json
 import logging
+import os
 import signal
 import time
 from aegis.calibration import load_cluster_calibration
@@ -8,6 +9,7 @@ from aegis.collector import Collector
 from aegis.config import load_config
 from aegis.decision import HOLD, DecisionEngine, pct
 from aegis.kube import load_kubernetes_credentials
+from aegis.loads import LoadController
 from aegis.risk import RiskCalculator
 from aegis.server import start_server
 from aegis.state import AegisState
@@ -241,8 +243,10 @@ def main():
     if not args.no_server:
         port = args.port or config.get("server", {}).get("port", 8080)
         state = AegisState(build_meta(config, actuator))
+        server = config.get("server", {})
         try:
-            start_server(state, port)
+            start_server(state, port, loads=LoadController(config), load_key=os.environ.get("AEGIS_LOAD_KEY", ""),
+                         allowed_origins=server.get("allowed_origins"))
         except OSError as error:
             logger.warning("API and /metrics not served (port %s: %s); Aegis keeps running", port, error)
     run_loop(config, actuator, DecisionLog(args.log), state)
