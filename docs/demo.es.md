@@ -137,8 +137,8 @@ El tráfico sube de 5 a 50 req/s en 2 minutos, se queda 1 minuto en 50 y baja. U
 En la terminal 3:
 
 ```bash
-kubectl apply -f kubernetes/load/linear.yaml
-kubectl logs -f job/load-linear
+# en el monitor: botón Ramp (con la clave)
+kubectl logs -f job/aegis-load
 ```
 
 | Cuándo (s desde que arrancó k6) | Dónde | Qué ves | Qué decir |
@@ -166,8 +166,8 @@ Dos olas que suben como la rampa, 560 s en total: 30 s en 5 req/s, una ola hasta
 En la terminal 3:
 
 ```bash
-kubectl apply -f kubernetes/load/fluctuating.yaml
-kubectl logs -f job/load-fluctuating
+# en el monitor: botón Waves (con la clave)
+kubectl logs -f job/aegis-load
 ```
 
 | Cuándo (s) | Qué ves | Qué decir |
@@ -187,16 +187,8 @@ python3 scripts/reset.py
 
 ## 5. El HPA solo (mostrar las gráficas, no en vivo)
 
-En vivo tarda ~15 minutos. Mejor muestra `docs/tests/test3-hpa-baseline/` (`tests` branch).
+En vivo tarda ~15 minutos. Mejor muestra `docs/tests/test3-hpa-baseline/` (rama `tests`).
 
-Para correrlo en vivo de todas formas: detén Aegis (Ctrl+C en la terminal 1) y luego
-
-```bash
-kubectl apply -f kubernetes/hpa/baseline.yaml
-kubectl apply -f kubernetes/load/linear.yaml
-```
-
-y al final `python3 scripts/reset.py` (vuelve a poner el HPA de Aegis).
 
 ## 6. Si algo falla
 

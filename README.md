@@ -27,7 +27,6 @@ Prometheus ──► demand r ──► projection p = r + m·(T + lag) ──�
 | `services/catalog-service/`, `shared/proto/` | The service Aegis protects (from MyBookstore): HTTP and gRPC over DynamoDB |
 | `kubernetes/catalog-service/`, `dynamodb/` | The service, its Ingress and ServiceMonitor; DynamoDB Local and the table seed |
 | `kubernetes/hpa/` | `aegis.yaml` (Aegis writes `minReplicas`) and `baseline.yaml` (plain HPA, CPU 70%) |
-| `kubernetes/load/` | k6 traffic profiles |
 | `kubernetes/helm/` | Values for Prometheus and Traefik |
 | `scripts/setup.sh`, `scripts/check_env.py` | Bring up and check the whole environment |
 | `scripts/reset.py` | Stops any load and leaves 1 pod, between demos |
