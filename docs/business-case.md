@@ -114,8 +114,6 @@ No se midieron alertas, consumo energético ni abandono de usuarios: la relació
 
 ## 9. Modelo económico (diapositivas 16, 18 y 19)
 
-Para las instrucciones de edición de la presentación, consulta la [guía del modelo económico Open Source](modelo-economico-open-source.md).
-
 **Modelo de adopción:** Aegis se plantea como software Open Source, al estilo de Prometheus, para que las organizaciones lo adopten sin pagar una licencia o suscripción. No se propone vender Aegis; el costo directo considerado para una organización es el tiempo de trabajo necesario para integrarlo en su ecosistema. El repositorio todavía no contiene un archivo de licencia, por lo que debe definirse y añadirse una licencia antes de afirmar que la distribución ya está formalmente licenciada como Open Source.
 
 ```
