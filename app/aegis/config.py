@@ -3,9 +3,18 @@ import yaml
 from pathlib import Path
 
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.yaml"
+def comma_list(text):
+    values = []
+    for part in text.split(","):
+        if part.strip():
+            values.append(part.strip())
+    return values
+
+
 ENV_OVERRIDES = [
     ("AEGIS_PROMETHEUS_URL", ("prometheus", "url"), str),
     ("AEGIS_HTTP_PORT", ("server", "port"), int),
+    ("AEGIS_ALLOWED_ORIGIN", ("server", "allowed_origins"), comma_list),
 ]
 
 
