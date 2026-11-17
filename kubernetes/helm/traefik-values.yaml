@@ -1,7 +1,15 @@
-# The entrance: Aegis reads the demand here. ClusterIP on minikube, LoadBalancer on EKS.
+# The entrance: Aegis reads the demand on web; the monitor reaches the Aegis API on monitor (8090), apart from it.
 service:
   spec:
     type: ClusterIP
+
+ports:
+  monitor:
+    port: 8090
+    exposedPort: 8090
+    protocol: TCP
+    expose:
+      default: true
 
 ingressClass:
   enabled: true

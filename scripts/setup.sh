@@ -161,7 +161,8 @@ if [ "$AEGIS" = "yes" ]; then
   fi
   kubectl create configmap aegis-monitor -n aegis-system --from-literal=allowed_origin="$MONITOR_ORIGIN" \
     --dry-run=client -o yaml | kubectl apply -f -
-  kubectl apply -f kubernetes/aegis/rbac.yaml -f kubernetes/aegis/deployment.yaml -f kubernetes/aegis/servicemonitor.yaml
+  kubectl apply -f kubernetes/aegis/rbac.yaml -f kubernetes/aegis/deployment.yaml -f kubernetes/aegis/servicemonitor.yaml \
+    -f kubernetes/aegis/ingress.yaml
   if kubectl get configmap aegis-calibration >/dev/null 2>&1; then
     kubectl rollout restart -n aegis-system deploy/aegis >/dev/null
     kubectl rollout status -n aegis-system deploy/aegis --timeout=180s

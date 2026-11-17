@@ -1,8 +1,10 @@
-# Every request enters through Traefik: http://traefik.traefik.svc.cluster.local/api/books
+# Every request enters through the Traefik entrypoint web: http://traefik.traefik.svc.cluster.local/api/books
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: catalog-service
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   ingressClassName: traefik
   rules:
