@@ -48,6 +48,7 @@ export default function Cards({ meta, records }) {
         label="Demand"
         value={show(last && last.rps, 1, " req/s")}
         detail={"projected " + show(last && last.projected_rps !== null ? atLeastZero(last.projected_rps) : null, 1, " req/s")}
+        className="card-blue"
       />
       <Card
         label="Risk"
@@ -59,6 +60,7 @@ export default function Cards({ meta, records }) {
         label="Pods"
         value={last ? show(last.replicas_ready, 0) + " / " + show(last.target, 0) : "–"}
         detail="Ready / requested by Aegis"
+        className="card-blue"
       />
       <Card
         label="Latency P95"

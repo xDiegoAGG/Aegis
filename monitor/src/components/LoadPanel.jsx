@@ -66,7 +66,7 @@ export default function LoadPanel() {
           return (
             <button
               key={profile.name}
-              className={"load-button" + (running && running.profile === profile.name ? " active" : "")}
+              className={"load-button load-" + profile.name + (running && running.profile === profile.name ? " active" : "")}
               disabled={busy || !enabled || Boolean(running)}
               onClick={() => run(() => startLoad(key, profile.name))}
               title={label.hint}
