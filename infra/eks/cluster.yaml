@@ -1,4 +1,4 @@
-# EKS for the demo: the cluster and the nodes reuse one existing IAM role, so eksctl creates no IAM roles.
+# EKS for the demo: 2 Ubuntu 24.04 nodes; the cluster and the nodes reuse one existing IAM role (eksctl creates none).
 # scripts/eks_up.sh replaces ROLE_ARN with the role given in EKS_ROLE (name of the role in this account).
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
@@ -12,7 +12,8 @@ iam:
   withOIDC: false
   serviceRoleARN: ROLE_ARN
 managedNodeGroups:
-  - name: workers
+  - name: ubuntu
+    amiFamily: Ubuntu2404
     instanceType: t3.medium
     desiredCapacity: 2
     minSize: 2
