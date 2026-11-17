@@ -1,0 +1,24 @@
+# EKS for the demo: the cluster and the nodes reuse one existing IAM role, so eksctl creates no IAM roles.
+# scripts/eks_up.sh replaces ROLE_ARN with the role given in EKS_ROLE (name of the role in this account).
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: aegis
+  region: us-east-1
+  tags:
+    project: aegis
+availabilityZones: ["us-east-1a", "us-east-1b"]
+iam:
+  withOIDC: false
+  serviceRoleARN: ROLE_ARN
+managedNodeGroups:
+  - name: workers
+    instanceType: t3.medium
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 2
+    volumeSize: 20
+    iam:
+      instanceRoleARN: ROLE_ARN
+    labels:
+      role: workers
