@@ -35,6 +35,18 @@ spec:
               value: /etc/aegis/config.yaml
             - name: AEGIS_PROMETHEUS_URL
               value: http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090
+            - name: AEGIS_LOAD_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aegis-load-key
+                  key: key
+                  optional: true
+            - name: AEGIS_ALLOWED_ORIGIN
+              valueFrom:
+                configMapKeyRef:
+                  name: aegis-monitor
+                  key: allowed_origin
+                  optional: true
           volumeMounts:
             - name: config
               mountPath: /etc/aegis

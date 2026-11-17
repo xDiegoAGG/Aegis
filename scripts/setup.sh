@@ -4,6 +4,7 @@
 #   --hpa aegis         Aegis writes minReplicas (default)
 #   --hpa baseline      plain HPA on CPU 70%, without Aegis
 #   --aegis             also run Aegis in the cluster (aegis-system)
+#   --monitor-origin U  URL of the React monitor allowed to call the Aegis API (default http://localhost:5173)
 #   --pod-cpu 60m       CPU per catalog-service pod (default: keep the current one, 200m on a new cluster);
 #                       lower it on fast machines so one pod serves 20-30 req/s
 set -euo pipefail
@@ -17,6 +18,7 @@ HPA="aegis"
 BUILD="no"
 AEGIS="no"
 POD_CPU=""
+MONITOR_ORIGIN="http://localhost:5173,http://127.0.0.1:5173"
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -34,6 +36,10 @@ while [ $# -gt 0 ]; do
       ;;
     --pod-cpu)
       POD_CPU="$2"
+      shift 2
+      ;;
+    --monitor-origin)
+      MONITOR_ORIGIN="$2"
       shift 2
       ;;
     *)
@@ -150,13 +156,16 @@ if [ "$AEGIS" = "yes" ]; then
   kubectl apply -f kubernetes/aegis/namespace.yaml
   kubectl create configmap aegis-config -n aegis-system --from-file=config.yaml=app/config.yaml \
     --dry-run=client -o yaml | kubectl apply -f -
-  kubectl apply -f kubernetes/aegis/rbac.yaml -f kubernetes/aegis/deployment.yaml -f kubernetes/aegis/servicemonitor.yaml
-  if [ "$BUILD" = "yes" ]; then
-    kubectl rollout restart -n aegis-system deploy/aegis
+  if ! kubectl get secret aegis-load-key -n aegis-system >/dev/null 2>&1; then
+    kubectl create secret generic aegis-load-key -n aegis-system --from-literal=key="$(python3 -c 'import secrets; print(secrets.token_urlsafe(18))')"
   fi
+  kubectl create configmap aegis-monitor -n aegis-system --from-literal=allowed_origin="$MONITOR_ORIGIN" \
+    --dry-run=client -o yaml | kubectl apply -f -
+  kubectl apply -f kubernetes/aegis/rbac.yaml -f kubernetes/aegis/deployment.yaml -f kubernetes/aegis/servicemonitor.yaml
   if kubectl get configmap aegis-calibration >/dev/null 2>&1; then
+    kubectl rollout restart -n aegis-system deploy/aegis >/dev/null
     kubectl rollout status -n aegis-system deploy/aegis --timeout=180s
-    echo "API: kubectl port-forward -n aegis-system svc/aegis 8080  ->  http://localhost:8080/api/state"
+    echo "Load key of the monitor buttons: kubectl get secret aegis-load-key -n aegis-system -o jsonpath='{.data.key}' | base64 -d"
   else
     kubectl scale -n aegis-system deploy/aegis --replicas=0
     echo "Aegis stays off until the calibration exists: run python3 -m aegis.calibrate from app/, then"
@@ -168,9 +177,8 @@ elif kubectl get deploy aegis -n aegis-system >/dev/null 2>&1; then
 fi
 
 step "Removing finished load Jobs"
-for job in load-linear load-fluctuating aegis-calibration-load; do
-  kubectl delete job "$job" --ignore-not-found
-done
+kubectl delete job -l app.kubernetes.io/part-of=aegis-load --ignore-not-found
+kubectl delete job aegis-calibration-load --ignore-not-found
 
 step "Checking the environment"
 python3 scripts/check_env.py --wait 300

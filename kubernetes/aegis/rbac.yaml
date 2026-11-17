@@ -1,4 +1,4 @@
-# Least privilege: read the workload and its calibration, patch only the HPA.
+# Least privilege: read the workload and its calibration, patch only the HPA, run only its own load Job.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -24,6 +24,20 @@ rules:
     resources: ["configmaps"]
     resourceNames: ["aegis-calibration"]
     verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["aegis-load"]
+    verbs: ["get", "update", "delete"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    resourceNames: ["aegis-load"]
+    verbs: ["get", "delete"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["create"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
