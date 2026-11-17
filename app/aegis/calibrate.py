@@ -8,9 +8,9 @@ import time
 from aegis.calibration import environment_fingerprint, pod_selector, write_calibration
 from aegis.collector import PrometheusClient
 from aegis.config import load_config
+from aegis.k6job import K6Job, arrival_rate_options
 from aegis.kube import load_kubernetes_credentials
 from kubernetes import client
-from kubernetes.client.rest import ApiException
 
 logger = logging.getLogger(__name__)
 
@@ -25,14 +25,6 @@ METRIC_LAG_SECONDS = 5
 WINDOW_SECONDS = 10
 SHORTFALL_RATIO = 0.9
 IDLE_RPS = 0.5
-K6_SCRIPT = "\n".join([
-    "import http from 'k6/http';",
-    "export const options = OPTIONS;",
-    "export default function () {",
-    "  http.get('TARGET_URL');",
-    "}",
-    "",
-])
 
 
 def utc_text(timestamp):
@@ -54,19 +46,7 @@ def build_k6_options(steps, step_seconds):
     for rps in steps:
         stages.append({"target": rps, "duration": "1s"})
         stages.append({"target": rps, "duration": str(step_seconds - 1) + "s"})
-    return {
-        "noConnectionReuse": True,
-        "scenarios": {
-            "calibration": {
-                "executor": "ramping-arrival-rate",
-                "startRate": steps[0],
-                "timeUnit": "1s",
-                "preAllocatedVUs": 50,
-                "maxVUs": 300,
-                "stages": stages,
-            },
-        },
-    }
+    return arrival_rate_options(steps[0], stages, 50, 300)
 
 
 # Measures C (step load on 1 pod until it degrades) and T (time from asking for pods until Ready).
@@ -83,7 +63,8 @@ class Calibrator:
         self.autoscaling = client.AutoscalingV2Api()
         self.apps = client.AppsV1Api()
         self.core = client.CoreV1Api()
-        self.batch = client.BatchV1Api()
+        self.load_job = K6Job(self.settings["load_job_name"], self.namespace, self.settings["k6_image"],
+                              self.settings["target_url"])
         self.original_limits = None
 
     def query(self, promql):
@@ -152,71 +133,15 @@ class Calibrator:
             raise RuntimeError("the service already receives " + str(round(rps, 1)) + " req/s: stop other load first")
 
     def delete_load_job(self):
-        name = self.settings["load_job_name"]
-        try:
-            self.batch.delete_namespaced_job(name, self.namespace, propagation_policy="Background")
-        except ApiException as error:
-            if error.status != 404:
-                raise
-        deadline = time.monotonic() + 120
-        while time.monotonic() < deadline:
-            if not self.core.list_namespaced_pod(self.namespace, label_selector="job-name=" + name).items:
-                return
-            time.sleep(2)
+        self.load_job.delete()
 
     # Creates the k6 Job and returns the moment its container started.
     def start_load_job(self, steps):
-        name = self.settings["load_job_name"]
-        script = K6_SCRIPT.replace("OPTIONS", json.dumps(build_k6_options(steps, self.settings["step_seconds"])))
-        script = script.replace("TARGET_URL", self.settings["target_url"])
-        config_map = {"apiVersion": "v1", "kind": "ConfigMap", "metadata": {"name": name}, "data": {"test.js": script}}
-        try:
-            self.core.replace_namespaced_config_map(name, self.namespace, config_map)
-        except ApiException as error:
-            if error.status != 404:
-                raise
-            self.core.create_namespaced_config_map(self.namespace, config_map)
-        container = {
-            "name": "k6",
-            "image": self.settings["k6_image"],
-            "imagePullPolicy": "IfNotPresent",
-            "args": ["run", "/scripts/test.js"],
-            "volumeMounts": [{"name": "script", "mountPath": "/scripts"}],
-        }
-        job = {
-            "apiVersion": "batch/v1",
-            "kind": "Job",
-            "metadata": {"name": name, "labels": {"app.kubernetes.io/part-of": "aegis"}},
-            "spec": {
-                "backoffLimit": 0,
-                "template": {"spec": {
-                    "restartPolicy": "Never",
-                    "containers": [container],
-                    "volumes": [{"name": "script", "configMap": {"name": name}}],
-                }},
-            },
-        }
-        self.batch.create_namespaced_job(self.namespace, job)
-        deadline = time.monotonic() + 180
-        while time.monotonic() < deadline:
-            for pod in self.core.list_namespaced_pod(self.namespace, label_selector="job-name=" + name).items:
-                for status in pod.status.container_statuses or []:
-                    if status.state.running is not None:
-                        return status.state.running.started_at.timestamp()
-                    waiting = status.state.waiting
-                    if waiting is not None and waiting.reason in ("ErrImagePull", "ImagePullBackOff"):
-                        raise RuntimeError("the k6 pod cannot pull " + self.settings["k6_image"])
-            time.sleep(1)
-        raise RuntimeError("the k6 pod did not start in time")
+        self.load_job.create(build_k6_options(steps, self.settings["step_seconds"]))
+        return self.load_job.wait_started()
 
     def load_job_finished(self):
-        try:
-            job = self.batch.read_namespaced_job(self.settings["load_job_name"], self.namespace)
-        except ApiException:
-            return True
-        if job.status.succeeded or job.status.failed:
-            return True
-        return False
+        return self.load_job.finished()
 
     # Degraded = P95 above L, errors, serving under 90% of the sent rate, or no Ready pod, for T_d.
     def degradation_reason(self, p95, rps, errors, ready, expected_rps):
