@@ -1,0 +1,9 @@
+# On EKS one AWS load balancer opens web (80, the service) and monitor (8090, the Aegis API); no TLS port.
+service:
+  spec:
+    type: LoadBalancer
+
+ports:
+  websecure:
+    expose:
+      default: false

@@ -5,6 +5,7 @@
 #   --hpa baseline      plain HPA on CPU 70%, without Aegis
 #   --aegis             also run Aegis in the cluster (aegis-system)
 #   --monitor-origin U  URL of the React monitor allowed to call the Aegis API (default http://localhost:5173)
+#   --registry R        pull the images from R (ECR, scripts/push_images.sh) instead of building them in minikube
 #   --pod-cpu 60m       CPU per catalog-service pod (default: keep the current one, 200m on a new cluster);
 #                       lower it on fast machines so one pod serves 20-30 req/s
 set -euo pipefail
@@ -18,6 +19,8 @@ HPA="aegis"
 BUILD="no"
 AEGIS="no"
 POD_CPU=""
+REGISTRY=""
+METRICS_SERVER_VERSION="v0.8.0"
 MONITOR_ORIGIN="http://localhost:5173,http://127.0.0.1:5173"
 
 while [ $# -gt 0 ]; do
@@ -38,6 +41,10 @@ while [ $# -gt 0 ]; do
       POD_CPU="$2"
       shift 2
       ;;
+    --registry)
+      REGISTRY="$2"
+      shift 2
+      ;;
     --monitor-origin)
       MONITOR_ORIGIN="$2"
       shift 2
@@ -53,6 +60,24 @@ if [ "$HPA" != "aegis" ] && [ "$HPA" != "baseline" ]; then
   echo "--hpa must be aegis or baseline"
   exit 1
 fi
+
+# Applies manifests with the images of --registry (pulled) instead of the ones built in minikube.
+apply_images() {
+  local path="$1"
+  if [ -z "$REGISTRY" ]; then
+    kubectl apply -f "$path"
+    return
+  fi
+  local files="$path"
+  if [ -d "$path" ]; then
+    files="$(ls "$path"/*.yaml)"
+  fi
+  for manifest in $files; do
+    sed -e "s#image: catalog-service:local#image: $REGISTRY/catalog-service:latest#" \
+        -e "s#image: aegis:local#image: $REGISTRY/aegis:latest#" \
+        -e "s#imagePullPolicy: Never#imagePullPolicy: Always#" "$manifest" | kubectl apply -f -
+  done
+}
 
 step() {
   echo
@@ -80,6 +105,14 @@ elif command -v minikube >/dev/null 2>&1 && { [ -z "$CONTEXT" ] || [ "$CONTEXT" 
     minikube start --driver=docker --kubernetes-version=v1.37.0 --cpus="${MINIKUBE_CPUS:-2}" --memory="${MINIKUBE_MEMORY:-4g}"
   fi
   ON_MINIKUBE="yes"
+fi
+if [ "$ON_MINIKUBE" = "no" ]; then
+  if [ -z "$REGISTRY" ]; then
+    echo "Not on minikube: pass --registry (scripts/push_images.sh prints it)"
+    exit 1
+  fi
+  step "metrics-server $METRICS_SERVER_VERSION"
+  kubectl apply -f "https://github.com/kubernetes-sigs/metrics-server/releases/download/$METRICS_SERVER_VERSION/components.yaml"
 fi
 if [ "$ON_MINIKUBE" = "yes" ]; then
   kubectl config use-context minikube >/dev/null
@@ -116,6 +149,10 @@ helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
   -f kubernetes/helm/prometheus-values.yaml --wait --timeout 10m
 
 step "Traefik (chart $TRAEFIK_CHART_VERSION)"
+TRAEFIK_EXTRA=""
+if [ "$ON_MINIKUBE" = "no" ]; then
+  TRAEFIK_EXTRA="-f kubernetes/helm/traefik-values-eks.yaml"
+fi
 if ! helm repo list 2>/dev/null | grep -q "^traefik"; then
   helm repo add traefik https://traefik.github.io/charts
 fi
@@ -124,13 +161,13 @@ if ! helm search repo traefik/traefik --version "$TRAEFIK_CHART_VERSION" | grep 
 fi
 helm upgrade --install traefik traefik/traefik \
   --version "$TRAEFIK_CHART_VERSION" --namespace traefik --create-namespace \
-  -f kubernetes/helm/traefik-values.yaml --wait --timeout 5m
+  -f kubernetes/helm/traefik-values.yaml $TRAEFIK_EXTRA --wait --timeout 5m
 
 step "DynamoDB Local and the books table"
 kubectl delete job seed-books --ignore-not-found >/dev/null
 kubectl apply -f kubernetes/dynamodb/dynamodb-local.yaml
 kubectl rollout status deploy/dynamodb-local --timeout=600s
-kubectl apply -f kubernetes/dynamodb/seed-books-job.yaml
+apply_images kubernetes/dynamodb/seed-books-job.yaml
 kubectl wait --for=condition=complete job/seed-books --timeout=300s
 kubectl logs job/seed-books
 
@@ -138,7 +175,7 @@ step "catalog-service"
 if [ -z "$POD_CPU" ]; then
   POD_CPU="$(kubectl get deploy catalog-service -o jsonpath='{.spec.template.spec.containers[0].resources.limits.cpu}' 2>/dev/null || true)"
 fi
-kubectl apply -f kubernetes/catalog-service/
+apply_images kubernetes/catalog-service
 if [ -n "$POD_CPU" ] && [ "$POD_CPU" != "200m" ]; then
   echo "Pod CPU: $POD_CPU (request = limit)"
   kubectl set resources deploy/catalog-service --requests=cpu="$POD_CPU" --limits=cpu="$POD_CPU"
@@ -161,8 +198,8 @@ if [ "$AEGIS" = "yes" ]; then
   fi
   kubectl create configmap aegis-monitor -n aegis-system --from-literal=allowed_origin="$MONITOR_ORIGIN" \
     --dry-run=client -o yaml | kubectl apply -f -
-  kubectl apply -f kubernetes/aegis/rbac.yaml -f kubernetes/aegis/deployment.yaml -f kubernetes/aegis/servicemonitor.yaml \
-    -f kubernetes/aegis/ingress.yaml
+  kubectl apply -f kubernetes/aegis/rbac.yaml -f kubernetes/aegis/servicemonitor.yaml -f kubernetes/aegis/ingress.yaml
+  apply_images kubernetes/aegis/deployment.yaml
   if kubectl get configmap aegis-calibration >/dev/null 2>&1; then
     kubectl rollout restart -n aegis-system deploy/aegis >/dev/null
     kubectl rollout status -n aegis-system deploy/aegis --timeout=180s
