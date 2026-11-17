@@ -20,11 +20,12 @@ flowchart LR
     deploy --> pods
     aegis <-->|"read C and T"| cm["ConfigMap<br/>aegis-calibration"]
     calibrate["aegis.calibrate"] -->|"write C and T"| cm
-    aegis -->|"/api/state"| browser["Monitor (browser)"]
+    browser["Monitor (React, S3)"] -->|"/api/state, /api/load<br/>Traefik entrypoint monitor :8090"| aegis
+    aegis -->|"k6 Job (buttons)"| k6
     aegis -. "/metrics (in the cluster)" .-> prom
 ```
 
-Aegis runs on the laptop or as a Deployment in `aegis-system` ([deployment.md](../deployment.md)). It patches `minReplicas` of the HPA.
+Aegis runs on the laptop or as a Deployment in `aegis-system` ([deployment.md](../deployment.md)); on AWS the cluster is EKS and the monitor an S3 website ([aws.md](../aws.md)). The monitor reaches the API on its own Traefik entrypoint, so its polls never count as demand. It patches `minReplicas` of the HPA.
 
 ## Responsibility boundaries
 

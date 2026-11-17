@@ -19,7 +19,10 @@ Prometheus ──► demand r ──► projection p = r + m·(T + lag) ──�
 | `app/aegis/risk.py` | Projection, live σ and risk |
 | `app/aegis/decision.py` | Scale-up and scale-down rules |
 | `app/aegis/actuator.py` | Main loop: applies the decisions to the HPA `minReplicas` |
-| `app/aegis/state.py`, `server.py` | Last cycles, `/metrics` for Prometheus and the JSON API for the monitor |
+| `app/aegis/state.py`, `server.py` | Last cycles, `/metrics` for Prometheus and the JSON API for the monitor (CORS) |
+| `app/aegis/loads.py`, `k6job.py` | The load buttons of the monitor: k6 Jobs in the cluster, one at a time, with a key |
+| `monitor/` | Live React monitor ([README](monitor/README.md)) |
+| `infra/eks/`, `scripts/eks_up.sh`, `eks_down.sh`, `push_images.sh`, `deploy_monitor.sh` | EKS cluster, images in ECR and the monitor on S3 ([docs/aws.md](docs/aws.md)) |
 | `app/aegis/calibrate.py`, `calibration.py` | Measure C and T; save and read them in the cluster |
 | `app/config.yaml` | Thresholds, queries, calibration and API port |
 | `app/tests/` | Unit tests of projection, σ, risk, decisions and server, and two recorded runs fed again to the engine |
@@ -45,6 +48,7 @@ python3 -m aegis.actuator        # Aegis, with its API on http://localhost:8080/
 
 - Fast machine: `scripts/setup.sh --pod-cpu 60m` keeps C at 20–30 req/s. `--build` rebuilds the service image; `--hpa baseline` runs without Aegis.
 - Aegis flags: `--dry-run`, `--log file.ndjson`.
+- On AWS (EKS + S3): [docs/aws.md](docs/aws.md).
 - In the cluster: `scripts/setup.sh --aegis` ([docs/deployment.md](docs/deployment.md)).
 - Unit tests: `cd app && python3 -m pytest`.
 

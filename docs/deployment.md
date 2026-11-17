@@ -6,7 +6,7 @@
 | Start | `cd app && python3 -m aegis.actuator` | Deployment `aegis` in `aegis-system` |
 | Prometheus | API server proxy | `http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090` |
 | Credentials | `~/.kube/config` | ServiceAccount `aegis` |
-| API (`/api/state`) | http://localhost:8080 | `kubectl port-forward -n aegis-system svc/aegis 8080` |
+| API (`/api/state`, `/api/load`) | http://localhost:8080 | Traefik entrypoint `monitor`, port 8090 (`kubernetes/aegis/ingress.yaml`) |
 | `/metrics` scraped | no | yes (ServiceMonitor `aegis`) |
 
 Run only one Aegis at a time. `setup.sh` without `--aegis` scales the in-cluster one to 0.
@@ -40,6 +40,7 @@ In `default`:
 | `deployments` | get, list | selector, calibration fingerprint |
 | `pods`, `endpoints`, `services` | get, list | Ready pods |
 | `configmaps` `aegis-calibration` | get | C and T |
+| `jobs` and `configmaps` `aegis-load` | create, get, update, delete | the k6 load of the monitor buttons |
 
 Cluster-wide only `nodes: get`. Calibration runs from the laptop with your credentials (it creates Jobs and writes the ConfigMap).
 
@@ -50,7 +51,7 @@ kubectl auth can-i delete pods -n default --as $SA                 # no
 kubectl auth can-i list pods -n kube-system --as $SA               # no
 ```
 
-Verified on 2026-10-25: yes for patch hpa, get the calibration ConfigMap, list pods, get deployments and nodes; no for delete/create pods, patch deployments, secrets, other ConfigMaps and `kube-system`.
+Verified on 2026-10-25: yes for patch hpa, get the calibration ConfigMap, list pods, get deployments and nodes; no for delete/create pods (the load Job is the only thing it creates), patch deployments, secrets, other ConfigMaps and `kube-system`.
 
 ## Metrics
 
@@ -73,7 +74,15 @@ Verified on 2026-10-25: yes for patch hpa, get the calibration ConfigMap, list p
 | `aegis_decisions_total{action}`, `aegis_cycles_total`, `aegis_failed_applies_total` | counters |
 | `aegis_last_cycle_timestamp_seconds` | staleness |
 
-Also `/healthz`, `/readyz` (a cycle in the last 20 s) and `/api/state` (JSON for the monitor).
+Also `/healthz`, `/readyz` (a cycle in the last 20 s), `/api/state` (JSON for the monitor) and `/api/load`:
+
+| Call | What it does |
+|---|---|
+| `GET /api/load` | profiles (ramp, spike, waves: rates as multiples of C), the running load, whether the buttons are on |
+| `POST /api/load {"profile": "ramp"}` | starts that k6 Job; needs `X-Aegis-Key` (Secret `aegis-load-key`); 409 if another load runs |
+| `DELETE /api/load` | stops the load; needs the key |
+
+Browsers may call the API only from `server.allowed_origins` (`AEGIS_ALLOWED_ORIGIN`, ConfigMap `aegis-monitor`).
 
 ## Prometheus
 
