@@ -1,4 +1,4 @@
-# Aegis inside the cluster: the same loop as on the laptop, plus the dashboard and /metrics on 8080.
+# Aegis inside the cluster: the same loop as on the laptop, plus the API and /metrics on 8080.
 FROM python:3.13-slim
 
 WORKDIR /app

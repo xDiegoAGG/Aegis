@@ -9,34 +9,28 @@ from aegis.config import load_config
 from aegis.decision import HOLD, DecisionEngine, pct
 from aegis.kube import load_kubernetes_credentials
 from aegis.risk import RiskCalculator
-from aegis.server import AegisState, start_server
+from aegis.server import start_server
+from aegis.state import AegisState
 from kubernetes import client
 from kubernetes.client.rest import ApiException
 
 logger = logging.getLogger(__name__)
 
 
-MODE_MIN_REPLICAS = "min_replicas"
-MODE_METRIC = "metric"
 
-
-# Applies decisions through minReplicas; in metric mode it writes nothing (the HPA reads /metrics).
+# Applies the decisions through the HPA minReplicas.
 class HpaActuator:
-    def __init__(self, hpa_name, namespace, dry_run, mode=MODE_MIN_REPLICAS):
+    def __init__(self, hpa_name, namespace, dry_run):
         self.hpa_name = hpa_name
         self.namespace = namespace
         self.dry_run = dry_run
-        self.mode = mode
         self.api = client.AutoscalingV2Api()
         self.applied = None
 
     @classmethod
     def from_config(cls, config, dry_run):
         kubernetes = config["kubernetes"]
-        mode = config.get("actuator", {}).get("mode", MODE_MIN_REPLICAS)
-        if mode not in (MODE_MIN_REPLICAS, MODE_METRIC):
-            raise ValueError("actuator.mode must be min_replicas or metric, not " + str(mode))
-        return cls(kubernetes["hpa_name"], kubernetes["namespace"], dry_run, mode)
+        return cls(kubernetes["hpa_name"], kubernetes["namespace"], dry_run)
 
     def read_hpa(self):
         try:
@@ -45,8 +39,7 @@ class HpaActuator:
             logger.warning("Could not read HPA %s: %s %s", self.hpa_name, error.status, error.reason)
             return None
 
-    # Returns (starting replicas, maxReplicas) of the HPA, or None if it cannot be read.
-    # min_replicas mode starts from minReplicas; metric mode from the replicas running now.
+    # Returns (minReplicas, maxReplicas) of the HPA, or None if it cannot be read.
     def read_limits(self):
         hpa = self.read_hpa()
         if hpa is None:
@@ -54,13 +47,10 @@ class HpaActuator:
         min_replicas = hpa.spec.min_replicas
         if min_replicas is None:
             min_replicas = 1
-        start = min_replicas
-        if self.mode == MODE_METRIC and hpa.status is not None and hpa.status.current_replicas:
-            start = hpa.status.current_replicas
-        self.applied = start
-        return start, hpa.spec.max_replicas
+        self.applied = min_replicas
+        return min_replicas, hpa.spec.max_replicas
 
-    # What the HPA reports this cycle, for the log and the dashboard.
+    # What the HPA reports this cycle, for the log and the monitor.
     def observe(self):
         hpa = self.read_hpa()
         if hpa is None:
@@ -74,10 +64,6 @@ class HpaActuator:
     # Sets minReplicas only when it changes; on error it keeps the old value and the next cycle retries.
     def apply(self, target):
         if target == self.applied:
-            return True
-        if self.mode == MODE_METRIC:
-            logger.info("aegis_target_replicas %s -> %s (the HPA reads it)", self.applied, target)
-            self.applied = target
             return True
         if self.dry_run:
             logger.info("[dry-run] would set minReplicas %s -> %s", self.applied, target)
@@ -94,7 +80,7 @@ class HpaActuator:
         return True
 
 
-# Writes one JSON line per cycle (NDJSON), for the experiments and the monitor.
+# Writes one JSON line per cycle (NDJSON).
 class DecisionLog:
     def __init__(self, path):
         self.file = None
@@ -164,7 +150,7 @@ def log_cycle(record, important):
                record["target"], record["reason"])
 
 
-# The fixed parameters the dashboard shows next to the cycles.
+# The fixed parameters the monitor shows next to the cycles.
 def build_meta(config, actuator):
     kubernetes = config["kubernetes"]
     thresholds = config["risk_thresholds"]
@@ -174,7 +160,6 @@ def build_meta(config, actuator):
         mode = "dry-run"
     return {
         "mode": mode,
-        "actuator_mode": actuator.mode,
         "namespace": kubernetes["namespace"],
         "deployment": kubernetes["deployment_name"],
         "hpa_name": kubernetes["hpa_name"],
@@ -207,8 +192,8 @@ def run_loop(config, actuator, decision_log, state=None):
         return
     engine = DecisionEngine.from_config(config, limits[0])
     actuator.apply(engine.target)
-    logger.info("Aegis running every %s s (%s mode): C=%s req/s, T=%s s, start at %s replica(s) (Ctrl+C to stop)",
-                interval, actuator.mode, config["capacity_rps"], config["startup_time_seconds"], limits[0])
+    logger.info("Aegis running every %s s: C=%s req/s, T=%s s, start at %s replica(s) (Ctrl+C to stop)",
+                interval, config["capacity_rps"], config["startup_time_seconds"], limits[0])
     next_run = time.monotonic()
     try:
         while True:
@@ -237,8 +222,8 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="run the loop without changing the HPA")
     parser.add_argument("--log", help="also write every cycle as one JSON line to this file")
     parser.add_argument("--set", type=int, metavar="N", help="only set minReplicas to N and exit")
-    parser.add_argument("--port", type=int, help="port of the dashboard and /metrics (default: server.port)")
-    parser.add_argument("--no-server", action="store_true", help="do not serve the dashboard and /metrics")
+    parser.add_argument("--port", type=int, help="port of the API and /metrics (default: server.port)")
+    parser.add_argument("--no-server", action="store_true", help="do not serve the API and /metrics")
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -259,7 +244,7 @@ def main():
         try:
             start_server(state, port)
         except OSError as error:
-            logger.warning("Dashboard and /metrics not served (port %s: %s); Aegis keeps running", port, error)
+            logger.warning("API and /metrics not served (port %s: %s); Aegis keeps running", port, error)
     run_loop(config, actuator, DecisionLog(args.log), state)
 
 

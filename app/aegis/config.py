@@ -3,17 +3,13 @@ import yaml
 from pathlib import Path
 
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.yaml"
-
-# Environment variables that override one value of the file (used by the in-cluster Deployment).
-# Not AEGIS_PORT: Kubernetes sets that one (tcp://...) for the Service named aegis.
 ENV_OVERRIDES = [
     ("AEGIS_PROMETHEUS_URL", ("prometheus", "url"), str),
-    ("AEGIS_ACTUATOR_MODE", ("actuator", "mode"), str),
     ("AEGIS_HTTP_PORT", ("server", "port"), int),
 ]
 
 
-# Reads app/config.yaml, or the file given in AEGIS_CONFIG.
+# Reads app/config.yaml (or AEGIS_CONFIG) and applies the AEGIS_* overrides; AEGIS_PORT is set by Kubernetes.
 def load_config():
     path = os.environ.get("AEGIS_CONFIG") or DEFAULT_CONFIG_PATH
     with open(path) as f:
