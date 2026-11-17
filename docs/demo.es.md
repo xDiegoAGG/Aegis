@@ -1,207 +1,90 @@
 # Demo en vivo
 
-Dos demos en consola (~6 y ~10 min): una rampa lineal, donde Aegis pide un pod **antes** de que se supere un pod, y tráfico fluctuante, donde sube en cada ola y **baja** después.
+[English](demo.md)
 
-## 1. Una máquina nueva, desde cero (unos 45 minutos, hazlo antes de la clase)
+Aegis corre en EKS y el monitor es un sitio web en S3. Todo se muestra en el navegador: un botón manda tráfico real (k6 dentro del clúster), y las cuatro gráficas muestran a Aegis pidiendo pods **antes** de que falten y devolviéndolos después. Tres demos: Rampa (~4 min), Olas (~9 min) y Pico (~3 min). Si AWS falla, la misma demo corre en minikube (sección 7).
 
-Probado en Kali Linux; los comandos son para Ubuntu/Debian en amd64.
+## 1. Antes de la clase (~45 min)
 
-**Hardware**: al menos 4 hilos de CPU y 8 GB de RAM (minikube usa 2 CPUs y 4 GB), 20 GB libres en disco, internet.
+Seguir [aws.es.md](aws.es.md): credenciales, `scripts/eks_up.sh`, `scripts/push_images.sh`, `scripts/setup.sh --aegis --registry …`, calibración y `scripts/deploy_monitor.sh`. Después revisar:
 
-| Herramienta | Versión usada |
+```bash
+python3 scripts/check_env.py      # todo OK, con C y T
+python3 scripts/reset.py          # sin carga, 1 pod
+kubectl get secret aegis-load-key -n aegis-system -o jsonpath='{.data.key}' | base64 -d    # la clave de carga
+```
+
+`deploy_monitor.sh` imprime la URL del monitor. Abrirla, pegar la clave en **Load key** y comprobar que arriba diga **Live**. Si Aegis se reinicia, las gráficas quedan vacías; es normal.
+
+## 2. Qué hay en la pantalla
+
+| Parte | Qué decir |
 |---|---|
-| Docker | 29.9.0 |
-| minikube | v1.39.0 (Kubernetes v1.37.0) |
-| kubectl | v1.37.1 |
-| Helm | v3.22.0 |
-| Python | 3.13 (sirve 3.11 o más nuevo) |
+| Tarjetas | Demanda ahora, riesgo, pods Ready / pedidos, P95, C y T (medidos por la calibración), σ (aprendido en vivo), última decisión |
+| Requests per second | Azul: demanda. Violeta: lo que Aegis espera en T + 20 s. Gris en escalones: lo que aguantan los pods Ready (C × pods) |
+| Risk | Probabilidad de quedarse corto **con los pods que Aegis ya pidió**. Al 70% pide uno más; luego el riesgo cae a ~0 porque la fórmula ya cuenta ese pod |
+| Pods | Azul: lo que pide Aegis (minReplicas del HPA). Negro: Ready. Naranja punteado: lo que querría el HPA solo, por CPU |
+| Latency P95 | El 95% de las peticiones tarda menos que esto; por encima de L = 1 s el servicio cuenta como lento. Se mide sobre 30 s, así que muestra los problemas unos segundos tarde |
 
-### 1.1 Instalar las herramientas (~10 min)
+Las horas son de Colombia (UTC−5), las mismas del reloj del salón.
 
-```bash
-sudo apt update
-sudo apt install -y git curl python3 python3-venv python3-pip
+## 3. Demo 1: Rampa
 
-# Docker. En Kali usa en cambio: sudo apt install -y docker.io
-curl -fsSL https://get.docker.com | sudo sh
-sudo usermod -aG docker $USER
-newgrp docker                      # o cierra sesión y vuelve a entrar
-docker run --rm hello-world        # tiene que decir "Hello from Docker!"
+Apretar **Ramp**. El tráfico sube de 0,2 C a 2,1 C en 2 minutos, se queda 1 minuto y baja (en EKS con C = 16: de 3 a 34 req/s).
 
-# kubectl
-curl -LO https://dl.k8s.io/release/v1.37.1/bin/linux/amd64/kubectl
-sudo install -m 0755 kubectl /usr/local/bin/kubectl && rm kubectl
-
-# minikube
-curl -LO https://github.com/kubernetes/minikube/releases/download/v1.39.0/minikube-linux-amd64
-sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
-
-# Helm
-curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash -s -- --version v3.22.0
-```
-
-En macOS: Docker Desktop y `brew install git python kubectl minikube helm`. En Windows: WSL2 con Ubuntu y los comandos de Linux adentro. Ninguno de los dos se probó.
-
-### 1.2 Bajar el proyecto (~2 min)
-
-```bash
-git clone https://github.com/xDiegoAGG/Aegis.git
-cd Aegis
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r app/requirements.txt
-```
-
-**Cada terminal nueva** necesita primero estas dos líneas: `cd Aegis` y `source .venv/bin/activate`.
-
-### 1.3 Levantar el entorno (~15 min la primera vez)
-
-```bash
-scripts/setup.sh
-```
-
-Tiene que terminar con `Environment ready`; `Aegis calibration - not calibrated yet` es lo esperado en una máquina nueva. Más recursos para minikube (solo la primera vez): `MINIKUBE_CPUS=4 MINIKUBE_MEMORY=6g scripts/setup.sh`.
-
-### 1.4 Calibrar (~17 min, una vez por máquina)
-
-No puede correr nada más mientras tanto.
-
-```bash
-cd app
-python3 -m aegis.calibrate
-cd ..
-```
-
-Termina con `Saved in ConfigMap aegis-calibration: C=… req/s, T=… s`. Los perfiles de tráfico esperan un C entre 20 y 30 req/s, y los tiempos de abajo son para C ≈ 24. Si C queda fuera de ese rango (o dice `no degradation up to 80 req/s`), cambia el CPU del pod con CPU nuevo ≈ CPU probado × (C buscado ÷ C medido), por ejemplo `scripts/setup.sh --pod-cpu 60m`, y calibra de nuevo. Un clúster nuevo arranca con 200m; este PC usa 200m (C = 24).
-
-### 1.5 Dejarlo en reposo
-
-```bash
-python3 scripts/check_env.py           # todas las líneas OK, y la calibración
-python3 scripts/reset.py   # 1 pod, sin tráfico
-```
-
-Tras reiniciar, `scripts/setup.sh` recupera todo; la calibración se conserva.
-
-## 2. Terminales
-
-Tres terminales en la raíz del repositorio, cada una con `source .venv/bin/activate`.
-
-Justo antes de la demo, revisa que todo siga arriba (después de un reinicio, vuelve a levantar minikube):
-
-```bash
-scripts/setup.sh
-python3 scripts/reset.py
-```
-
-**Terminal 1, Aegis** (déjala corriendo en las dos demos):
-
-```bash
-cd app
-python3 -m aegis.actuator
-```
-
-Usa el modo `min_replicas`, que es el de siempre: Aegis sube `minReplicas` del HPA.
-
-Debes ver `Calibration from …: C=… req/s, T=… s` y después una línea cada 5 s:
-
-```
-demand=0.0 projected=0.0 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min_replicas)
-```
-
-| Campo | Significado |
-|---|---|
-| `demand` | req/s que llegan a la entrada (Traefik), incluidas las que esperan |
-| `projected` | el tráfico que Aegis espera dentro de T + 20 s |
-| `sigma` | cuánto se han equivocado las proyecciones últimamente (req/s) |
-| `risk` | probabilidad de pasarse de la capacidad de los pods ya pedidos |
-| `ready` | pods Ready ahora |
-| `HOLD / SCALE_UP / SCALE_DOWN 1 -> 2` | la decisión y los pods pedidos antes y después |
-
-Las decisiones salen como `WARNING` para que se noten.
-
-**Navegador**: el monitor en vivo ([monitor/](../monitor/)): `cd monitor && npm run dev` y abre http://localhost:5173.
-
-**Terminal 2, pods y HPA**:
-
-```bash
-watch -n 2 "kubectl get hpa catalog-service; echo; kubectl get pods -l app=catalog-service"
-```
-
-**Terminal 3, el tráfico**: se usa en cada demo de abajo.
-
-## 3. Demo 1: rampa lineal
-
-El tráfico sube de 5 a 50 req/s en 2 minutos, se queda 1 minuto en 50 y baja. Un pod atiende C ≈ 24 req/s (máquina de desarrollo): k6 pasa ese valor en el segundo 81.
-
-En la terminal 3:
-
-```bash
-# en el monitor: botón Ramp (con la clave)
-kubectl logs -f job/aegis-load
-```
-
-| Cuándo (s desde que arrancó k6) | Dónde | Qué ves | Qué decir |
-|---|---|---|---|
-| 0–30 | T1 | `demand` ≈ 5, riesgo 0% | Un pod alcanza |
-| 30–60 | T1 | `demand` sube, `projected` va adelante | Aegis extrapola la tendencia T + 20 s hacia adelante |
-| ~65–75 | T1 | `SCALE_UP 1 -> 2` con riesgo ≥ 70% | El tráfico todavía está bajo C; la proyección no |
-| ~80–90 | T2 | un segundo pod pasa de `0/1` a `1/1` | El pod nuevo está Ready cerca del segundo 81, cuando el tráfico pasa C |
-| ~110–150 | T1 | `SCALE_UP 2 -> 3` | Cerca de 50 req/s dos pods (2C ≈ 48) no alcanzan: pide un tercero |
-| 240 | T3 | resumen de k6: `http_req_failed` cerca de 1% o menos | Casi nadie notó la rampa |
-| ~285–330 | T1 | `SCALE_DOWN 3 -> 2`, luego `2 -> 1` | Grabado con la espera fija de 60 s; con la espera actual de 15–60 s baja de 3 a 1 de una vez, antes |
-
-Cuando termine (Ctrl+C en la terminal 3; el Job guarda su pod 10 min, es normal):
-
-```bash
-python3 scripts/reset.py
-```
-
-Deja Aegis corriendo en la terminal 1.
-
-## 4. Demo 2: tráfico fluctuante
-
-Dos olas que suben como la rampa, 560 s en total: 30 s en 5 req/s, una ola hasta 30 req/s (necesita 2 pods), 105 s en 5 req/s, una ola hasta 50 req/s (necesita 3 pods, 2C ≈ 48), 120 s en 5 req/s. Tiempos de la prueba 2.
-
-En la terminal 3:
-
-```bash
-# en el monitor: botón Waves (con la clave)
-kubectl logs -f job/aegis-load
-```
-
-| Cuándo (s) | Qué ves | Qué decir |
+| Cuándo (s después del botón) | Qué se ve | Qué decir |
 |---|---|---|
-| 30–90 | `SCALE_UP 1 -> 2` en la primera subida, quizás `2 -> 3` al final | Igual que en la demo 1 |
-| 90–135 | tráfico plano en 40 | Si pidió un 3er pod, ahora el riesgo con uno menos es bajo |
-| 150–230 | `SCALE_DOWN` hasta 1 pod mientras el tráfico está en 8 | **Aegis devuelve los pods** cuando no hacen falta, tras 15–60 s de riesgo bajo (60 s en las corridas grabadas) |
-| 255–300 | `SCALE_UP` otra vez, hasta 3 pods | La segunda ola es más alta que 2C: pide el tercer pod |
-| 345–480 | `SCALE_DOWN 3 -> 2`, luego `2 -> 1` | Vuelve a 1 pod, de a un paso |
-| 480 | resumen de k6 | Pocas o ninguna petición fallida |
+| 0–30 | demanda baja, riesgo 0% | Un pod alcanza |
+| 30–70 | la línea violeta sube por delante de la azul | Aegis extrapola la tendencia T + 20 s hacia adelante |
+| ~70 | el riesgo pasa el 70%, marca ▲2, el azul sube a 2 | Pide el 2º pod cuando el tráfico todavía está **por debajo** de lo que aguanta un pod |
+| ~90 | el negro sube a 2, la capacidad gris se duplica | El pod queda Ready unos T = 17 s después, justo cuando hace falta |
+| ~130 | ▲3 | Cerca de 2 C dos pods no alcanzan: pide el tercero |
+| ~250–300 | la demanda baja, ▼1 | Aegis devuelve los pods después de 15–60 s de riesgo bajo |
 
-Cuando termine:
+Ensayo en EKS (2026-11-17): 2º pod pedido a los 71 s con 10 req/s, 3º a los 131 s, y de vuelta a 1 pod al terminar la carga.
 
-```bash
-python3 scripts/reset.py
-```
+## 4. Demo 2: Olas
 
-## 5. El HPA solo (mostrar las gráficas, no en vivo)
+Esperar a que haya 1 pod (la tarjeta de pods dice 1 / 1) y apretar **Waves**: una ola a 1,25 C (necesita 2 pods), 105 s bajo, una ola a 2,1 C (necesita 3 pods), 120 s bajo. Unos 9 minutos.
 
-En vivo tarda ~15 minutos. Mejor muestra `docs/tests/test3-hpa-baseline/` (rama `tests`).
+Qué decir: Aegis sube en cada subida y **vuelve a bajar** entre las olas, así que no se queda con pods que no necesita.
 
+## 5. Demo 3: Pico
 
-## 6. Si algo falla
+Apretar **Spike**: de 0,2 C a 1,9 C en 5 s. Nada lo anuncia, así que Aegis no puede adelantarse: reacciona en los siguientes ciclos, igual antes que el HPA (su línea naranja). Es el límite honesto de proyectar la tendencia.
+
+## 6. Si algo sale mal
 
 | Síntoma | Solución |
 |---|---|
-| `permission denied ... docker.sock` | El usuario todavía no está en el grupo `docker`: `sudo usermod -aG docker $USER`, luego cierra sesión y vuelve a entrar |
-| `pip install` dice `externally-managed-environment` | El entorno virtual no está activo: `source .venv/bin/activate` |
-| `ModuleNotFoundError: No module named 'kubernetes'` (o `yaml`) | Lo mismo: activa `.venv` en esa terminal |
-| `minikube start` falla por memoria | Dale menos: `MINIKUBE_MEMORY=3g scripts/setup.sh`, o cierra otros programas |
-| `setup.sh` se detiene por tiempo mientras descarga imágenes | Internet lento: corre `scripts/setup.sh` otra vez, sigue donde quedó |
-| Aegis dice `No calibration found` | `cd app && python3 -m aegis.calibrate` |
-| `demand=-` y avisos `Prometheus did not answer` | Prometheus se está reiniciando; Aegis sigue y se recupera solo. `python3 scripts/check_env.py` |
-| `kubectl apply` dice que el Job es inmutable | Quedó un Job anterior: `python3 scripts/reset.py` |
-| `/api/books` devuelve 500 | `scripts/setup.sh` (vuelve a llenar la tabla) |
-| Aegis arranca con más de 1 pod | Detenlo, `python3 scripts/reset.py`, arráncalo otra vez |
-| `Address already in use` (puerto 8080) | Sigue corriendo otro Aegis: detenlo, o arranca con `--port 8081` |
+| Arriba dice **Aegis unreachable** | `kubectl get pods -n aegis-system`; `kubectl logs -n aegis-system deploy/aegis` |
+| Botones apagados, "no load key" | Correr otra vez `scripts/setup.sh --aegis --registry …` (crea el Secret) |
+| "Wrong key" | Pegar otra vez la clave (sección 1) |
+| "Another load is still running" | Apretar **Stop**, o `python3 scripts/reset.py` |
+| Aegis arranca con más de 1 pod | `python3 scripts/reset.py`, y `kubectl rollout restart -n aegis-system deploy/aegis` |
+| El navegador bloquea la API (CORS) | `scripts/deploy_monitor.sh` otra vez: permite la URL del sitio |
+| `/api/books` devuelve 500 | `scripts/setup.sh --aegis --registry …` (vuelve a llenar la tabla) |
+| Vencieron las credenciales de AWS | Copiar las nuevas (aws.es.md) y `aws eks update-kubeconfig --name aegis --region us-east-1` |
+
+## 7. Plan B: minikube en este PC
+
+El mismo monitor y los mismos botones, sin AWS. Necesita una máquina con al menos 4 hilos de CPU y 8 GB de RAM.
+
+```bash
+git clone https://github.com/xDiegoAGG/Aegis.git && cd Aegis
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r app/requirements.txt
+scripts/setup.sh --aegis                         # minikube, Prometheus, Traefik, DynamoDB, servicio, HPA, Aegis (~15 min)
+cd app && python3 -m aegis.calibrate && cd ..    # C y T, ~17 min, una vez por máquina
+scripts/setup.sh --aegis                         # ahora Aegis arranca con la calibración
+kubectl port-forward -n aegis-system svc/aegis 8080 &
+cd monitor && npm install && npm run dev         # http://localhost:5173
+```
+
+Herramientas: Docker, minikube v1.39.0, kubectl, Helm v3, Python 3.11+, Node.js 20+. Si C queda fuera de 20–30 req/s, cambiar el CPU del pod (`scripts/setup.sh --aegis --pod-cpu 60m`, CPU nuevo ≈ CPU probado × C buscado ÷ C medido) y calibrar otra vez. Más memoria para minikube: `MINIKUBE_CPUS=4 MINIKUBE_MEMORY=6g scripts/setup.sh --aegis`.
+
+## 8. Después de la clase
+
+```bash
+scripts/eks_down.sh       # borra el clúster y su balanceador
+```

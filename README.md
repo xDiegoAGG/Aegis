@@ -37,7 +37,7 @@ Prometheus ──► demand r ──► projection p = r + m·(T + lag) ──�
 
 ## Getting started (minikube)
 
-Requirements: Docker, minikube, kubectl, helm, Python 3.11+ with `app/requirements.txt` ([new machine](docs/demo.md#1-a-new-machine-from-zero-about-45-minutes-do-it-before-the-class)).
+Requirements: Docker, minikube, kubectl, helm, Python 3.11+ with `app/requirements.txt` ([new machine](docs/demo.md#7-plan-b-minikube-on-this-pc)).
 
 ```bash
 scripts/setup.sh                 # minikube, metrics-server, Prometheus, Traefik, DynamoDB Local, catalog-service, HPA
