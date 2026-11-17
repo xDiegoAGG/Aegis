@@ -4,6 +4,14 @@ export const WINDOWS = [
   { label: "30 min", seconds: 1800 },
 ];
 
+// Traffic cannot be negative: a falling trend projects below 0.
+export function atLeastZero(number) {
+  if (number === null) {
+    return null;
+  }
+  return Math.max(0, number);
+}
+
 function value(number, scale = 1, decimals = 2) {
   if (number === null || number === undefined || Number.isNaN(number)) {
     return null;
@@ -27,7 +35,7 @@ export function buildPoints(records, meta, windowSeconds, now) {
     points.push({
       t: record.time,
       rps: value(record.rps, 1, 1),
-      projected: value(record.projected_rps, 1, 1),
+      projected: atLeastZero(value(record.projected_rps, 1, 1)),
       capacity: readyCapacity,
       risk: value(record.risk, 100, 1),
       requested: record.target,

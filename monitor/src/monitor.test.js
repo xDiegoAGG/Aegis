@@ -53,6 +53,7 @@ describe("chart series", () => {
     expect(points[0].p95).toBeNull();
     expect(points[0].risk).toBe(75.6);
     expect(points[0].capacity).toBe(48);
+    expect(buildPoints([record(400, { projected_rps: -9.6 })], META, 300, 450)[0].projected).toBe(0);
   });
 
   it("marks only scale-ups and scale-downs", () => {

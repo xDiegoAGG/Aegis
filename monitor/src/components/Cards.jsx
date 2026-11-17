@@ -1,3 +1,4 @@
+import { atLeastZero } from "../series.js";
 import { colombiaTime } from "../time.js";
 
 function show(number, decimals, unit) {
@@ -46,7 +47,7 @@ export default function Cards({ meta, records }) {
       <Card
         label="Demand"
         value={show(last && last.rps, 1, " req/s")}
-        detail={"projected " + show(last && last.projected_rps, 1, " req/s")}
+        detail={"projected " + show(last && last.projected_rps !== null ? atLeastZero(last.projected_rps) : null, 1, " req/s")}
       />
       <Card
         label="Risk"
