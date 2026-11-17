@@ -111,8 +111,10 @@ if [ "$ON_MINIKUBE" = "no" ]; then
     echo "Not on minikube: pass --registry (scripts/push_images.sh prints it)"
     exit 1
   fi
-  step "metrics-server $METRICS_SERVER_VERSION"
-  kubectl apply -f "https://github.com/kubernetes-sigs/metrics-server/releases/download/$METRICS_SERVER_VERSION/components.yaml"
+  if ! kubectl get deploy metrics-server -n kube-system >/dev/null 2>&1; then
+    step "metrics-server $METRICS_SERVER_VERSION"
+    kubectl apply -f "https://github.com/kubernetes-sigs/metrics-server/releases/download/$METRICS_SERVER_VERSION/components.yaml"
+  fi
 fi
 if [ "$ON_MINIKUBE" = "yes" ]; then
   kubectl config use-context minikube >/dev/null
