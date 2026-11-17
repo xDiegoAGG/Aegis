@@ -66,9 +66,9 @@ export default function Cards({ meta, records }) {
         className={last && latency && last.p95_s > latency ? "card-alert" : ""}
       />
       <Card
-        label="Calibration"
-        value={meta ? "C " + show(meta.pod_capacity_rps, 0) + " · T " + show(meta.startup_time_seconds, 0) + " s" : "–"}
-        detail="req/s per pod · pod startup"
+        label="C · T"
+        value={meta ? show(meta.pod_capacity_rps, 0) + " · " + show(meta.startup_time_seconds, 0) + " s" : "–"}
+        detail="req/s one pod serves · seconds until a new pod is Ready"
       />
       <Card label="σ" value={show(last && last.sigma_rps, 1, " req/s")} detail="projection error, learned live" />
       <Card
