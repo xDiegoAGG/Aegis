@@ -53,5 +53,5 @@ The API is public and unencrypted: `/api/state` only reads; the load buttons nee
 
 ```bash
 scripts/eks_down.sh                                          # cluster and load balancer
-aws s3 rb s3://aegis-monitor-<account> --force               # the monitor site, if no longer needed
+aws s3 rb s3://aegis-monitor --force                       # the monitor site, if no longer needed
 ```

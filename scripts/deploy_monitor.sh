@@ -5,8 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 REGION="us-east-1"
-ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
-BUCKET="aegis-monitor-$ACCOUNT_ID"
+BUCKET="${MONITOR_BUCKET:-aegis-monitor}"
 SITE="http://$BUCKET.s3-website-$REGION.amazonaws.com"
 API_HOST="$(kubectl get svc traefik -n traefik -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 if [ -z "$API_HOST" ]; then

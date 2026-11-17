@@ -53,5 +53,5 @@ La API es pública y sin cifrar: `/api/state` solo lee; los botones de carga pid
 
 ```bash
 scripts/eks_down.sh                                          # clúster y balanceador
-aws s3 rb s3://aegis-monitor-<cuenta> --force                # el sitio del monitor, si ya no se usa
+aws s3 rb s3://aegis-monitor --force                       # el sitio del monitor, si ya no se usa
 ```
