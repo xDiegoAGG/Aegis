@@ -16,11 +16,16 @@ class UnknownProfile(Exception):
     pass
 
 
+# k6 takes whole req/s only; at least 1.
+def whole_rate(factor, capacity_rps):
+    return max(1, int(round(factor * capacity_rps)))
+
+
 # k6 stages of a profile: every [factor, seconds] goes to factor * C req/s in that time.
 def profile_stages(profile, capacity_rps):
     stages = []
     for factor, seconds in profile["stages"]:
-        stages.append({"target": round(factor * capacity_rps, 1), "duration": str(int(seconds)) + "s"})
+        stages.append({"target": whole_rate(factor, capacity_rps), "duration": str(int(seconds)) + "s"})
     return stages
 
 
@@ -35,7 +40,7 @@ def profile_peak(profile, capacity_rps):
     peak = profile["start"]
     for factor, seconds in profile["stages"]:
         peak = max(peak, factor)
-    return round(peak * capacity_rps, 1)
+    return whole_rate(peak, capacity_rps)
 
 
 # Starts and stops the k6 loads of the monitor buttons, one at a time, each with a time limit.
@@ -84,7 +89,7 @@ class LoadController:
             seconds = profile_seconds(profile)
             if seconds > self.max_seconds:
                 raise UnknownProfile(name + " is longer than load.max_seconds")
-            options = arrival_rate_options(round(profile["start"] * self.capacity_rps, 1),
+            options = arrival_rate_options(whole_rate(profile["start"], self.capacity_rps),
                                            profile_stages(profile, self.capacity_rps),
                                            self.pre_allocated_vus, self.max_vus)
             self.job.delete(wait_seconds=60)

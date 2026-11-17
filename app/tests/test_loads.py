@@ -40,9 +40,18 @@ class LoadControllerTest(unittest.TestCase):
         loads = controller(capacity=20.0)
         loads.start("ramp")
         scenario = loads.job.created[0]["scenarios"]["load"]
-        self.assertEqual(scenario["startRate"], 4.0)
-        self.assertEqual(scenario["stages"][1], {"target": 42.0, "duration": "120s"})
+        self.assertEqual(scenario["startRate"], 4)
+        self.assertEqual(scenario["stages"][1], {"target": 42, "duration": "120s"})
         self.assertTrue(loads.job.created[0]["noConnectionReuse"])
+
+    # k6 rejects fractional rates (C = 16 gives 3.2 req/s at 0.2 C).
+    def test_rates_are_whole_numbers(self):
+        loads = controller(capacity=16.0)
+        loads.start("waves")
+        scenario = loads.job.created[0]["scenarios"]["load"]
+        self.assertIsInstance(scenario["startRate"], int)
+        for stage in scenario["stages"]:
+            self.assertIsInstance(stage["target"], int)
 
     def test_one_load_at_a_time(self):
         loads = controller()
