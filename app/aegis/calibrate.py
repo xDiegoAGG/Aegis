@@ -406,7 +406,6 @@ def run(config, repetitions, save=True, output=None):
             json.dump(calibration, out, indent=2)
         logger.info("Written to %s", output)
     if not save:
-        # Drift check of the experiment design: measure C again without changing the C the runs use.
         logger.info("Not saved (--check-only): C=%s req/s (runs: %s), T=%s s", calibration["capacity_rps"],
                     capacities, calibration["startup_time_seconds"])
         return

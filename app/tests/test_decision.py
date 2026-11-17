@@ -78,7 +78,7 @@ class DecisionTest(unittest.TestCase):
         engine = self.engine(initial=2)
         engine.decide(result(5), 0)
         engine.decide(result(5), 5)
-        engine.decide(result(23), 10)  # risk with 1 pod 31%
+        engine.decide(result(23), 10)
         self.assertEqual(engine.decide(result(5), 15).action, HOLD)
         self.assertEqual(engine.decide(result(5), 25).action, HOLD)
         self.assertEqual(engine.decide(result(5), 30).action, SCALE_DOWN)

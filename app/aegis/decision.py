@@ -18,23 +18,20 @@ class Decision:
         self.reason = reason
 
 
-# Turns the risk into replicas. Up: one more pod when the risk with the requested pods reaches 70%.
-# Down: for every smaller count k, how long the risk with k pods has stayed under 30%, and the highest
-# risk seen meanwhile. k is allowed after a wait between min_wait (risk ~0%) and max_wait (risk near
-# 30%): the surer the projection, the sooner the pod is given back (ski-rental style break-even).
-# Aegis then goes straight to the smallest allowed k, so 3 -> 1 does not take two full waits.
+# Turns the risk into replicas: one more pod at 70% risk; down to the smallest count whose risk stayed under 30% for 15-60 s.
 class DecisionEngine:
     def __init__(self, scale_up_threshold, scale_down_threshold, scale_down_max_wait_seconds,
                  min_replicas, max_replicas, initial_target, scale_down_min_wait_seconds=None):
         self.scale_up_threshold = scale_up_threshold
         self.scale_down_threshold = scale_down_threshold
         self.scale_down_max_wait_seconds = scale_down_max_wait_seconds
-        self.scale_down_min_wait_seconds = (scale_down_max_wait_seconds if scale_down_min_wait_seconds is None
-                                            else scale_down_min_wait_seconds)
+        self.scale_down_min_wait_seconds = scale_down_min_wait_seconds
+        if scale_down_min_wait_seconds is None:
+            self.scale_down_min_wait_seconds = scale_down_max_wait_seconds
         self.min_replicas = min_replicas
         self.max_replicas = max_replicas
         self.target = max(min_replicas, min(max_replicas, initial_target))
-        self.low = {}  # pods -> [since, highest risk while low]
+        self.low = {}
 
     @classmethod
     def from_config(cls, config, initial_target):
@@ -80,8 +77,10 @@ class DecisionEngine:
                 self.low[pods][1] = max(self.low[pods][1], pods_risk)
             else:
                 self.low[pods] = [now, pods_risk]
-        allowed = [pods for pods, (since, highest) in self.low.items()
-                   if pods < self.target and now - since >= self.wait_for(highest)]
+        allowed = []
+        for pods, (since, highest) in self.low.items():
+            if pods < self.target and now - since >= self.wait_for(highest):
+                allowed.append(pods)
         risk_one_less = result.risk_at(self.target - 1)
         if not allowed:
             reason = "risk with one pod less " + pct(risk_one_less)

@@ -6,6 +6,13 @@ from aegis.risk import RiskCalculator, SigmaEstimator, normal_cdf, risk_probabil
 from tests.helpers import config, feed
 
 
+def linear(start, step, count):
+    values = []
+    for index in range(count):
+        values.append(start + step * index)
+    return values
+
+
 class NormalCdfTest(unittest.TestCase):
     def test_known_values(self):
         self.assertAlmostEqual(normal_cdf(0), 0.5, places=12)
@@ -25,7 +32,7 @@ class ProjectionTest(unittest.TestCase):
     # Scenario 1 of #6: an upward trend is projected T + lag seconds ahead, with a sigma.
     def test_upward_trend_is_extrapolated(self):
         calculator = RiskCalculator.from_config(config())
-        result = feed(calculator, [10 + 0.5 * 5 * i for i in range(7)])
+        result = feed(calculator, linear(10, 2.5, 7))
         self.assertAlmostEqual(result.slope, 0.5, places=6)
         self.assertAlmostEqual(result.projected_rps, result.rps + 0.5 * 35, places=6)
         self.assertEqual(result.sigma_rps, 2)
@@ -43,7 +50,8 @@ class ProjectionTest(unittest.TestCase):
     def test_window_keeps_only_recent_samples(self):
         calculator = RiskCalculator.from_config(config())
         feed(calculator, [50] * 10 + [5] * 7)
-        self.assertTrue(all(rps == 5 for _, rps in calculator.window))
+        for moment, rps in calculator.window:
+            self.assertEqual(rps, 5)
 
     def test_missing_sample_keeps_previous_projection(self):
         calculator = RiskCalculator.from_config(config())
@@ -60,14 +68,14 @@ class RiskTest(unittest.TestCase):
     # Scenario 2 of #6: projected demand above the capacity of the replicas crosses the scale-up threshold.
     def test_projected_overload_crosses_threshold(self):
         calculator = RiskCalculator.from_config(config())
-        result = feed(calculator, [10 + 2.5 * i for i in range(7)])
+        result = feed(calculator, linear(10, 2.5, 7))
         self.assertGreater(result.projected_rps, 24)
         self.assertGreaterEqual(result.risk_at(1), 0.70)
 
     # Scenario 3 of #6: enough replicas for the projection keep the risk low.
     def test_headroom_keeps_risk_low(self):
         calculator = RiskCalculator.from_config(config())
-        result = feed(calculator, [10 + 2.5 * i for i in range(7)])
+        result = feed(calculator, linear(10, 2.5, 7))
         self.assertLess(result.risk_at(3), 0.30)
 
     def test_risk_never_divides_by_zero_replicas(self):
