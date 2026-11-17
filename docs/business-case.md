@@ -4,7 +4,7 @@ Documento de respaldo de la presentación «Aegis: caso de negocio» (21 diaposi
 
 Cada cifra pertenece a una de tres categorías:
 
-- **Medición propia:** campaña de 54 corridas del 2026-11-05 ([diseño](experiments/design.md), [resultados](experiments/results.md), datos en `docs/tests/`). Se usa **solo para medir el efecto de Aegis**, nunca para dimensionar el problema.
+- **Medición propia:** campaña de 54 corridas del 2026-11-05 ([diseño](https://github.com/xDiegoAGG/Aegis/tree/tests/docs/experiments/design.md), [resultados](https://github.com/xDiegoAGG/Aegis/tree/tests/docs/experiments/results.md), datos en `docs/tests/` de la rama `tests`). Se usa **solo para medir el efecto de Aegis**, nunca para dimensionar el problema.
 - **Fuente externa:** documentación oficial, organismos públicos, publicaciones revisadas por pares o encuestas de proveedores (estas últimas se identifican como tales). Referencias en la sección 12.
 - **Estimación:** juicio del equipo o parámetro de cada organización; se declara y se muestra su efecto en la sensibilidad.
 
@@ -57,7 +57,7 @@ si riesgo ≥ 70 %: mínimo de réplicas del HPA + 1
 
 r: peticiones por segundo actuales; m: tendencia de los últimos 30 s; T = 12 s de arranque de un pod (calibrado) y lag = 20 s de retraso de la medición; C = 22 req/s, capacidad calibrada de un pod; N: pods solicitados; σ: error de la proyección en los últimos 5 minutos (solo errores por debajo de la demanda real); Φ: distribución normal acumulada. Detalle en [formulas.md](formulas.md).
 
-**Bajada:** Aegis calcula el riesgo con menos pods. Si permanece por debajo del 30 %, espera `15 s + 45 s × riesgo máximo / 30 %` y reduce directamente al menor número seguro de pods; cualquier ciclo con riesgo elevado reinicia la espera. La regla se inspira en el problema del alquiler de esquís [9]: la espera solo cubre el error de la proyección, que ya mira T + lag hacia adelante. Antes de adoptarla se simuló sobre 22 corridas registradas: entre 10 y 14 % menos pods-minuto sin aumentar el tiempo con capacidad insuficiente (`scripts/experiments/scale_down_sim.py`).
+**Bajada:** Aegis calcula el riesgo con menos pods. Si permanece por debajo del 30 %, espera `15 s + 45 s × riesgo máximo / 30 %` y reduce directamente al menor número seguro de pods; cualquier ciclo con riesgo elevado reinicia la espera. La regla se inspira en el problema del alquiler de esquís [9]: la espera solo cubre el error de la proyección, que ya mira T + lag hacia adelante. Antes de adoptarla se simuló sobre 22 corridas registradas: entre 10 y 14 % menos pods-minuto sin aumentar el tiempo con capacidad insuficiente (`scripts/experiments/scale_down_sim.py`, rama `tests`).
 
 **Requisitos:** una calibración inicial de C y T, unos minutos de datos en vivo y ningún historial de días; los datos no salen del clúster.
 
@@ -79,7 +79,7 @@ r: peticiones por segundo actuales; m: tendencia de los últimos 30 s; T = 12 s 
 
 ## 6. Diseño experimental (diapositivas 9 a 12)
 
-Diseño de bloques completos aleatorizados con tratamientos factoriales 3 × 3 [14]: 3 autoscalers (Aegis, HPA por defecto con CPU al 70 %, HPA afinado con CPU al 50 % y reducción en 60 s) × 3 cargas (rampa, pico, olas) × 6 bloques = 54 corridas en orden aleatorio con semilla fija, registradas antes de la primera corrida. Métrica principal: porcentaje de peticiones fallidas medido por k6. Análisis: ANOVA con bloques, 6 contrastes corregidos con Holm [15], respaldo por rangos donde los residuos no son normales (el pico). Plan completo en [design.md](experiments/design.md).
+Diseño de bloques completos aleatorizados con tratamientos factoriales 3 × 3 [14]: 3 autoscalers (Aegis, HPA por defecto con CPU al 70 %, HPA afinado con CPU al 50 % y reducción en 60 s) × 3 cargas (rampa, pico, olas) × 6 bloques = 54 corridas en orden aleatorio con semilla fija, registradas antes de la primera corrida. Métrica principal: porcentaje de peticiones fallidas medido por k6. Análisis: ANOVA con bloques, 6 contrastes corregidos con Holm [15], respaldo por rangos donde los residuos no son normales (el pico). Plan completo en [design.md](https://github.com/xDiegoAGG/Aegis/tree/tests/docs/experiments/design.md).
 
 | Carga | Perfil (escalado a C = 22 req/s) | Cruza la capacidad de un pod |
 |---|---|---|
@@ -99,7 +99,7 @@ Peticiones fallidas, media de 6 corridas (en la diapositiva, cada corrida se mue
 
 Aegis tuvo menos fallas en 5 de las 6 comparaciones registradas. Con la mediana la conclusión no cambia (rampa 0,9 % frente a 14,4 % y 12,9 %; pico 5,5 % frente a 19,9 % y 23,4 %). En un análisis de sensibilidad no registrado (t pareado sobre log(1 + %)) los mismos 5 contrastes son significativos; con el t pareado sin transformar, 2 son significativos y 3 quedan en p = 0,063.
 
-Métricas secundarias (exploratorias, sin corrección): tiempo degradado de 58 s frente a 123 y 129 s en la rampa, y 46 s frente a 123 y 113 s en el pico; solicitud del 2º pod a los 77 s frente a 148 y 138 s en la rampa; pods-minuto inferiores al HPA por defecto en las tres cargas (−27 % en las olas) y equivalentes al HPA afinado salvo en el pico (13,9 frente a 12,3). Detalle en [results.md](experiments/results.md).
+Métricas secundarias (exploratorias, sin corrección): tiempo degradado de 58 s frente a 123 y 129 s en la rampa, y 46 s frente a 123 y 113 s en el pico; solicitud del 2º pod a los 77 s frente a 148 y 138 s en la rampa; pods-minuto inferiores al HPA por defecto en las tres cargas (−27 % en las olas) y equivalentes al HPA afinado salvo en el pico (13,9 frente a 12,3). Detalle en [results.md](https://github.com/xDiegoAGG/Aegis/tree/tests/docs/experiments/results.md).
 
 ## 8. Valor no monetario (diapositiva 15)
 
@@ -176,7 +176,7 @@ Los valores usan la estimación experimental de 0,76 minutos degradados evitados
 Riesgos principales:
 
 - **Representatividad del laboratorio:** un nodo, pods de 60m de CPU, como máximo 3 réplicas, carga sintética. Si Aegis evitara la mitad de los minutos degradados, el equilibrio semanal pasa de 12,15 a 24,29 $/min.
-- **Deriva de capacidad durante la campaña:** C medida pasó de 22 a 30 y a 24 req/s; se mantuvo C = 22 como establece el plan, lo que hace a Aegis más conservador (registro de desviaciones en [design.md](experiments/design.md)).
+- **Deriva de capacidad durante la campaña:** C medida pasó de 22 a 30 y a 24 req/s; se mantuvo C = 22 como establece el plan, lo que hace a Aegis más conservador (registro de desviaciones en [design.md](https://github.com/xDiegoAGG/Aegis/tree/tests/docs/experiments/design.md)).
 - **Picos abruptos:** Aegis no los anticipa; reduce las fallas al reaccionar antes que el HPA, pero no las evita.
 - **Métricas secundarias:** el tiempo degradado y los pods-minuto no tienen corrección por comparaciones múltiples.
 - **Regla de bajada elegida sobre trazas de la campaña de octubre con las mismas cargas:** su ventaja en costo podría ser menor con tráfico no visto.

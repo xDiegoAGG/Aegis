@@ -49,7 +49,7 @@ git clone https://github.com/xDiegoAGG/Aegis.git
 cd Aegis
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r scripts/experiments/requirements.txt
+pip install -r app/requirements.txt
 ```
 
 **Every new terminal** needs these two lines first: `cd Aegis` and `source .venv/bin/activate`.
@@ -78,7 +78,7 @@ It ends with `Saved in ConfigMap aegis-calibration: C=… req/s, T=… s`. The t
 
 ```bash
 python3 scripts/check_env.py           # every line OK, and the calibration
-python3 scripts/experiments/reset.py   # 1 pod, no traffic
+python3 scripts/reset.py   # 1 pod, no traffic
 ```
 
 After a reboot, `scripts/setup.sh` brings everything back; the calibration is kept.
@@ -91,7 +91,7 @@ Right before the demo, check that everything is still up (after a reboot it brin
 
 ```bash
 scripts/setup.sh
-python3 scripts/experiments/reset.py
+python3 scripts/reset.py
 ```
 
 **Terminal 1, Aegis** (leave it running for both demos):
@@ -154,7 +154,7 @@ kubectl logs -f job/load-linear
 When it ends (Ctrl+C in terminal 3; the Job keeps its pod 10 min, that is normal):
 
 ```bash
-python3 scripts/experiments/reset.py
+python3 scripts/reset.py
 ```
 
 Leave Aegis running in terminal 1.
@@ -182,12 +182,12 @@ kubectl logs -f job/load-fluctuating
 When it ends:
 
 ```bash
-python3 scripts/experiments/reset.py
+python3 scripts/reset.py
 ```
 
 ## 5. The HPA alone (show the charts, not live)
 
-Running it live takes ~15 minutes. Show `docs/tests/test3-hpa-baseline/` instead, or the *Experiments* tab of the dashboard with tests 1 and 3 side by side.
+Running it live takes ~15 minutes. Show `docs/tests/test3-hpa-baseline/` (`tests` branch) instead, or the *Experiments* tab of the dashboard with tests 1 and 3 side by side.
 
 To run it live anyway: stop Aegis (Ctrl+C in terminal 1), then
 
@@ -196,7 +196,7 @@ kubectl apply -f kubernetes/hpa/baseline.yaml
 kubectl apply -f kubernetes/load/linear.yaml
 ```
 
-and at the end `python3 scripts/experiments/reset.py` (it puts the Aegis HPA back).
+and at the end `python3 scripts/reset.py` (it puts the Aegis HPA back).
 
 ## 6. If something goes wrong
 
@@ -209,7 +209,7 @@ and at the end `python3 scripts/experiments/reset.py` (it puts the Aegis HPA bac
 | `setup.sh` stops with a timeout while downloading images | Slow internet: run `scripts/setup.sh` again, it continues where it stopped |
 | Aegis says `No calibration found` | `cd app && python3 -m aegis.calibrate` |
 | `demand=-` and warnings `Prometheus did not answer` | Prometheus is restarting; Aegis keeps running and recovers by itself. `python3 scripts/check_env.py` |
-| `kubectl apply` says the Job is immutable | A previous Job is still there: `python3 scripts/experiments/reset.py` |
+| `kubectl apply` says the Job is immutable | A previous Job is still there: `python3 scripts/reset.py` |
 | `/api/books` returns 500 | `scripts/setup.sh` (it seeds the table again) |
-| Aegis starts with more than 1 pod | Stop it, `python3 scripts/experiments/reset.py`, start it again |
+| Aegis starts with more than 1 pod | Stop it, `python3 scripts/reset.py`, start it again |
 | `Address already in use` (port 8080) | Another Aegis or replay is still running: `pkill -f aegis.replay` (or stop the other Aegis), or start with `--port 8081` |

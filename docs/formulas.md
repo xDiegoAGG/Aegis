@@ -89,7 +89,7 @@ For every smaller pod count k, Aegis tracks how long the risk with k pods has st
 
 **Where it comes from.** Giving a pod back is a *ski-rental* decision: keep paying for a pod that may be idle, or release it and pay the shortfall if it is needed again (T + lag seconds to get it back). The online answer is to wait until what was paid for the idle pod matches what a wrong release would cost [22]; applied to servers this is *lazy capacity provisioning* [23]. Aegis already projects at T + lag, the time to get a pod back, so with a perfect forecast no wait would be needed: **the wait only covers the error of the projection**. That is why it is short when the risk with fewer pods is ~0% and long near 30%. 15 s is one startup time T; 60 s is the previous fixed wait.
 
-**Evidence (simulation, not yet a cluster run).** The real engine fed with the demand of the 22 recorded Aegis runs (`scripts/experiments/scale_down_sim.py`): 10–14% fewer pod-minutes, the same scale-ups, no extra seconds short of capacity. On synthetic traffic with short dips and bursts it added no shortfall either; a fixed 15 s wait added 126 s of shortfall on bursts.
+**Evidence (simulation, not yet a cluster run).** The real engine fed with the demand of the 22 recorded Aegis runs (`scripts/experiments/scale_down_sim.py` in the `tests` branch): 10–14% fewer pod-minutes, the same scale-ups, no extra seconds short of capacity. On synthetic traffic with short dips and bursts it added no shortfall either; a fixed 15 s wait added 126 s of shortfall on bursts.
 
 ## Assumptions and limits
 

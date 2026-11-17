@@ -89,7 +89,7 @@ Para cada número menor de pods k, Aegis mide cuánto tiempo lleva el riesgo con
 
 **De dónde sale.** Devolver un pod es un problema de *alquiler de esquís* (ski rental): seguir pagando un pod que quizás está ocioso, o soltarlo y pagar la falta de capacidad si vuelve a hacer falta (T + lag segundos para recuperarlo). La respuesta sin conocer el futuro es esperar hasta que lo pagado por el pod ocioso iguale lo que costaría equivocarse [22]; aplicado a servidores es el *lazy capacity provisioning* [23]. Aegis ya proyecta a T + lag, el tiempo para recuperar un pod, así que con un pronóstico perfecto no haría falta esperar: **la espera solo cubre el error de la proyección**. Por eso es corta cuando el riesgo con menos pods es ~0% y larga cerca de 30%. 15 s es un arranque T; 60 s es la espera fija anterior.
 
-**Evidencia (simulación, falta una corrida en el clúster).** El motor real alimentado con la demanda de las 22 corridas grabadas de Aegis (`scripts/experiments/scale_down_sim.py`): 10–14% menos pods-minuto, las mismas subidas, ningún segundo extra sin capacidad. Con tráfico sintético con caídas cortas y ráfagas tampoco añadió falta de capacidad; una espera fija de 15 s añadió 126 s sin capacidad en las ráfagas.
+**Evidencia (simulación, falta una corrida en el clúster).** El motor real alimentado con la demanda de las 22 corridas grabadas de Aegis (`scripts/experiments/scale_down_sim.py` en la rama `tests`): 10–14% menos pods-minuto, las mismas subidas, ningún segundo extra sin capacidad. Con tráfico sintético con caídas cortas y ráfagas tampoco añadió falta de capacidad; una espera fija de 15 s añadió 126 s sin capacidad en las ráfagas.
 
 ## Supuestos y límites
 

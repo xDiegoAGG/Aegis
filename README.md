@@ -23,7 +23,7 @@ Prometheus ──► demand r ──► projection p = r + m·(T + lag) ──�
 | `app/aegis/replay.py` | Plays a recorded run on the dashboard, without a cluster |
 | `app/aegis/calibrate.py`, `calibration.py` | Measure C and T; save and read them in the cluster |
 | `app/config.yaml` | Thresholds, queries, calibration, actuator mode and dashboard port |
-| `app/tests/` | Unit tests of projection, σ, risk, decisions and server, and a replay of the recorded runs |
+| `app/tests/` | Unit tests of projection, σ, risk, decisions and server, and two recorded runs fed again to the engine |
 | `app/Dockerfile`, `kubernetes/aegis/` | Aegis inside the cluster: image, least-privilege RBAC, Deployment, ServiceMonitor |
 | `kubernetes/monitoring/` | Prometheus recording rules (`aegis:catalog_p95_latency`, `aegis:catalog_rps`, `aegis:replica_count`, ...) and alerts |
 | `services/catalog-service/`, `shared/proto/` | The service Aegis protects (from MyBookstore): HTTP and gRPC over DynamoDB |
@@ -32,13 +32,12 @@ Prometheus ──► demand r ──► projection p = r + m·(T + lag) ──�
 | `kubernetes/load/` | k6 traffic profiles |
 | `kubernetes/helm/` | Values for Prometheus, prometheus-adapter and Traefik |
 | `scripts/setup.sh`, `scripts/check_env.py` | Bring up and check the whole environment |
-| `scripts/experiments/` | Campaign, runs, charts, comparison, forecast accuracy, reset |
-| `docs/tests/` | The tests, their charts and data ([summary](docs/tests/README.md)) |
+| `scripts/reset.py` | Stops any load and leaves 1 pod, between demos |
 | `docs/demo.md` | Step-by-step live demo ([español](docs/demo.es.md)) |
 
 ## Getting started (minikube)
 
-Requirements: Docker, minikube, kubectl, helm, Python 3.11+ with `scripts/experiments/requirements.txt` ([new machine](docs/demo.md#1-a-new-machine-from-zero-about-45-minutes-do-it-before-the-class)).
+Requirements: Docker, minikube, kubectl, helm, Python 3.11+ with `app/requirements.txt` ([new machine](docs/demo.md#1-a-new-machine-from-zero-about-45-minutes-do-it-before-the-class)).
 
 ```bash
 scripts/setup.sh                 # minikube, metrics-server, Prometheus, Traefik, DynamoDB Local, catalog-service, HPA
@@ -51,25 +50,13 @@ python3 -m aegis.actuator        # Aegis, with its dashboard on http://localhost
 - Fast machine: `scripts/setup.sh --pod-cpu 60m` keeps C at 20–30 req/s. `--build` rebuilds the service image; `--hpa baseline` runs without Aegis.
 - Aegis flags: `--dry-run`, `--log file.ndjson`.
 - In the cluster: `scripts/setup.sh --aegis [--hpa aegis-metric]` ([docs/deployment.md](docs/deployment.md)).
-- Unit tests: `cd app && python3 -m unittest`.
+- Unit tests: `cd app && python3 -m pytest`.
 
-## Tests
+## Experiments
 
-```bash
-cd scripts/experiments
-python3 preflight.py               # checks everything is in place, and how long the missing runs take
-python3 campaign.py --plan         # the randomized order of the 6 blocks (docs/experiments/design.md)
-python3 campaign.py --blocks 1-2   # run whole blocks per session (~134 min each); resumable
-python3 design_analysis.py         # the pre-registered analysis: docs/tests/design-results.md
-python3 run.py ramp-aegis          # or one cell only
-python3 report.py                  # charts and tables again from the saved data
-python3 compare.py                 # October 2026 campaign: Aegis vs HPA only, docs/tests/comparison.md
-python3 forecast_accuracy.py       # the projection against other forecasters: docs/tests/forecast.md
-```
+The experiments (runs, raw data, charts, statistical analysis and their tooling) live in the [`tests` branch](https://github.com/xDiegoAGG/Aegis/tree/tests/), so `main` keeps only Aegis and what deploys it. `git checkout tests` brings them back.
 
-### Results
-
-Randomized complete block design, 2026-11-05: 3 autoscalers × 3 loads × 6 blocks = 54 runs in a random order registered before the first run ([design](docs/experiments/design.md), [results](docs/experiments/results.md)). Failed requests, mean of 6 runs:
+Randomized complete block design, 2026-11-05: 3 autoscalers × 3 loads × 6 blocks = 54 runs in a random order registered before the first run ([design](https://github.com/xDiegoAGG/Aegis/tree/tests/docs/experiments/design.md), [results](https://github.com/xDiegoAGG/Aegis/tree/tests/docs/experiments/results.md)). Failed requests, mean of 6 runs:
 
 | Load | Aegis | Default HPA (CPU 70%) | Tuned HPA (CPU 50%, 60 s down) |
 |---|---|---|---|
@@ -77,27 +64,7 @@ Randomized complete block design, 2026-11-05: 3 autoscalers × 3 loads × 6 bloc
 | Spike | **5.6%** | 26.7% ✓ | 24.9% ✓ |
 | Waves | **1.4%** | 3.7% (not significant) | 7.1% ✓ |
 
-✓ = Aegis lower, Holm-corrected p < 0.05 (5 of 6 pre-registered contrasts). Aegis was degraded half the time or less on ramps and spikes and used the same or fewer pod-minutes, except on the spike against the tuned HPA. The advantage on the spike, with no trend to anticipate, is as large as on the ramp: Aegis also wins by reacting every 5 s to the request rate instead of to averaged CPU.
-
-### Preliminary campaign (October 2026)
-
-One factor at a time, not randomized ([why it was replaced](docs/experiments/design.md#2-why-the-october-campaign-was-replaced)). Its HPA numbers predate the readiness-probe fix and should not be quoted as the HPA's failure rate today.
-
-![Aegis vs HPA, same traffic](docs/tests/evidence.png)
-
-Campaign of 2026-10-25, 32 runs, C = 22 req/s, T = 15 s ([all the numbers](docs/tests/comparison.md)):
-
-| Test | Runs | Result |
-|---|---|---|
-| [Test 1: linear ramp](docs/tests/test1-linear-ramp/), Aegis | 5 | 2nd pod requested 6 s **before** the traffic passes one pod; **2.5%** failed |
-| [Test 3: same ramp, HPA only](docs/tests/test3-hpa-baseline/) | 5 | 2nd pod requested 36–65 s **after**; **37.1%** failed |
-| [Test 4: spike 5 → 41 req/s in 5 s](docs/tests/test4-spike-aegis/), Aegis | 5 | cannot prevent it, reacts in 11 s; 13.3% failed, 1 unneeded pod per run |
-| [Test 5: same spike, HPA only](docs/tests/test5-spike-hpa/) | 5 | reacts in 67–112 s; 54.8% failed |
-| [Test 2: two waves](docs/tests/test2-fluctuating/), Aegis | 3 | 1 → 2 → 1 → 2 → 3 → 2 → 1 every run, 0.64% failed |
-| [Tests 6 and 7: faster ramps](docs/tests/test6-ramp-045/) (0.41 and 0.46 req/s per s), Aegis | 3 + 3 | the request reaches the crossing itself; 1–2% failed |
-| [Test 8: metric mode](docs/tests/test8-metric-mode/) (HPA reads Aegis through the Custom Metrics API) | 3 | works, but each decision arrives ~10 s later and the pod starts under overload; 20.2% failed |
-
-Every run also saves a timeline (`run-N-timeline.csv`) with the load, the Aegis decisions, the Kubernetes events and the pod transitions on one clock. Comparison: [docs/tests/comparison.md](docs/tests/comparison.md).
+✓ = Aegis lower, Holm-corrected p < 0.05 (5 of 6 pre-registered contrasts). Aegis was degraded half the time or less on ramps and spikes and used the same or fewer pod-minutes, except on the spike against the tuned HPA.
 
 ## More documentation
 
@@ -106,5 +73,5 @@ Every run also saves a timeline (`run-N-timeline.csv`) with the load, the Aegis 
 - [Workload capacity, L and T_d](docs/capacity.md)
 - [Operating boundaries, limitations and threats to validity](docs/limitations.md)
 - [Business case, with the economic model step by step](docs/business-case.md) (Spanish)
-- [Experimental methodology](docs/experiments/methodology.md)
+- [Experimental methodology](https://github.com/xDiegoAGG/Aegis/tree/tests/docs/experiments/methodology.md) (`tests` branch)
 - [References](docs/references.md)
