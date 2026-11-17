@@ -1,4 +1,4 @@
-# Aegis in the cluster; stop any local Aegis first. aegis-config is app/config.yaml (scripts/setup.sh --aegis).
+# Aegis in the cluster (scripts/setup.sh --aegis); no service links, so Kubernetes does not set AEGIS_PORT.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,7 +19,6 @@ spec:
         app: aegis
     spec:
       serviceAccountName: aegis
-      # The Service "aegis" would otherwise set AEGIS_PORT=tcp://...
       enableServiceLinks: false
       securityContext:
         runAsNonRoot: true
@@ -36,9 +35,6 @@ spec:
               value: /etc/aegis/config.yaml
             - name: AEGIS_PROMETHEUS_URL
               value: http://prometheus-kube-prometheus-prometheus.monitoring.svc:9090
-            # min_replicas with kubernetes/hpa/aegis.yaml, metric with kubernetes/hpa/aegis-metric.yaml.
-            - name: AEGIS_ACTUATOR_MODE
-              value: min_replicas
           volumeMounts:
             - name: config
               mountPath: /etc/aegis

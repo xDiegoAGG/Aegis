@@ -94,8 +94,6 @@ def check_hpa():
     for metric in spec.get("metrics", []):
         if metric.get("type") == "Resource" and metric["resource"]["name"] == "cpu":
             targets.append("CPU " + str(metric["resource"]["target"].get("averageUtilization", "?")) + "%")
-        if metric.get("type") == "Object":
-            targets.append(metric["object"]["metric"]["name"])
     for condition in hpa.get("status", {}).get("conditions", []):
         if condition["type"] == "ScalingActive" and condition["status"] != "True":
             return False, "the HPA cannot read its metrics: " + condition.get("message", "")
@@ -107,26 +105,6 @@ def check_metrics_server():
     if code != 0 or not out:
         return False, "metrics-server has no CPU data yet"
     return True, "CPU data available"
-
-
-def check_recording_rules():
-    result = prometheus_query("aegis:replica_count")
-    if result is None:
-        return False, "Prometheus did not answer"
-    if not result:
-        return False, "aegis:replica_count has no data yet (kubernetes/monitoring/recording-rules.yaml)"
-    return True, "aegis:replica_count = " + result[0]["value"][1]
-
-
-def check_custom_metrics_api():
-    code, out, err = kubectl(["get", "--raw", "/apis/custom.metrics.k8s.io/v1beta1"])
-    if code != 0:
-        return False, "custom.metrics.k8s.io not available (prometheus-adapter): " + err
-    resources = json.loads(out).get("resources", [])
-    names = sorted({resource["name"].split("/")[-1] for resource in resources})
-    if not names:
-        return True, "API up, no Aegis metric yet (they appear when Aegis runs in the cluster)"
-    return True, ", ".join(names)
 
 
 # Only when Aegis runs in the cluster (scripts/setup.sh --aegis); otherwise informative.
@@ -159,8 +137,6 @@ CHECKS = [
     ("Prometheus scrapes Traefik", check_traefik_metrics),
     ("Prometheus scrapes catalog-service", check_prometheus_target),
     ("kube-state-metrics reports replicas", check_replica_metric),
-    ("Recording rules evaluate", check_recording_rules),
-    ("Custom Metrics API (prometheus-adapter)", check_custom_metrics_api),
     ("HPA exists", check_hpa),
     ("metrics-server works", check_metrics_server),
     ("Aegis calibration", check_calibration),

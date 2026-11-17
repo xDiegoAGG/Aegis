@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # Brings up or repairs the whole environment and checks it. Safe to run many times.
-# Usage: scripts/setup.sh [--hpa aegis|aegis-metric|baseline] [--build] [--aegis] [--pod-cpu VALUE]
+# Usage: scripts/setup.sh [--hpa aegis|baseline] [--build] [--aegis] [--pod-cpu VALUE]
 #   --hpa aegis         Aegis writes minReplicas (default)
-#   --hpa aegis-metric  the HPA reads aegis_target_replicas through prometheus-adapter (needs --aegis)
 #   --hpa baseline      plain HPA on CPU 70%, without Aegis
 #   --aegis             also run Aegis in the cluster (aegis-system)
 #   --pod-cpu 60m       CPU per catalog-service pod (default: keep the current one, 200m on a new cluster);
@@ -11,7 +10,6 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 PROMETHEUS_CHART_VERSION="91.7.0"
-PROMETHEUS_ADAPTER_CHART_VERSION="5.3.0"
 TRAEFIK_CHART_VERSION="41.7.1"
 IMAGE="catalog-service:local"
 AEGIS_IMAGE="aegis:local"
@@ -45,12 +43,8 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ "$HPA" != "aegis" ] && [ "$HPA" != "aegis-metric" ] && [ "$HPA" != "baseline" ]; then
-  echo "--hpa must be aegis, aegis-metric or baseline"
-  exit 1
-fi
-if [ "$HPA" = "aegis-metric" ] && [ "$AEGIS" != "yes" ]; then
-  echo "--hpa aegis-metric needs --aegis: Prometheus can only scrape the Aegis that runs in the cluster"
+if [ "$HPA" != "aegis" ] && [ "$HPA" != "baseline" ]; then
+  echo "--hpa must be aegis or baseline"
   exit 1
 fi
 
@@ -92,7 +86,6 @@ if [ "$ON_MINIKUBE" = "yes" ]; then
   fi
   if [ "$AEGIS" = "yes" ] && { [ "$BUILD" = "yes" ] || ! minikube image ls | grep -q "docker.io/library/$AEGIS_IMAGE"; }; then
     step "Building $AEGIS_IMAGE inside minikube"
-    # -f is relative to the build context (app/).
     minikube image build -t "$AEGIS_IMAGE" -f Dockerfile app
     if ! minikube image ls | grep -q "docker.io/library/$AEGIS_IMAGE"; then
       echo "The $AEGIS_IMAGE image was not built"
@@ -115,14 +108,6 @@ fi
 helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
   --version "$PROMETHEUS_CHART_VERSION" --namespace monitoring --create-namespace \
   -f kubernetes/helm/prometheus-values.yaml --wait --timeout 10m
-
-step "Recording rules (aegis:catalog_p95_latency, aegis:catalog_rps, aegis:replica_count, ...)"
-kubectl apply -f kubernetes/monitoring/recording-rules.yaml
-
-step "prometheus-adapter $PROMETHEUS_ADAPTER_CHART_VERSION (Custom Metrics API for the Aegis metrics)"
-helm upgrade --install prometheus-adapter prometheus-community/prometheus-adapter \
-  --version "$PROMETHEUS_ADAPTER_CHART_VERSION" --namespace monitoring \
-  -f kubernetes/helm/prometheus-adapter-values.yaml --wait --timeout 5m
 
 step "Traefik (chart $TRAEFIK_CHART_VERSION)"
 if ! helm repo list 2>/dev/null | grep -q "^traefik"; then
@@ -162,23 +147,17 @@ kubectl apply -f "kubernetes/hpa/$HPA.yaml"
 
 if [ "$AEGIS" = "yes" ]; then
   step "Aegis in the cluster (aegis-system)"
-  MODE="min_replicas"
-  if [ "$HPA" = "aegis-metric" ]; then
-    MODE="metric"
-  fi
   kubectl apply -f kubernetes/aegis/namespace.yaml
   kubectl create configmap aegis-config -n aegis-system --from-file=config.yaml=app/config.yaml \
     --dry-run=client -o yaml | kubectl apply -f -
   kubectl apply -f kubernetes/aegis/rbac.yaml -f kubernetes/aegis/deployment.yaml -f kubernetes/aegis/servicemonitor.yaml
-  kubectl set env -n aegis-system deploy/aegis AEGIS_ACTUATOR_MODE="$MODE" >/dev/null
   if [ "$BUILD" = "yes" ]; then
     kubectl rollout restart -n aegis-system deploy/aegis
   fi
   if kubectl get configmap aegis-calibration >/dev/null 2>&1; then
     kubectl rollout status -n aegis-system deploy/aegis --timeout=180s
-    echo "Dashboard: kubectl port-forward -n aegis-system svc/aegis 8080  ->  http://localhost:8080"
+    echo "API: kubectl port-forward -n aegis-system svc/aegis 8080  ->  http://localhost:8080/api/state"
   else
-    # Off until calibrated (it would crash-loop and disturb the calibration).
     kubectl scale -n aegis-system deploy/aegis --replicas=0
     echo "Aegis stays off until the calibration exists: run python3 -m aegis.calibrate from app/, then"
     echo "kubectl scale -n aegis-system deploy/aegis --replicas=1"
