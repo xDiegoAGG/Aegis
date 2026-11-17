@@ -20,13 +20,11 @@ flowchart LR
     deploy --> pods
     aegis <-->|"read C and T"| cm["ConfigMap<br/>aegis-calibration"]
     calibrate["aegis.calibrate"] -->|"write C and T"| cm
-    aegis -->|"dashboard, /api/state"| browser["Browser"]
+    aegis -->|"/api/state"| browser["Monitor (browser)"]
     aegis -. "/metrics (in the cluster)" .-> prom
-    prom --> adapter["prometheus-adapter"]
-    adapter -. "custom.metrics.k8s.io (metric mode)" .-> hpa
 ```
 
-Aegis runs on the laptop or as a Deployment in `aegis-system` ([deployment.md](../deployment.md)). In `min_replicas` mode (default) it patches `minReplicas`; in `metric` mode it only publishes `aegis_target_replicas` and a standard HPA reads it through prometheus-adapter.
+Aegis runs on the laptop or as a Deployment in `aegis-system` ([deployment.md](../deployment.md)). It patches `minReplicas` of the HPA.
 
 ## Responsibility boundaries
 
@@ -35,8 +33,7 @@ Aegis runs on the laptop or as a Deployment in `aegis-system` ([deployment.md](.
 | Traefik | Single entrance for the traffic. Balances request by request across Ready pods and exports request counts, open connections and latency |
 | Prometheus | Scrapes Traefik, the pods and kube-state-metrics every 5 s and answers PromQL queries |
 | kube-state-metrics | Exposes Deployment and pod state (Ready replicas, pod creation and Ready times) |
-| Aegis (`app/aegis/`) | Reads the demand, projects it, calculates the risk, decides the replicas and writes `minReplicas` of the HPA (or publishes it as a metric). Logs every cycle (NDJSON), serves the dashboard and `/metrics` |
-| prometheus-adapter | Publishes the Aegis metrics in the Custom Metrics API, attached to the Deployment |
+| Aegis (`app/aegis/`) | Reads the demand, projects it, calculates the risk, decides the replicas and writes `minReplicas` of the HPA Logs every cycle (NDJSON), serves `/api/state` for the monitor and `/metrics` |
 | Calibration (`aegis.calibrate`) | Measures C (capacity of one pod) and T (startup time) with a step load and saves them in a ConfigMap |
 | HPA | Keeps the replicas between `minReplicas` and `maxReplicas`. With Aegis its CPU target is 95% (never reached), so Aegis decides; without Aegis it scales on CPU at 70% (baseline) |
 | Deployment / ReplicaSet | Creates and removes pods to match the replicas |
@@ -71,7 +68,7 @@ flowchart TD
 | Decide | `decision.py` | Up at 70% with the pods already requested; down to the fewest pods whose risk stays under 30% for 15–60 s (shorter the lower the risk) |
 | Act | `actuator.py` | Sets `minReplicas` only when it changes; on an API error it retries next cycle |
 | Log | `actuator.py` (`--log`) | One JSON line per cycle with every value above |
-| Publish | `server.py` | The same cycle on `/api/state` (dashboard) and `/metrics` (Prometheus) |
+| Publish | `server.py` | The same cycle on `/api/state` (monitor) and `/metrics` (Prometheus) |
 
 ## Preventive vs reactive scaling
 

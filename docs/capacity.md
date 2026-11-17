@@ -47,4 +47,3 @@ The first evaluation (other machine, 200m, 2026-10-19) measured C = 24 and T = 1
 
 L and T_d are in `app/config.yaml` (`degradation`), C and T in the calibration ConfigMap. σ is learned live ([formulas.md](formulas.md#5-sigma-learned-from-the-projections-own-errors)).
 
-Recording rules for these signals: [deployment.md](deployment.md#recording-rules).

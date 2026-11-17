@@ -101,7 +101,7 @@ cd app
 python3 -m aegis.actuator
 ```
 
-It uses the default `min_replicas` mode: Aegis raises `minReplicas` of the HPA. The metric mode is only an experiment (test 8), not used in the demo.
+It uses the default `min_replicas` mode: Aegis raises `minReplicas` of the HPA.
 
 You should see `Calibration from …: C=… req/s, T=… s`, then one line every 5 s:
 
@@ -120,7 +120,7 @@ demand=0.0 projected=0.0 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min
 
 Decisions are printed as `WARNING` so they stand out.
 
-**Browser**: http://localhost:8080 shows the same values live, with the formula of the last cycle and every scale event ([dashboard.md](dashboard.md)). If the cluster fails, `cd app && python3 -m aegis.replay --speed 3` plays a recorded run.
+**Browser**: the live monitor ([monitor/](../monitor/)): `cd monitor && npm run dev` and open http://localhost:5173.
 
 **Terminal 2, pods and HPA**:
 
@@ -187,7 +187,7 @@ python3 scripts/reset.py
 
 ## 5. The HPA alone (show the charts, not live)
 
-Running it live takes ~15 minutes. Show `docs/tests/test3-hpa-baseline/` (`tests` branch) instead, or the *Experiments* tab of the dashboard with tests 1 and 3 side by side.
+Running it live takes ~15 minutes. Show `docs/tests/test3-hpa-baseline/` (`tests` branch) instead.
 
 To run it live anyway: stop Aegis (Ctrl+C in terminal 1), then
 
@@ -212,4 +212,4 @@ and at the end `python3 scripts/reset.py` (it puts the Aegis HPA back).
 | `kubectl apply` says the Job is immutable | A previous Job is still there: `python3 scripts/reset.py` |
 | `/api/books` returns 500 | `scripts/setup.sh` (it seeds the table again) |
 | Aegis starts with more than 1 pod | Stop it, `python3 scripts/reset.py`, start it again |
-| `Address already in use` (port 8080) | Another Aegis or replay is still running: `pkill -f aegis.replay` (or stop the other Aegis), or start with `--port 8081` |
+| `Address already in use` (port 8080) | Another Aegis is still running: stop it, or start with `--port 8081` |

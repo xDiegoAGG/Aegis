@@ -35,11 +35,11 @@ Between the start of a climb and a Ready pod there are three delays: the demand 
 
 - On the ramp Aegis spent **+2.8 pod-minutes (+49%)** to cut failures from 37.1% to 2.5%. The HPA saves pods by under-provisioning: it never reached the 3 pods 46 req/s needs.
 - The overhead comes from requesting T + lag early and from waiting 60 s of low risk before scaling down. On the waves (test 2) the wait dominates: +4.9 pod-minutes per run. Since November 2026 the wait is 15–60 s by risk; simulated on these runs it saves 10–14% of pod-minutes ([formulas.md](formulas.md#6-the-decision-rule-70-up-30-for-1560-s-down)), still to be measured in the cluster.
-- **False alarms:** none on ramps and waves. On the spike every run added a 3rd pod the peak did not need (the 30 s slope overshoots right after a jump), ~2.5 pod-minutes each. Damped forecasters overshoot less but request later on ramps ([forecast.md](tests/forecast.md)).
+- **False alarms:** none on ramps and waves. On the spike every run added a 3rd pod the peak did not need (the 30 s slope overshoots right after a jump), ~2.5 pod-minutes each. Damped forecasters overshoot less but request later on ramps ([forecast.md](https://github.com/xDiegoAGG/Aegis/tree/tests/docs/tests/forecast.md)).
 
 ## 3. Metric mode
 
-With the HPA reading the decision through the Custom Metrics API (test 8), each decision reaches the HPA **3–12 s** later (9.5 s on average: scrape, prometheus-adapter, 15 s HPA sync). The first pod is created at ~86 s instead of ~74 s, after the traffic passed C, so it starts under overload and takes ~75 s to be Ready (section 4). Failures rise from 2.5% to **20.2%**. Use `min_replicas` mode unless that path is shortened.
+With the HPA reading the decision through the Custom Metrics API (test 8), each decision reaches the HPA **3–12 s** later (9.5 s on average: scrape, prometheus-adapter, 15 s HPA sync). The first pod is created at ~86 s instead of ~74 s, after the traffic passed C, so it starts under overload and takes ~75 s to be Ready (section 4). Failures rise from 2.5% to **20.2%**. That is why Aegis only writes `minReplicas`; the metric mode was removed from `main` and stays in the [`tests` branch](https://github.com/xDiegoAGG/Aegis/tree/tests/).
 
 ## 4. Assumptions
 
@@ -82,4 +82,3 @@ So "Ready" understates the HPA's capacity in the charts; compare request times a
 - Traffic made of instant spikes: schedule capacity instead.
 - Capacity that varies a lot per request, unless C is calibrated per mix.
 - Startups of minutes: the horizon and its error grow.
-- Acting only through the Custom Metrics API with default intervals.

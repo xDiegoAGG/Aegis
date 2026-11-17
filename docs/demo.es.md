@@ -101,7 +101,7 @@ cd app
 python3 -m aegis.actuator
 ```
 
-Usa el modo `min_replicas`, que es el de siempre: Aegis sube `minReplicas` del HPA. El modo métrica es solo un experimento (prueba 8) y no se usa en la demo.
+Usa el modo `min_replicas`, que es el de siempre: Aegis sube `minReplicas` del HPA.
 
 Debes ver `Calibration from …: C=… req/s, T=… s` y después una línea cada 5 s:
 
@@ -120,7 +120,7 @@ demand=0.0 projected=0.0 sigma=2 risk=0.0% ready=1 | HOLD 1 -> 1 (already at min
 
 Las decisiones salen como `WARNING` para que se noten.
 
-**Navegador**: http://localhost:8080 muestra los mismos valores en vivo, con la fórmula del último ciclo y cada escalado ([dashboard.md](dashboard.md)). Si el clúster falla, `cd app && python3 -m aegis.replay --speed 3` reproduce una corrida grabada.
+**Navegador**: el monitor en vivo ([monitor/](../monitor/)): `cd monitor && npm run dev` y abre http://localhost:5173.
 
 **Terminal 2, pods y HPA**:
 
@@ -187,7 +187,7 @@ python3 scripts/reset.py
 
 ## 5. El HPA solo (mostrar las gráficas, no en vivo)
 
-En vivo tarda ~15 minutos. Mejor muestra `docs/tests/test3-hpa-baseline/` (`tests` branch), o la pestaña *Experimentos* del dashboard con las pruebas 1 y 3 lado a lado.
+En vivo tarda ~15 minutos. Mejor muestra `docs/tests/test3-hpa-baseline/` (`tests` branch).
 
 Para correrlo en vivo de todas formas: detén Aegis (Ctrl+C en la terminal 1) y luego
 
@@ -212,4 +212,4 @@ y al final `python3 scripts/reset.py` (vuelve a poner el HPA de Aegis).
 | `kubectl apply` dice que el Job es inmutable | Quedó un Job anterior: `python3 scripts/reset.py` |
 | `/api/books` devuelve 500 | `scripts/setup.sh` (vuelve a llenar la tabla) |
 | Aegis arranca con más de 1 pod | Detenlo, `python3 scripts/reset.py`, arráncalo otra vez |
-| `Address already in use` (puerto 8080) | Sigue corriendo otro Aegis o un replay: `pkill -f aegis.replay` (o detén el otro Aegis), o arranca con `--port 8081` |
+| `Address already in use` (puerto 8080) | Sigue corriendo otro Aegis: detenlo, o arranca con `--port 8081` |
